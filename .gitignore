@@ -11,3 +11,12 @@ dist
 stats.html
 
 .eslintcache
+
+# Archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.lz
+*.7z
+*.rar
