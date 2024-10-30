@@ -1,6 +1,7 @@
 import { firestoreDb } from '../firebase.js';
-import { collection, doc, getDoc, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import bcrypt from 'bcrypt';
+
 
 const usersCollection = collection(firestoreDb, 'users');
 
