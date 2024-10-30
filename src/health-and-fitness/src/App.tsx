@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [responseData, setResponseData] = useState(null); // State to store response data
+
+  useEffect(() => {
+    // Define the fetch function
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: "exampleUser",
+            password: "examplePassword"
+          })
+        });
+        
+        // Check if the response is okay
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse JSON response
+        setResponseData(data); // Update response data state
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData(); // Call the fetch function when component mounts
+  }, []); // Empty dependency array to run only once
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <header className="App-header">
+        <img src={reactLogo} className="App-logo" alt="logo" />
+        <img src={viteLogo} className="App-logo" alt="logo" />
+
+        {/* Display fetched data or loading state */}
+        <h2>API Response:</h2>
+        {responseData ? <pre>{JSON.stringify(responseData, null, 2)}</pre> : <p>Loading...</p>}
+      </header>
+    </div>
+  );
 }
 
-export default App
+export default App;
