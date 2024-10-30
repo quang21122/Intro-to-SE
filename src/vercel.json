@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+      { "source": "/api/(.*)", "destination": "/api/routes/$1.js" },
+      { "source": "/(.*)", "destination": "/" }
+    ],
+    "functions": {
+      "api/routes/*.js": {
+        "runtime": "nodejs20.x"
+      }
+    }
+  }
+  
