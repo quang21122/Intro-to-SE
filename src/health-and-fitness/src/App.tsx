@@ -10,14 +10,12 @@ function App() {
     // Define the fetch function
     const fetchData = async () => {
       try {
-        const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
+        const params = new URLSearchParams({ 'username': 'exampleUser' }); // Create URLSearchParams object
+        const response = await fetch(`https://intro2se-staging.vercel.app/api/user?${params}`, {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            username: "exampleUser",
-          }),
         });
         
         // Check if the response is okay
