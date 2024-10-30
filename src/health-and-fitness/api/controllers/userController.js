@@ -21,7 +21,7 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   // Get the username from the request body
-  const { username } = req.body;
+  const { username } = req.query;
   // Delete the user document by username
   await userService.deleteUser(username);
   return res.status(200).json({ message: "DELETE user" });
