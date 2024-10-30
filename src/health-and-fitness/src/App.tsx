@@ -65,7 +65,7 @@ function App() {
           },
           body: JSON.stringify({
             username: 'exampleUser2',
-            password: '12345',
+            oldPassword: '12345',
             newPassword: '54321'
           }),
         });

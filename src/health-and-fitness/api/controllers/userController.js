@@ -13,9 +13,9 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   // Get the username and data from the request body
-  const { username, data } = req.body;
+  const { username, oldPassword, newPassword} = req.body;
   // Update the user document by username
-  await userService.updateUser(username, data);
+  await userService.updateUser(username, oldPassword, newPassword);
   return res.status(200).json({ message: "PUT user" });
 };
 

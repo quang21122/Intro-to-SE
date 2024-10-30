@@ -55,7 +55,7 @@ const getUser = async (username) => {
     }
 }
 
-const updateUser = async (username, data) => {
+const updateUser = async (username, oldPassword, newPassword) => {
     try {
       // Check if the user document exists
       const usernameQuery = query(usersCollection, where("username", "==", username));
@@ -63,11 +63,21 @@ const updateUser = async (username, data) => {
       if (querySnapshot.empty) {
         throw new Error("User not found");
       }
+
+      // Hash the new password
+      const hashedOldPassword = await bcrypt.hash(oldPassword, 10);
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+      // Check if the old password matches the stored password
+      if (hashedOldPassword !== querySnapshot.docs[0].data().password) {
+        throw new Error("Old password does not match");
+      }
       
-      // Update the user document by username
+      // Update the user password by username
       querySnapshot.forEach(async (doc) => {
-        await updateDoc(doc.ref, data);
+        await updateDoc(doc.ref, { password: hashedNewPassword });
       });
+      
     } catch (error) {
       throw new Error(error.message);
     }
