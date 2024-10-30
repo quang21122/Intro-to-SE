@@ -1,7 +1,9 @@
 import userService from "../services/userService.js";
 
 const getUser = async (req, res) => {
-  return res.status(200).json({ message: "GET user" });
+  const { username } = req.body;
+  const user = await userService.getUser(username);
+  res.status(200).json(user);
 };
 
 const createUser = async (req, res) => {

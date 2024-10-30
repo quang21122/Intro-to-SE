@@ -33,18 +33,22 @@ const createUser = async (data) => {
     }
 };
 
-const getUser = async (id) => {
+const getUser = async (username) => {
     try {
-      // Get the user document by ID
-      const userDoc = await getDoc(doc(usersCollection, id));
+      // Get user by username
+      const usernameQuery = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(usernameQuery);
 
-      // Check if the user document exists
-      if (!userDoc.exists()) {
+      if (querySnapshot.empty) {
         throw new Error("User not found");
       }
 
-      // Return the user document data
-      return userDoc.data();
+      let user = {};
+      querySnapshot.forEach((doc) => {
+        user = doc.data();
+      });
+
+      return user;
     } catch (error) {
       throw new Error(error.message);
     }

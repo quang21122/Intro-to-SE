@@ -11,13 +11,12 @@ function App() {
     const fetchData = async () => {
       try {
         const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            username: "exampleUser1",
-            password: "examplePassword1"
+            username: "exampleUser",
           }),
         });
         
