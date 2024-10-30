@@ -38,7 +38,7 @@ function App() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            username: 'exampleUser2',
+            username: 'exampleUser3',
             password: '12345'
 
           }),
@@ -56,8 +56,58 @@ function App() {
       }
     }
 
+    const updateUser = async () => {
+      try {
+        const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: 'exampleUser2',
+            password: '12345',
+            newPassword: '54321'
+          }),
+        });
+
+        // Check if the response is okay
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse JSON response
+        setResponseData(data); // Update response data state
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const deleteUser = async () => {
+      try {
+        const params = new URLSearchParams({ 'username': 'exampleUser3' }); // Create URLSearchParams object
+        const response = await fetch(`https://intro2se-staging.vercel.app/api/user?${params}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+
+        // Check if the response is okay
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json(); // Parse JSON response
+        setResponseData(data); // Update response data state
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     createUser();
-    fetchData(); // Call the fetch function when component mounts
+    fetchData();
+    updateUser();
+    deleteUser();
   }, []); // Empty dependency array to run only once
 
   return (
