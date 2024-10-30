@@ -1,10 +1,8 @@
 import userRoutes from "./routes/user.js";
-import { initializeFirebaseApp, getFirebaseApp } from "./firebase.js";
 
 // Main entry function
 export default function handler(req, res) {
     // Initialize the Firebase app
-    initializeFirebaseApp();
     // Check the URL path and route accordingly
     if (req.url.startsWith("/api/user")) {
         return userRoutes(req, res);
