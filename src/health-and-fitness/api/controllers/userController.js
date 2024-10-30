@@ -1,8 +1,7 @@
 import userService from "../services/userService.js";
 
 const getUser = async (req, res) => {
-  const user = await userService.getUserById(req.query.id);
-  res.status(200).json(user);
+  return res.status(200).json({ message: "GET user" });
 };
 
 const createUser = async (req, res) => {
