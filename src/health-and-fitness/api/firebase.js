@@ -28,4 +28,4 @@ const initializeFirebaseApp = () => {
 
 const getFirebaseApp = () => app;
 
-export { initializeFirebaseApp, getFirebaseApp };
+export { initializeFirebaseApp, getFirebaseApp, firestoreDb };
