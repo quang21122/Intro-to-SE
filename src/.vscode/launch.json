@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "https://intro2se-staging.vercel.app/",
+            "request": "launch",
+            "url": "https://intro2se-staging.vercel.app/"
+        }
+    ]
+}
