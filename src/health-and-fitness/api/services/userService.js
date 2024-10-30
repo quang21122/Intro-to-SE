@@ -8,6 +8,14 @@ const createUser = async (data) => {
     const { username, password } = data;
 
     try {
+      // Check if the username already exists in the database
+      const usernameQuery = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(usernameQuery);
+      
+      if (!querySnapshot.empty) {
+        throw new Error("Username already exists. Please choose a different one.");
+      }
+      
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -25,4 +33,56 @@ const createUser = async (data) => {
     }
 };
 
-export default { createUser };
+const getUser = async (id) => {
+    try {
+      // Get the user document by ID
+      const userDoc = await getDoc(doc(usersCollection, id));
+
+      // Check if the user document exists
+      if (!userDoc.exists()) {
+        throw new Error("User not found");
+      }
+
+      // Return the user document data
+      return userDoc.data();
+    } catch (error) {
+      throw new Error(error.message);
+    }
+}
+
+const updateUser = async (username, data) => {
+    try {
+      // Check if the user document exists
+      const usernameQuery = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(usernameQuery);
+      if (querySnapshot.empty) {
+        throw new Error("User not found");
+      }
+      
+      // Update the user document by username
+      querySnapshot.forEach(async (doc) => {
+        await updateDoc(doc.ref, data);
+      });
+    } catch (error) {
+      throw new Error(error.message);
+    }
+}
+
+const deleteUser = async (username) => {
+    try {
+      // Check if the user document exists
+      const usernameQuery = query(usersCollection, where("username", "==", username));
+      const querySnapshot = await getDocs(usernameQuery);
+      if (querySnapshot.empty) {
+        throw new Error("User not found");
+      }
+      
+      // Delete the user document by username
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+    } catch (error) {
+      throw new Error(error.message);
+    }
+}
+export default { createUser,getUser,updateUser,deleteUser };

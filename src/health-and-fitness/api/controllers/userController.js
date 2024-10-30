@@ -9,4 +9,19 @@ const createUser = async (req, res) => {
   res.status(201).json(newUser);
 };
 
-export default { getUser, createUser };
+const updateUser = async (req, res) => {
+  // Get the username and data from the request body
+  const { username, data } = req.body;
+  // Update the user document by username
+  await userService.updateUser(username, data);
+  return res.status(200).json({ message: "PUT user" });
+};
+
+const deleteUser = async (req, res) => {
+  // Get the username from the request body
+  const { username } = req.body;
+  // Delete the user document by username
+  await userService.deleteUser(username);
+  return res.status(200).json({ message: "DELETE user" });
+} 
+export default { getUser, createUser, updateUser, deleteUser };
