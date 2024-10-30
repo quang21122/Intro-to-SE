@@ -16,9 +16,9 @@ function App() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            username: "exampleUser",
-            password: "examplePassword"
-          })
+            username: "exampleUser1",
+            password: "examplePassword1"
+          }),
         });
         
         // Check if the response is okay
