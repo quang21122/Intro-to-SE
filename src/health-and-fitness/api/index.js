@@ -1,4 +1,4 @@
-import userRoutes from "./routes/user";
+import userRoutes from "./routes/user.js";
 
 // Main entry function
 export default function handler(req, res) {

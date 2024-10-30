@@ -1,4 +1,4 @@
-import userController from "../controllers/userController";
+import userController from "../controllers/userController.js";
 
 export default async function handler(req, res) {
   switch (req.method) {
