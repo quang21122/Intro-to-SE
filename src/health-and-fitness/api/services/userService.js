@@ -14,7 +14,8 @@ const createUser = async (data) => {
       const querySnapshot = await getDocs(usernameQuery);
       
       if (!querySnapshot.empty) {
-        throw new Error("Username already exists. Please choose a different one.");
+        console.error("Username already exists. Please choose a different one.");
+        return { error: "Username already exists. Please choose a different one.", status: 409 };
       }
       
       // Hash the password
@@ -30,7 +31,8 @@ const createUser = async (data) => {
       // Return the new user's document ID if needed
       return { id: newUser.id, username }; // You can choose to return the auto-generated ID or not
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error creating user: ", error);
+      return { error: "Error creating user", status: 500 };
     }
 };
 
@@ -41,7 +43,8 @@ const getUser = async (username) => {
       const querySnapshot = await getDocs(usernameQuery);
 
       if (querySnapshot.empty) {
-        throw new Error("User not found");
+        console.error("User not found");
+        return { error: "User not found", status: 404 };
       }
 
       let user = {};
@@ -51,7 +54,8 @@ const getUser = async (username) => {
 
       return user;
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error getting user: ", error);
+      return { error: "Error getting user", status: 500 };
     }
 }
 
@@ -61,7 +65,8 @@ const updateUser = async (username, oldPassword, newPassword) => {
       const usernameQuery = query(usersCollection, where("username", "==", username));
       const querySnapshot = await getDocs(usernameQuery);
       if (querySnapshot.empty) {
-        throw new Error("User not found");
+        console.error("User not found");
+        return { error: "User not found", status: 404 };
       }
 
       // Hash the new password
@@ -70,7 +75,8 @@ const updateUser = async (username, oldPassword, newPassword) => {
 
       // Check if the old password matches the stored password
       if (hashedOldPassword !== querySnapshot.docs[0].data().password) {
-        throw new Error("Old password does not match");
+        console.error("Old password does not match");
+        return { error: "Old password does not match", status: 401 };
       }
       
       // Update the user password by username
@@ -79,7 +85,8 @@ const updateUser = async (username, oldPassword, newPassword) => {
       });
       
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error updating user: ", error);
+      return { error: "Error updating user", status: 500 };
     }
 }
 
@@ -89,7 +96,8 @@ const deleteUser = async (username) => {
       const usernameQuery = query(usersCollection, where("username", "==", username));
       const querySnapshot = await getDocs(usernameQuery);
       if (querySnapshot.empty) {
-        throw new Error("User not found");
+        console.error("User not found");
+        return { error: "User not found", status: 404 };
       }
       
       // Delete the user document by username
@@ -97,7 +105,9 @@ const deleteUser = async (username) => {
         await deleteDoc(doc.ref);
       });
     } catch (error) {
-      throw new Error(error.message);
+      console.error("Error deleting user: ", error);
+      return { error: "Error deleting user", status: 500 };
     }
 }
+
 export default { createUser,getUser,updateUser,deleteUser };
