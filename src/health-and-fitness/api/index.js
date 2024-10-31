@@ -1,20 +1,11 @@
 import userRoutes from "./routes/user.js";
-import cors from "cors";
-
-// Middleware to enable CORS
-export const corsMiddleware = cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-});
 
 // Main entry function
 export default function handler(req, res) {
-    // Enable CORS
-    corsMiddleware(req, res, () => {
-        // Handle routes
-        userRoutes(req, res);
-    });
+    // Handle user routes
+    if (req.url.startsWith("/user")) {
+        return userRoutes(req, res);
+    }
 
     // Handle OPTIONS requests
     if (req.method === "OPTIONS") {
