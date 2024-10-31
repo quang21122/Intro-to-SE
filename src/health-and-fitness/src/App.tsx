@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg';
 import './App.css';
 
 function App() {
-  const [responseData, setResponseData] = useState(null); // State to store response data
+  const [responseData, setResponseData] = useState(null); 
 
   const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : window.location.origin; // Define the URL based on the environment
 
