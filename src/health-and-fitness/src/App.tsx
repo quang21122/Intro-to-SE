@@ -6,18 +6,7 @@ import './App.css';
 function App() {
   const [responseData, setResponseData] = useState(null); // State to store response data
 
-  let URL;
-
-  if (import.meta.env.DEV) {
-    // Local development environment
-    URL = import.meta.env.VITE_BE_LOCAL_TEST_URL;
-  } else if (import.meta.env.VERCEL_ENV === 'production') {
-    // Production deployment
-    URL = "https://intro2se-health-and-fitness.vercel.app/";
-  } else {
-    // Preview deployment
-    URL = "intro2se-staging.vercel.app";
-  }
+  const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : import.meta.env.VITE_PROD_URL; // Define the URL based on the environment
   
   useEffect(() => {
     // Define the fetch function
