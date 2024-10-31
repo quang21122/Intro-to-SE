@@ -13,7 +13,9 @@ export default function handler(req, res) {
     // Enable CORS
     corsMiddleware(req, res, () => {
         // Handle routes
-        userRoutes(req, res);
+        if (req.url.startsWith("/user")) {
+            userRoutes(req, res);
+        }
     });
 
     // Handle OPTIONS requests
