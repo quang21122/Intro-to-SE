@@ -84,32 +84,32 @@ function App() {
       }
     }
 
-    const deleteUser = async () => {
-      try {
-        const params = new URLSearchParams({ 'username': 'exampleUser3' }); // Create URLSearchParams object
-        const response = await fetch(`${URL}/api/user?${params}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        });
+    // const deleteUser = async () => {
+    //   try {
+    //     const params = new URLSearchParams({ 'username': 'exampleUser3' }); // Create URLSearchParams object
+    //     const response = await fetch(`${URL}/api/user?${params}`, {
+    //       method: 'DELETE',
+    //       headers: {
+    //         'Content-Type': 'application/json'
+    //       },
+    //     });
 
-        // Check if the response is okay
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
+    //     // Check if the response is okay
+    //     if (!response.ok) {
+    //       throw new Error(`Error: ${response.status}`);
+    //     }
 
-        const data = await response.json(); // Parse JSON response
-        setResponseData(data); // Update response data state
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    //     const data = await response.json(); // Parse JSON response
+    //     setResponseData(data); // Update response data state
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    // createUser();
-    // fetchData();
-    // updateUser();
-    deleteUser();
+    createUser();
+    fetchData();
+    updateUser();
+    // deleteUser();
   }, [URL]); // Empty dependency array to run only once
 
   return (
