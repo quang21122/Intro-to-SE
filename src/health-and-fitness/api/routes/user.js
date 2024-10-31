@@ -6,8 +6,12 @@ export default async function handler(req, res) {
       return userController.getUser(req, res);
     case "POST":
       return userController.createUser(req, res);
+    case "PUT":
+      return userController.updateUser(req, res);
+    case "DELETE":
+      return userController.deleteUser(req, res);
     default:
-      res.setHeader("Allow", ["GET", "POST"]);
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
