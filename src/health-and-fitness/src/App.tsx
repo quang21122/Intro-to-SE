@@ -6,7 +6,7 @@ import './App.css';
 function App() {
   const [responseData, setResponseData] = useState(null); // State to store response data
 
-  const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : "/";
+  const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : window.location.origin; // Define the URL based on the environment
 
   useEffect(() => {
     // Define the fetch function
