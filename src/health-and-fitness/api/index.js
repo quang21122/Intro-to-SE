@@ -3,7 +3,7 @@ import userRoutes from "./routes/user.js";
 // Main entry function
 export default function handler(req, res) {
     // Handle user routes
-    if (req.url.startsWith("/user")) {
+    if (req.url.startsWith("/api/user")) {
         return userRoutes(req, res);
     }
 
