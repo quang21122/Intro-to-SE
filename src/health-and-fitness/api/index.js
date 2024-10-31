@@ -1,12 +1,28 @@
 import userRoutes from "./routes/user.js";
+import cors from "cors";
+
+// Middleware to enable CORS
+export const corsMiddleware = cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+});
 
 // Main entry function
 export default function handler(req, res) {
-    // Check the URL path and route accordingly
-    if (req.url.startsWith("/api/user")) {
-        return userRoutes(req, res);
+    // Enable CORS
+    corsMiddleware(req, res, () => {
+        // Handle routes
+        userRoutes(req, res);
+    });
+
+    // Handle OPTIONS requests
+    if (req.method === "OPTIONS") {
+        res.status(200).end();
     }
 
-    // 404 for any other routes not defined
-    res.status(404).json({ error: "Route not found" });
+    // Handle unsupported methods
+    if (req.method !== "GET" && req.method !== "POST" && req.method !== "PUT" && req.method !== "DELETE") {
+        res.status(405).end();
+    }
 }

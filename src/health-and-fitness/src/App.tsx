@@ -6,12 +6,14 @@ import './App.css';
 function App() {
   const [responseData, setResponseData] = useState(null); // State to store response data
 
+  const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : "/";
+
   useEffect(() => {
     // Define the fetch function
     const fetchData = async () => {
       try {
         const params = new URLSearchParams({ 'username': 'exampleUser' }); // Create URLSearchParams object
-        const response = await fetch(`https://intro2se-staging.vercel.app/api/user?${params}`, {
+        const response = await fetch(`${URL}/api/user?${params}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -32,7 +34,7 @@ function App() {
 
     const createUser = async () => {
       try {
-        const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
+        const response = await fetch(`${URL}/api/user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -58,7 +60,7 @@ function App() {
 
     const updateUser = async () => {
       try {
-        const response = await fetch('https://intro2se-staging.vercel.app/api/user', {
+        const response = await fetch(`${URL}/api/user`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -85,7 +87,7 @@ function App() {
     const deleteUser = async () => {
       try {
         const params = new URLSearchParams({ 'username': 'exampleUser3' }); // Create URLSearchParams object
-        const response = await fetch(`https://intro2se-staging.vercel.app/api/user?${params}`, {
+        const response = await fetch(`${URL}/api/user?${params}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
@@ -104,11 +106,11 @@ function App() {
       }
     }
 
-    createUser();
-    fetchData();
-    updateUser();
+    // createUser();
+    // fetchData();
+    // updateUser();
     deleteUser();
-  }, []); // Empty dependency array to run only once
+  }, [URL]); // Empty dependency array to run only once
 
   return (
     <div className="App">
