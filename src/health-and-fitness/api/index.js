@@ -13,7 +13,7 @@ export default function handler(req, res) {
     // Enable CORS
     corsMiddleware(req, res, () => {
         // Handle routes
-        if (req.url.startsWith("/user")) {
+        if (req.url.startsWith("/api/user")) {
             userRoutes(req, res);
         }
     });
@@ -27,4 +27,6 @@ export default function handler(req, res) {
     if (req.method !== "GET" && req.method !== "POST" && req.method !== "PUT" && req.method !== "DELETE") {
         res.status(405).end();
     }
+    
+    res.status(500).end();
 }

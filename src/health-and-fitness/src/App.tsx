@@ -107,9 +107,9 @@ function App() {
     }
 
     // createUser();
-    // fetchData();
+    fetchData();
     // updateUser();
-    deleteUser();
+    // deleteUser();
   }, [URL]); // Empty dependency array to run only once
 
   return (
