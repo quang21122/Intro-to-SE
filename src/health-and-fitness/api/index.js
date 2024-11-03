@@ -10,23 +10,25 @@ export const corsMiddleware = cors({
 
 // Main entry function
 export default function handler(req, res) {
-    // Enable CORS
+    // Handle OPTIONS requests first
+    if (req.method === "OPTIONS") {
+        corsMiddleware(req, res, () => res.status(200).end());
+        return;
+    }
+
+    // Enable CORS for other requests
     corsMiddleware(req, res, () => {
         // Handle routes
         if (req.url.startsWith("/api/user")) {
-            userRoutes(req, res);
+            return userRoutes(req, res);
         }
+
+        // Handle unsupported methods
+        if (!["GET", "POST", "PUT", "DELETE"].includes(req.method)) {
+            return res.status(405).end();
+        }
+
+        // If no matching route is found, return a 404
+        res.status(404).end();
     });
-
-    // Handle OPTIONS requests
-    if (req.method === "OPTIONS") {
-        res.status(200).end();
-    }
-
-    // Handle unsupported methods
-    if (req.method !== "GET" && req.method !== "POST" && req.method !== "PUT" && req.method !== "DELETE") {
-        res.status(405).end();
-    }
-    
-    res.status(500).end();
 }
