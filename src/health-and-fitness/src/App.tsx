@@ -9,7 +9,7 @@ function App() {
   const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : window.location.origin;
 
   useEffect(() => {
-    const signIn = async (email, password) => {
+    const signIn = async (email: string, password: string) => {
       try {
         const response = await axios.post(`${URL}/api/user/sign-in`, {
           email,
@@ -25,7 +25,7 @@ function App() {
     
         // Optionally, navigate the user to the dashboard or homepage
         // window.location.href = '/dashboard';
-    
+        setResponseData(response.data);
       } catch (error) {
           console.error("Error during sign-in:", error);
       }
