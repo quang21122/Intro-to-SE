@@ -62,7 +62,6 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   const { username } = req.query;
-  console.log(username);
   // Delete the user document by username
   await userService.deleteUser(username);
 

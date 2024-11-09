@@ -2,7 +2,6 @@ import userController from "../controllers/userController.js";
 
 export default async function handler(req, res) {
   if (req.url.startsWith("/api/user/sign-in") && req.method === "POST") {
-    console.log("Sign-in request received");
     return userController.signIn(req, res);
   }
 
