@@ -1,36 +1,35 @@
 import userRoutes from "./routes/user.js";
 import cors from 'cors';
 import dotenv from 'dotenv';
-dotenv.config({ path: '../../.env.local' });
+dotenv.config({ path: '../../.env.local' }); // Adjust the path if needed
 
-// Create cors middleware with specific options
+// Define CORS options
 const corsOptions = {
-  origin: 'http://localhost:9000', // Replace with your frontend URL
+  origin: 'http://localhost:9000', // Update to match your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, // Enable credentials (cookies, authorization headers, etc)
+  credentials: true,
   optionsSuccessStatus: 200
 };
 
+// Middleware to apply CORS with options
+const corsMiddleware = cors(corsOptions);
+
 export default async function handler(req, res) {
     try {
-        // Enable CORS with options
-        if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
-            const corsMiddleware = cors(corsOptions);
-            await new Promise((resolve, reject) => {
-            corsMiddleware(req, res, (err) => {
-                if (err) {
-                reject(err);
-                } else {
-                resolve();
-                }
-            });
-            });
-        }
-
-        // Handle OPTIONS request for CORS preflight
+        // Always apply CORS for OPTIONS requests (preflight)
         if (req.method === 'OPTIONS') {
             return res.status(200).end();
+        }
+
+        // Apply CORS only in development for non-OPTIONS requests
+        if (process.env.NODE_ENV === 'development') {
+            await new Promise((resolve, reject) => {
+                corsMiddleware(req, res, (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
         }
 
         // Route handling for /api/user
