@@ -9,6 +9,28 @@ function App() {
   const URL = import.meta.env.DEV ? import.meta.env.VITE_BE_LOCAL_TEST_URL : window.location.origin;
 
   useEffect(() => {
+    const signIn = async (email, password) => {
+      try {
+        const response = await axios.post(`${URL}/api/user/sign-in`, {
+          email,
+          password,
+        });
+    
+        console.log("Sign-in successful:", response.data);
+        // You can store the user info and token in your app state, localStorage, or cookies
+        const { userId, token } = response.data;
+    
+        // Store the token in localStorage (or wherever you prefer)
+        localStorage.setItem('token', token);
+    
+        // Optionally, navigate the user to the dashboard or homepage
+        // window.location.href = '/dashboard';
+    
+      } catch (error) {
+          console.error("Error during sign-in:", error);
+      }
+    };
+
     // Define the fetch function
     const fetchData = async () => {
       try {
@@ -25,8 +47,9 @@ function App() {
     const createUser = async () => {
       try {
         const response = await axios.post(`${URL}/api/user`, {
+          email: 'baoduytdn@gmail.com',
           username: 'exampleUser3',
-          password: '12345'
+          password: '12345678'
         }, {
           withCredentials: true,
           headers: {
@@ -42,9 +65,9 @@ function App() {
     const updateUser = async () => {
       try {
         const response = await axios.put(`${URL}/api/user`, {
-          username: 'exampleUser2',
-          oldPassword: '12345',
-          newPassword: '54321'
+          username: 'exampleUser3',
+          oldPassword: '12345678',
+          newPassword: '87654321'
         }, {
           withCredentials: true,
           headers: {
@@ -72,10 +95,11 @@ function App() {
       }
     };
 
-    createUser();
-    fetchData();
-    updateUser();
-    deleteUser();
+    signIn('baoduytdn@gmail.com', '12345678');
+    // createUser();
+    // fetchData();
+    // updateUser();
+    // deleteUser();
   }, [URL]);
 
 

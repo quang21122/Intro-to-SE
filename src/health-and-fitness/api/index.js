@@ -34,6 +34,7 @@ export default async function handler(req, res) {
 
         // Route handling for /api/user
         if (req.url.startsWith('/api/user')) {
+            console.log(1);
             return userRoutes(req, res);
         }
 
