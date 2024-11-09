@@ -56,7 +56,7 @@ function App() {
         console.error(error);
       }
     };
-
+    
     const deleteUser = async () => {
       try {
         const response = await axios.delete(`${URL}/api/user`, {
@@ -71,11 +71,12 @@ function App() {
       }
     };
 
-    // createUser();
+    createUser();
     fetchData();
-    // updateUser();
-    // deleteUser();
+    updateUser();
+    deleteUser();
   }, [URL]);
+
 
   return (
     <div className="App">
