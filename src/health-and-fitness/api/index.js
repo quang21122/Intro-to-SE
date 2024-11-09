@@ -8,13 +8,21 @@ export const corsMiddleware = cors({
     allowedHeaders: ["Content-Type"],
 });
 
-// Main entry function
-export default function handler(req, res) {
-    // Handle OPTIONS requests first
-    if (req.method === "OPTIONS") {
-        corsMiddleware(req, res, () => res.status(200).end());
-        return;
-    }
+export default async function handler(req, res) {
+    try {
+        // Enable CORS with options
+        if (process.env.NODE_ENV && process.env.NODE_ENV === 'development') {
+            const corsMiddleware = cors(corsOptions);
+            await new Promise((resolve, reject) => {
+            corsMiddleware(req, res, (err) => {
+                if (err) {
+                reject(err);
+                } else {
+                resolve();
+                }
+            });
+            });
+        }
 
     // Enable CORS for other requests
     corsMiddleware(req, res, () => {
