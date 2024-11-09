@@ -13,10 +13,8 @@ function App() {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${URL}/api/user`, {
+          withCredentials: true,
           params: { username: 'exampleUser' },
-          headers: {
-            'Content-Type': 'application/json'
-          }
         });
         setResponseData(response.data);
       } catch (error) {
@@ -30,6 +28,7 @@ function App() {
           username: 'exampleUser3',
           password: '12345'
         }, {
+          withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
           }
@@ -47,6 +46,7 @@ function App() {
           oldPassword: '12345',
           newPassword: '54321'
         }, {
+          withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
           }
@@ -61,6 +61,7 @@ function App() {
       try {
         const response = await axios.delete(`${URL}/api/user`, {
           params: { username: 'exampleUser3' },
+          withCredentials: true,
           headers: {
             'Content-Type': 'application/json'
           }
