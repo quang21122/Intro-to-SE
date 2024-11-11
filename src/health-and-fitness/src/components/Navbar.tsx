@@ -10,14 +10,30 @@ export default function Navbar() {
       <img src={logo} alt="Logo" className="h-8" />
       <nav className="hidden md:block">
         <ul className="flex gap-20 relative mx-28">
-          <li className="relative group cursor-pointer pr-6">
+          <li className="relative group  pr-6">
             <a
               href="#"
-              className="tracking-[0.2rem] text-white group-hover:text-red-500 focus:text-red-500"
+              className="tracking-[0.2rem] text-white group-hover:text-red-500"
             >
               WORKOUTS
             </a>
             <div className="absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent border-b-white group-hover:border-b-[red] cursor-pointer"></div>
+            <div className="bg-black absolute w-full h-4 -bottom-3 right-0"></div>
+            {/* Dropdown menu */}
+            <div className="absolute rounded-xl mt-2 top-full -right-3 hidden group-hover:block bg-white text-black py-2 w-40 z-10">
+              <ul className="">
+                <li className="px-4 py-2">
+                  <a href="#" className="tracking-widest hover:underline">
+                    Workout Plans
+                  </a>
+                </li>
+                <li className="px-4 py-2">
+                  <a href="#" className="tracking-widest hover:underline">
+                    My plan
+                  </a>
+                </li>
+              </ul>
+            </div>
           </li>
 
           <li>
