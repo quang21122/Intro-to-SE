@@ -19,3 +19,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.bebas-font {
+  font-family: "Bebas Neue", sans-serif;
+}
