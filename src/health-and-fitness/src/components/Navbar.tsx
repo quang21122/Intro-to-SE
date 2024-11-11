@@ -54,7 +54,7 @@ export default function Navbar() {
       <img
         src={humanBg}
         alt="Human"
-        className="absolute top-0 right-0 w-[32%] h-screen object-fill"
+        className="absolute top-0 right-0 w-[30%] h-screen object-fill"
       />
       <img
         src={rectangle}
