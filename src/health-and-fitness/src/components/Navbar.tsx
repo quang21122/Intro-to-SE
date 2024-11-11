@@ -1,13 +1,15 @@
-import logo from "../assets/logo.png";
-// import edge from "../assets/edge.png";
-import humanBg from "../assets/human-bg.png";
-import banner from "../assets/banner.png";
-import rectangle from "../assets/rectangle.png";
+import logo from "../assets/header/logo.png";
+// import edge from "../assets/header/edge.png";
+import humanBg from "../assets/header/human-bg.png";
+import banner from "../assets/header/banner.png";
+import rectangle from "../assets/header/rectangle.png";
 
 export default function Navbar() {
   return (
     <nav className="w-full flex items-center justify-around pt-6 px-4 relative">
-      <img src={logo} alt="Logo" className="h-8" />
+      <a href="">
+        <img src={logo} alt="Logo" className="h-8" />
+      </a>
       <nav className="hidden md:block">
         <ul className="flex gap-20 relative mx-28">
           <li className="relative group  pr-6">

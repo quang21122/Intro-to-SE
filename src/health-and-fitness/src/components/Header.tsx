@@ -1,13 +1,13 @@
 import Navbar from "./Navbar";
-import rectangle from "../assets/rectangle.png";
-import human from "../assets/human.png";
-import fitness from "../assets/fitness.png";
-import title from "../assets/title.png";
-import customize from "../assets/customize.png";
-import energy from "../assets/energy.png";
-import intensity from "../assets/intensity.png";
+import rectangle from "../assets/header/rectangle.png";
+import human from "../assets/header/human.png";
+import fitness from "../assets/header/fitness.png";
+import title from "../assets/header/title.png";
+import customize from "../assets/header/customize.png";
+import energy from "../assets/header/energy.png";
+import intensity from "../assets/header/intensity.png";
 
-export default function FitnessHeader() {
+export default function Header() {
   return (
     <div className="relative h-screen bg-black text-white overflow-hidden">
       <Navbar />
@@ -34,7 +34,7 @@ export default function FitnessHeader() {
             be conquered!
           </p>
           <p>
-            the key to breaking through personal boundaries, unlocking your
+            The key to breaking through personal boundaries, unlocking your
             potential.
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function FitnessHeader() {
               <img src={customize} alt="" />
               <p>Customised fitness plan</p>
             </div>
-            <div className="flex justify-center items-center max-w-52 space-x-4">
+            <div className="flex justify-center items-center max-w-52 space-x-4 mx-4">
               <img src={energy} alt="" />
               <p>Keep your feet and strong</p>
             </div>
