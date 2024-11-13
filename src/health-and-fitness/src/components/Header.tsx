@@ -2,7 +2,6 @@ import Navbar from "./Navbar";
 import rectangle from "../assets/header/rectangle.png";
 import human from "../assets/header/human.png";
 import fitness from "../assets/header/fitness.png";
-import title from "../assets/header/title.png";
 import customize from "../assets/header/customize.png";
 import energy from "../assets/header/energy.png";
 import intensity from "../assets/header/intensity.png";
@@ -26,8 +25,10 @@ export default function Header() {
         alt="Fitness"
         className="absolute bottom-28 left-6 h-[70%]"
       />
-      <div className="absolute top-40 left-32 space-y-8">
-        <img src={title} alt="Title" className="w-full" />
+      <div className="absolute top-32 left-32 space-y-8">
+        <h1 className="font-semibold bebas-font uppercase text-[5rem] max-w-[40rem] text-[#D64141] text-shadow-custom">
+          Conquer your doubts stay fearless
+        </h1>
         <div className="max-w-[40rem] text-lg">
           <p>
             HAF - The Health And Fitness platform where every limit is meant to
