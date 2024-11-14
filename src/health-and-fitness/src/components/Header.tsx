@@ -8,7 +8,7 @@ import intensity from "../assets/header/intensity.png";
 
 export default function Header() {
   return (
-    <div className="h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-black text-white overflow-hidden">
       <Navbar />
       <img
         src={rectangle}
@@ -18,14 +18,14 @@ export default function Header() {
       <img
         src={human}
         alt="Human"
-        className="absolute bottom-10 right-0 h-[75%] object-fill"
+        className="absolute bottom-10 right-0 h-[75vh] object-fill"
       />
       <img
         src={fitness}
         alt="Fitness"
-        className="absolute bottom-28 left-6 h-[70%]"
+        className="absolute bottom-28 left-6 h-[70vh]"
       />
-      <div className="mt-16 ml-32 h-screen space-y-8">
+      <div className="mt-[8vh] ml-[8vw] min-h-[70vh] space-y-8">
         <h1 className="font-semibold bebas-font uppercase text-[5rem] max-w-[40rem] text-[#D64141] text-shadow-custom">
           Conquer your doubts stay fearless
         </h1>
