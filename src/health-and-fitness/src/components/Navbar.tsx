@@ -7,15 +7,16 @@ import rectangle from "../assets/header/rectangle.png";
 export default function Navbar() {
   return (
     <nav className="w-full flex items-center justify-around pt-6 px-4 relative">
-      <a href="">
-        <img src={logo} alt="Logo" className="h-8" />
+      <a href="" className="flex justify-center items-center">
+        <img src={logo} alt="Logo" className="h-10" />
+        <p className="bebas-font text-4xl ml-2 tracking-widest">HAF</p>
       </a>
       <nav className="hidden md:block">
         <ul className="flex gap-20 relative mx-28">
           <li className="relative group  pr-6">
             <a
               href="#"
-              className="tracking-[0.2rem] text-white group-hover:text-red-500"
+              className="tracking-[0.2rem] text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
             >
               WORKOUTS
             </a>
@@ -38,18 +39,18 @@ export default function Navbar() {
             </div>
           </li>
 
-          <li>
+          <li className="group">
             <a
               href="#"
-              className="text-white hover:text-red-500 focus:text-red-500 tracking-[0.2rem]"
+              className="text-white group-hover:bg-gradient-to-b  group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent tracking-[0.2rem]"
             >
               EXERCISES
             </a>
           </li>
-          <li className="">
+          <li className="group">
             <a
               href="#"
-              className="text-white hover:text-red-500 focus:text-red-500 tracking-[0.2rem]"
+              className="text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent tracking-[0.2rem]"
             >
               MEAL PLAN
             </a>
