@@ -1,8 +1,8 @@
 import React from "react";
-import GymBanner from '../assets/homepage/gym_banner.png'
-import GymPic from '../assets/homepage/gym_pic.png'
-import Food from '../assets/homepage/food.png'
-import FooterPic from '../assets/homepage/footer_pic.png'
+import GymBanner from "../assets/homepage/gym_banner.png";
+import GymPic from "../assets/homepage/gym_pic.png";
+import Food from "../assets/homepage/food.png";
+import FooterPic from "../assets/homepage/footer_pic.png";
 
 function Homepage() {
   return (
@@ -37,7 +37,7 @@ function Homepage() {
               Learn the benefits and techniques of each exercise to enhance your
               training.
             </p>
-            <button className="bg-black rounded-lg text-[1.5rem] px-6 py-1 font-semibold my-7 hover:text-black hover:bg-white mx-10">
+            <button className="bg-black text-white rounded-lg text-[1.5rem] px-6 py-1 font-semibold my-7 hover:text-black hover:bg-[#F24B4B] mx-10">
               <a href="#">Try it</a>
             </button>
           </div>
@@ -67,7 +67,7 @@ function Homepage() {
         </div>
 
         <div className="grid grid-cols-[8fr_2fr] mt-44 items-center">
-          <div className="text-2xl tracking-[0.3rem]">
+          <div className="text-2xl text-white tracking-[0.3rem]">
             <p>
               Become part of our community and start your fitness journey today!{" "}
               <br />
@@ -76,7 +76,7 @@ function Homepage() {
             </p>
           </div>
           <div>
-            <button className="bg-white rounded-lg text-[1.5rem] text-black px-7 py-3 font-semibold my-8 hover:text-white hover:bg-black ml-24">
+            <button className="bg-white rounded-lg text-[1.5rem] text-black px-7 py-3 font-semibold my-8 hover:text-white hover:bg-[#F24B4B] ml-24">
               <a href="#">Join now</a>
             </button>
           </div>
