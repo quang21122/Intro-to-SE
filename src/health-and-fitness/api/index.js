@@ -1,4 +1,5 @@
 import userRoutes from "./routes/user.js";
+import exerciseRoutes from "./routes/exercise.js";
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config({ path: '../../.env.local' }); // Adjust the path if needed
@@ -36,7 +37,11 @@ export default async function handler(req, res) {
         if (req.url.startsWith('/api/user')) {
             return userRoutes(req, res);
         }
-
+        console.log(req.url);
+        // Route handling for /api/exercise
+        // if (req.url.startsWith('/api/exercise')) {
+        //     return exerciseRoutes(req, res);
+        // }
         // Handle unsupported methods
         if (!['GET', 'POST', 'PUT', 'DELETE'].includes(req.method)) {
             return res.status(405).json({ message: 'Method not allowed' });
