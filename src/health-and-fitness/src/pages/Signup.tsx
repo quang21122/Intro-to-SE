@@ -6,24 +6,22 @@ import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState<string>(""); // Đảm bảo email có kiểu string
+  const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
 
-  // Hàm kiểm tra email hợp lệ
   const validateEmail = (email: string): boolean => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(email);
   };
 
-  // Hàm xử lý đăng ký
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Ngừng hành động mặc định của form
+    e.preventDefault();
 
-    // Kiểm tra email hợp lệ
     if (validateEmail(email)) {
-      navigate("/"); // Nếu email hợp lệ, chuyển hướng về trang chủ
+      localStorage.setItem("isAuthenticated", "true");
+      navigate("/");
     } else {
-      setEmailError("Invalid email address"); // Nếu không hợp lệ, hiển thị thông báo lỗi
+      setEmailError("Invalid email address");
     }
   };
 
