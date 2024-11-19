@@ -3,8 +3,18 @@ import logo from "../assets/header/logo.png";
 import humanBg from "../assets/header/human-bg.png";
 import banner from "../assets/header/banner.png";
 import rectangle from "../assets/header/rectangle.png";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
+  const handleSignup = () => {
+    navigate("/signup");
+  };
   return (
     <nav className="w-full flex items-center justify-around pt-6 px-4 relative">
       <a href="" className="flex justify-center items-center">
@@ -63,10 +73,16 @@ export default function Navbar() {
         </ul>
       </nav>
       <div className="hidden md:flex gap-4 z-10">
-        <button className="px-6 py-2 font-medium rounded-lg text-black hover:text-red-600 hover:bg-black border-2 border-black">
+        <button
+          onClick={handleLogin}
+          className="px-6 py-2 font-medium rounded-lg text-black hover:text-red-600 hover:bg-black border-2 border-black"
+        >
           Login
         </button>
-        <button className="px-6 py-2 rounded-lg font-semibold bg-black text-white hover:bg-[#363636]">
+        <button
+          onClick={handleSignup}
+          className="px-6 py-2 rounded-lg font-semibold bg-black text-white hover:bg-[#363636]"
+        >
           Sign up
         </button>
       </div>
