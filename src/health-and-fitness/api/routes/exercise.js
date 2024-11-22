@@ -1,7 +1,7 @@
 import exerciseController from '../controllers/exerciseController.js';
 
 export default async function handler(req, res) {
-    if (req.url.startsWith('/api/exercise')) {
+    if (true) {
         switch (req.method) {
         case 'GET':
             return exerciseController.getExercise(req, res);

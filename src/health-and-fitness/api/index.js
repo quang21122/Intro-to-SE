@@ -39,9 +39,14 @@ export default async function handler(req, res) {
         }
         console.log(req.url);
         // Route handling for /api/exercise
-        // if (req.url.startsWith('/api/exercise')) {
-        //     return exerciseRoutes(req, res);
-        // }
+        if (req.url.startsWith('/api/exercise')) {
+            return exerciseRoutes(req, res);
+        }
+
+        // Route handling for /api/plan
+        if (req.url.startsWith('/api/plan')) {
+            return planRoutes(req, res);
+        }
         // Handle unsupported methods
         if (!['GET', 'POST', 'PUT', 'DELETE'].includes(req.method)) {
             return res.status(405).json({ message: 'Method not allowed' });

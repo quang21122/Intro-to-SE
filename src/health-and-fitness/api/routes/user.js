@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   }
 
   if (req.url.startsWith("/api/user")) {
+    console.log(req.url);
     switch (req.method) {
       case "GET":
         return userController.getUser(req, res);

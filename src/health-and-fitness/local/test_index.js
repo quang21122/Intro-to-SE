@@ -4,6 +4,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import userRoutes from '../api/routes/user.js'; // Adjust path if needed
+import exerciseRoutes from '../api/routes/exercise.js'; // Adjust path if needed
+import planRoutes from '../api/routes/plan.js'; // Adjust path if needed
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -25,7 +27,8 @@ app.use(express.json()); // Parse incoming JSON data
 
 // Route for handling user API requests
 app.use('/api/user', userRoutes);
-
+app.use('/api/exercise', exerciseRoutes); 
+app.use('/api/plan', planRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
