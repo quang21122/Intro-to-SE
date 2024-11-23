@@ -28,7 +28,7 @@ export default function Signup() {
   return (
     <div className="grid grid-cols-[2fr_8fr] h-full bg-gray-200 relative">
       <div className="absolute inset-0 bg-[#A91D3A] z-0"></div>
-      <div className="flex flex-col h-full relative z-10">
+      <div className="flex flex-col h-screen relative z-10">
         <a href="" className="flex flex-col h-full w-full">
           <div className="flex m-6">
             <img src={logo} alt="Logo" className="h-10" />

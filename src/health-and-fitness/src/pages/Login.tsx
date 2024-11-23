@@ -47,7 +47,7 @@ export default function Login() {
           {!showForgetPassword ? (
             <>
               <div className="flex justify-center items-center space-x-4">
-                <h1 className="text-3xl font-semibold tracking-widest text-center uppercase font-raleway">
+                <h1 className="text-3xl font-semibold tracking-widest text-center uppercase font-raleway text-[#000000]">
                   Login
                 </h1>
                 <img src={dumbell} alt="Dumbell" className="h-10" />
@@ -66,7 +66,7 @@ export default function Login() {
                     name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-2 mt-1 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400"
+                    className="w-full p-2 mt-1 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400 bg-white text-black"
                     autoComplete="off"
                     autoCorrect="off"
                   />
@@ -85,7 +85,7 @@ export default function Login() {
                     type="password"
                     id="password"
                     name="password"
-                    className="w-full p-2 mt-1 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400"
+                    className="w-full p-2 mt-1 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400 bg-white text-black"
                     autoComplete="off"
                     autoCorrect="off"
                   />
@@ -102,7 +102,7 @@ export default function Login() {
                 >
                   Login
                 </button>
-                <div className="mt-10 flex justify-center items-center font-raleway font-medium">
+                <div className="mt-10 flex justify-center items-center font-raleway font-medium text-[#000000]">
                   <p className="tracking-widest">New to HAF?</p>
                   <Link to="/signup" className="tracking-widest underline mx-2">
                     Sign up
@@ -115,7 +115,7 @@ export default function Login() {
             // Forget Password Form
             <>
               <div className="flex justify-center items-center space-x-4 max-w-40 mx-auto">
-                <h1 className="text-3xl font-semibold tracking-widest text-center uppercase font-raleway break-words">
+                <h1 className="text-3xl font-semibold tracking-widest text-center uppercase font-raleway break-words text-[#000000]">
                   Forget Password
                 </h1>
               </div>
@@ -130,7 +130,7 @@ export default function Login() {
                   type="text"
                   id="resetEmail"
                   name="resetEmail"
-                  className="w-full p-2 mt-4 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400"
+                  className="w-full p-2 mt-4 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400 bg-white text-black"
                   autoComplete="off"
                   autoCorrect="off"
                 />
