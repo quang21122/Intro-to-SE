@@ -2,7 +2,7 @@ import { firestoreDb } from '../firebase.js';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore';
 
 const createExercise = async (data) => {
-    const { description, equipment, link_image, muscle, name } = data;
+    const {difficulty, instruction, equipment, image, muscle, name, type, video } = data;
     try {
         const query = await getDoc(doc(firestoreDb, 'exercises', name));
         if (query.exists()) {
@@ -15,15 +15,18 @@ const createExercise = async (data) => {
         const exerciseId = exercisesCollection.size + 1;
         // Store additional user data in Firestore
         await setDoc(doc(firestoreDb, 'exercises', exerciseId.toString()), {
-        description,
-        equipment,
-        link_image,
-        muscle,
-        name,
+        difficulty, 
+        instruction, 
+        equipment, 
+        image, 
+        muscle, 
+        name, 
+        type, 
+        video,
         createdAt: new Date(),
         });
     
-        return { description, equipment, link_image, muscle, name };
+        return { difficulty, instruction, equipment, image, muscle, name, type, video  };
     } catch (error) {
         console.error("Error creating exercise:", error);
         return { error: error.message, status: 500 };

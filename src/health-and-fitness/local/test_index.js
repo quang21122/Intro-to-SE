@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import userRoutes from '../api/routes/user.js'; // Adjust path if needed
 import exerciseRoutes from '../api/routes/exercise.js'; // Adjust path if needed
 import planRoutes from '../api/routes/plan.js'; // Adjust path if needed
+import equipmentRoutes from '../api/routes/equipment.js'; // Adjust path if needed
+import muscleRoutes from '../api/routes/muscle.js'; // Adjust path if needed
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -29,6 +31,8 @@ app.use(express.json()); // Parse incoming JSON data
 app.use('/api/user', userRoutes);
 app.use('/api/exercise', exerciseRoutes); 
 app.use('/api/plan', planRoutes);
+app.use('/api/equipment', equipmentRoutes);
+app.use('/api/muscle', muscleRoutes);
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
