@@ -23,6 +23,22 @@ function WorkoutSlider() {
     appendDots: (dots) => (
       <ul className="list-none m-0 p-0 [&>li]:mx-4">{dots}</ul>
     ),
+    responsive: [
+      {
+        breakpoint: 1024, // For screens below 1024px
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+        },
+      },
+      {
+        breakpoint: 768, // For screens below 768px
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
 
   const plans = [
@@ -102,12 +118,14 @@ function WorkoutSlider() {
 
   return (
     <div className="-mx-[6.4rem]">
-      <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">For you</h1>
+      <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">
+        For you
+      </h1>
       <Slider {...settings}>
         {plans.map((plan, index) => (
           <div key={index} className="px-6">
             <div
-              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[14rem]"
+              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[14rem] sm:h-[12rem] md:h-[10rem] lg:h-[14rem]"
               style={{ backgroundImage: `url(${plan.image})` }}
             >
               <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-32 rounded-2xl hover:translate-y-12 hover:cursor-pointer font-bebas">
@@ -115,13 +133,13 @@ function WorkoutSlider() {
                   {plan.title}
                 </h3>
                 <div className="grid grid-cols-2 py-6 text-center font-montserrat">
-                  <div className="text-white text-xl flex flex-col font-">
-                    <p className="">{plan.duration}</p>
-                    <p className="">{plan.target}</p>
+                  <div className="text-white text-xl flex flex-col">
+                    <p>{plan.duration}</p>
+                    <p>{plan.target}</p>
                   </div>
                   <div className="text-white text-xl flex flex-col">
-                    <p className="">{plan.goal}</p>
-                    <p className="">{plan.level}</p>
+                    <p>{plan.goal}</p>
+                    <p>{plan.level}</p>
                   </div>
                 </div>
               </div>
