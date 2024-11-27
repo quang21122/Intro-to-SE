@@ -6,15 +6,24 @@ import {
   DropResult,
 } from "@hello-pangea/dnd"; // Using more stable fork
 import examplePic from "../assets/workout/example_pic.png";
-import exaplePic2 from "../assets/workout/examplePic2.png";
+import examplePic2 from "../assets/workout/examplePic2.png";
 import { TfiCup } from "react-icons/tfi";
 import { HiChartBar } from "react-icons/hi";
-import { GiBiceps } from "react-icons/gi";
 import { TbBarbell } from "react-icons/tb";
 import { CiClock2 } from "react-icons/ci";
 import { IoTrashOutline } from "react-icons/io5";
-import PropTypes from "prop-types";
+import { TiTick } from "react-icons/ti";
+import { CiCirclePlus } from "react-icons/ci";
+import { GrFormPrevious } from "react-icons/gr";
+import { FaSearch } from "react-icons/fa";
+import { IoCloseCircleOutline } from "react-icons/io5";
+// import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+
+type ExerciseField = "sets" | "reps" | "intervals" | "rest";
+type DayField = "title";
+type Difficulty = "Beginner" | "Intermediate" | "Advanced";
+type Goal = "Maintain" | "Bulk" | "Cut" | "Strength";
 
 interface Exercise {
   id: string;
@@ -29,18 +38,24 @@ interface Exercise {
 interface DayWorkout {
   days: string;
   title: string;
-  setTime: string;
+  setTime: {
+    minutes: number;
+    seconds: number;
+  };
   numOfExercises: number;
   exercises: Exercise[];
 }
 
-const MyPlansEdit: React.FC = (id) => {
+const MyPlansEdit: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [exercises, setExercises] = useState<DayWorkout[]>([
     {
       days: "Mon",
       title: "Chest & Triceps",
-      setTime: "45:00",
+      setTime: {
+        minutes: 50,
+        seconds: 0,
+      },
       numOfExercises: 6,
       exercises: [
         {
@@ -84,7 +99,10 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Tue",
       title: "Back & Biceps",
-      setTime: "50:00",
+      setTime: {
+        minutes: 50,
+        seconds: 0,
+      },
       numOfExercises: 6,
       exercises: [
         {
@@ -128,7 +146,10 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Wed",
       title: "Legs & Core",
-      setTime: "55:00",
+      setTime: {
+        minutes: 50,
+        seconds: 0,
+      },
       numOfExercises: 5,
       exercises: [
         {
@@ -172,7 +193,10 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Thu",
       title: "Shoulders & Arms",
-      setTime: "45:00",
+      setTime: {
+        minutes: 50,
+        seconds: 0,
+      },
       numOfExercises: 6,
       exercises: [
         {
@@ -216,7 +240,10 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Fri",
       title: "Full Body",
-      setTime: "60:00",
+      setTime: {
+        minutes: 50,
+        seconds: 0,
+      },
       numOfExercises: 5,
       exercises: [
         {
@@ -261,7 +288,10 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Sat",
       title: "Active Recovery",
-      setTime: "30:00",
+      setTime: {
+        minutes: 30,
+        seconds: 0,
+      },
       numOfExercises: 4,
       exercises: [
         {
@@ -305,11 +335,15 @@ const MyPlansEdit: React.FC = (id) => {
     {
       days: "Sun",
       title: "Rest Day",
-      setTime: "00:00",
+      setTime: {
+        minutes: 0,
+        seconds: 0,
+      },
       numOfExercises: 0,
       exercises: [], // Empty array for rest day
     },
   ]);
+  const [isAdding, setIsAdding] = useState(false);
 
   const plan = {
     image: examplePic,
@@ -319,6 +353,126 @@ const MyPlansEdit: React.FC = (id) => {
     goal: "Maintain",
     description:
       "The 5 Day Muscle Mass Split routine by JefitTeam is a 7 day workout plan. It is a intermediate level plan to achieve bulking fitness goals.",
+  };
+
+  const [planDetails, setPlanDetails] = useState({
+    title: plan.title,
+    difficulty: plan.difficulty as Difficulty,
+    goal: plan.goal as Goal,
+    description: plan.description,
+  });
+
+  const difficultyOptions: Difficulty[] = [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+  ];
+  const goalOptions: Goal[] = ["Maintain", "Bulk", "Cut", "Strength"];
+
+  const PlanCard = () => {
+    const [activeDifficulty, setActiveDifficulty] = useState(
+      planDetails.difficulty
+    );
+    const [activeGoal, setActiveGoal] = useState(planDetails.goal);
+
+    const handleDifficultyChange = (difficulty: Difficulty) => {
+      setActiveDifficulty(difficulty);
+      setPlanDetails((prev) => ({ ...prev, difficulty }));
+    };
+
+    const handleGoalChange = (goal: Goal) => {
+      setActiveGoal(goal);
+      setPlanDetails((prev) => ({ ...prev, goal }));
+    };
+
+    const handleTitleChange = (value: string) => {
+      setPlanDetails((prev) => ({ ...prev, title: value }));
+    };
+
+    const handleDescriptionChange = (value: string) => {
+      setPlanDetails((prev) => ({ ...prev, description: value }));
+    };
+
+    return (
+      <div className="flex flex-col mt-4 mx-4">
+        <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
+          <img src={plan.image} alt="" />
+          <div className="flex flex-col ml-2 mt-6">
+            <div className="flex flex-row items-center justify-between">
+              <input
+                type="text"
+                value={planDetails.title}
+                onChange={(e) => handleTitleChange(e.target.value)}
+                className="w-[75%] font-bebas uppercase text-black text-3xl py-1 px-2 rounded-xl bg-[#D9D9D9] border border-gray-400 focus:outline-none"
+                autoFocus
+              />
+              <p className="bg-[#C73659] font-bebas px-2 py-1 text-2xl text-[#B2B2B2] rounded-xl">
+                Applied
+              </p>
+            </div>
+
+            <div className="flex flex-col font-montserrat mt-3">
+              <div className="flex flex-col">
+                <div className="text-2xl flex flex-row items-center">
+                  <TfiCup className="mr-4 text-[#A91D3A]" />
+                  <p className="text-black">Goal</p>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {goalOptions.map((goal) => (
+                    <button
+                      key={goal}
+                      onClick={() => handleGoalChange(goal)}
+                      className={`text-black text-[1.1rem] w-32 my-2 py-2 rounded-xl ${
+                        activeGoal === goal
+                          ? "bg-[#C73659] text-white"
+                          : "bg-[#D9D9D9]"
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col mt-4">
+                <div className="text-2xl flex flex-row items-center">
+                  <HiChartBar className="mr-4 text-[#A91D3A]" />
+                  <p className="text-black">Level</p>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {difficultyOptions.map((difficulty) => (
+                    <button
+                      key={difficulty}
+                      onClick={() => handleDifficultyChange(difficulty)}
+                      className={`text-black text-[1.1rem] w-32 my-2 py-2 rounded-xl ${
+                        activeDifficulty === difficulty
+                          ? "bg-[#C73659] text-white"
+                          : "bg-[#D9D9D9]"
+                      }`}
+                    >
+                      {difficulty}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <h2 className="text-3xl font-bebas text-black mt-6">
+                Plan description
+              </h2>
+              <textarea
+                value={planDetails.description}
+                onChange={(e) => handleDescriptionChange(e.target.value)}
+                className="text-black text-xl mt-2 font-montserrat bg-[#D9D9D9] rounded-xl p-2 focus:outline-none"
+                rows={6}
+                autoFocus
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const navigate = useNavigate();
@@ -353,166 +507,440 @@ const MyPlansEdit: React.FC = (id) => {
     setExercises(newExercises);
   };
 
-  const ExerciseCard: React.FC<{ exercise: Exercise; index: number }> = ({
-    exercise,
-    index,
-  }) => (
-    <Draggable draggableId={exercise.id} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={`flex flex-col bg-[#D9D9D9] px-4 py-6 mt-6 mx-2 rounded-xl transition-colors ${
-            snapshot.isDragging ? "bg-opacity-70 shadow-lg" : ""
-          }`}
-        >
-          <div className="grid grid-cols-[1fr_3fr_1fr_1.5fr_1.5fr_1.5fr_0.5fr] items-center">
-            <img src={exaplePic2} alt="" />
-            <div className="flex flex-col ml-5">
-              <h2 className="text-[1.4rem] text-black ml-4">
-                {exercise.title}
-              </h2>
-              <p className="text-xl text-[#686D76] ml-4">{exercise.body}</p>
+  const handleDayValueChange = (field: DayField, value: string) => {
+    const newExercises = [...exercises];
+    newExercises[selectedDay][field] = value;
+    setExercises(newExercises);
+  };
+
+  const handleValueChange = (
+    dayIndex: number,
+    exerciseIndex: number,
+    field: ExerciseField,
+    value: string
+  ) => {
+    const newExercises = [...exercises];
+    newExercises[dayIndex].exercises[exerciseIndex] = {
+      ...newExercises[dayIndex].exercises[exerciseIndex],
+      [field]: value,
+    };
+    setExercises(newExercises);
+  };
+
+  const formatMinutes = (minutes: number) => {
+    return minutes < 10 ? `0${minutes}` : minutes;
+  };
+
+  const formatSeconds = (seconds: number) => {
+    return seconds < 10 ? `0${seconds}` : seconds;
+  };
+  // Add time handlers
+  const handleMinutesChange = (value: string) => {
+    const newExercises = [...exercises];
+    const minutes = parseInt(value) || 0;
+    newExercises[selectedDay].setTime = {
+      ...newExercises[selectedDay].setTime,
+      minutes: Math.min(59, Math.max(0, minutes)),
+    };
+    setExercises(newExercises);
+  };
+
+  const handleSecondsChange = (value: string) => {
+    const newExercises = [...exercises];
+    const seconds = parseInt(value) || 0;
+    newExercises[selectedDay].setTime = {
+      ...newExercises[selectedDay].setTime,
+      seconds: Math.min(59, Math.max(0, seconds)),
+    };
+    setExercises(newExercises);
+  };
+
+  const ExerciseCard: React.FC<{
+    exercise: Exercise;
+    index: number;
+    onValueChange: (field: ExerciseField, value: string) => void;
+  }> = ({ exercise, index, onValueChange }) => {
+    const [localValues, setLocalValues] = useState({
+      sets: exercise.sets.toString(),
+      reps: exercise.reps,
+      intervals: exercise.intervals,
+      rest: exercise.rest,
+    });
+
+    const handleLocalChange = (field: ExerciseField, value: string) => {
+      setLocalValues((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
+
+    const handleBlur = (field: ExerciseField) => {
+      onValueChange(field, localValues[field]);
+    };
+
+    return (
+      <Draggable draggableId={exercise.id} index={index}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className={`flex flex-col bg-[#D9D9D9] px-4 py-6 mt-6 mx-2 rounded-xl transition-colors ${
+              snapshot.isDragging ? "bg-opacity-70 shadow-lg" : ""
+            }`}
+          >
+            <div className="grid grid-cols-[1fr_3fr_1fr_1.5fr_1.5fr_1.5fr_0.5fr] items-center">
+              <img src={examplePic2} alt="" />
+              <div className="flex flex-col ml-5">
+                <h2 className="text-[1.4rem] text-black ml-4">
+                  {exercise.title}
+                </h2>
+                <p className="text-xl text-[#686D76] ml-4">{exercise.body}</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-2xl text-[#686D76]">Sets</p>
+                <input
+                  type="number"
+                  value={localValues.sets}
+                  onChange={(e) => handleLocalChange("sets", e.target.value)}
+                  onBlur={() => handleBlur("sets")}
+                  className="w-16 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                />
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-2xl text-[#686D76]">Reps</p>
+                <input
+                  type="text"
+                  value={localValues.reps}
+                  onChange={(e) => handleLocalChange("reps", e.target.value)}
+                  onBlur={() => handleBlur("reps")}
+                  className="w-32 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                />
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-2xl text-[#686D76]">Intervals</p>
+                <input
+                  type="text"
+                  value={localValues.intervals}
+                  onChange={(e) =>
+                    handleLocalChange("intervals", e.target.value)
+                  }
+                  onBlur={() => handleBlur("intervals")}
+                  className="w-16 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                />
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-2xl text-[#686D76]">Rest time</p>
+                <input
+                  type="text"
+                  value={localValues.rest}
+                  onChange={(e) => handleLocalChange("rest", e.target.value)}
+                  onBlur={() => handleBlur("rest")}
+                  className="w-16 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                />
+              </div>
+              <IoTrashOutline className="text-3xl ml-3 text-black cursor-pointer" />
             </div>
-            <div className="flex flex-col items-center">
-              <p className="text-2xl text-[#686D76]">Sets</p>
-              <p className="text-xl text-black">{exercise.sets}</p>
+          </div>
+        )}
+      </Draggable>
+    );
+  };
+
+  const PlanTable = () => {
+    return (
+      <div
+        className={`flex flex-col mx-2 font-montserrat ${
+          isAdding ? "mt-16" : "mt-8"
+        }`}
+      >
+        <div className="grid grid-cols-7">
+          {exercises.map((exercise, index) => (
+            <div
+              key={index}
+              onClick={() => setSelectedDay(index)}
+              className={`font-montserrat text-xl px-4 py-2 rounded-t-xl mx-0.5 flex justify-center items-center cursor-pointer transition-colors hover:bg-red-500 ${
+                selectedDay === index
+                  ? "bg-[#C73659] text-white"
+                  : "bg-[#686D76] text-white"
+              }`}
+            >
+              <h2 className="text-2xl">{exercise.days}</h2>
             </div>
-            <div className="flex flex-col items-center">
-              <p className="text-2xl text-[#686D76]">Reps</p>
-              <p className="text-xl text-black">{exercise.reps}</p>
+          ))}
+        </div>
+
+        <div className="bg-[#B2B2B2] p-6 mx-0.5">
+          <div className="flex flex-col mt-2">
+            <input
+              type="text"
+              value={exercises[selectedDay].title}
+              onChange={(e) => handleDayValueChange("title", e.target.value)}
+              className="w-[40%] text-[4rem] text-black ml-2 font-bebas bg-transparent border-b border-gray-400 bg-[#CDCDCD] rounded-xl px-2 mb-4"
+            />
+            <div className="flex flex-row justify-between font-montserrat ml-14">
+              <div className="flex flex-row items-center">
+                <TbBarbell className="text-[#A91D3A] text-5xl mr-2" />
+                <p className="text-[#686D76] text-2xl">
+                  Exercises: {exercises[selectedDay].exercises.length}
+                </p>
+              </div>
+              <div className="flex flex-row items-center mx-24">
+                <CiClock2 className="text-[#A91D3A] text-5xl mr-2" />
+                <div className="flex items-center text-[#686D76]">
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={formatMinutes(
+                      exercises[selectedDay].setTime.minutes
+                    )}
+                    onChange={(e) => handleMinutesChange(e.target.value)}
+                    className="w-12 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                  />
+                  <span className="mx-1 text-xl">:</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={formatSeconds(
+                      exercises[selectedDay].setTime.seconds
+                    )}
+                    onChange={(e) => handleSecondsChange(e.target.value)}
+                    className="w-12 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                  />
+                  <button className="mx-4 border-2 border-black rounded-xl hover:bg-white">
+                    <TiTick className="text-3xl text-black" />
+                  </button>
+                </div>
+              </div>
+              <div className="-mt-12">
+                <button
+                  className="flex flex-row items-center bg-black rounded-xl px-4 py-2 ml-32 mr-2"
+                  onClick={() => {
+                    setIsAdding(true);
+                  }}
+                >
+                  <p className="text-white text-3xl">Add</p>
+                  <CiCirclePlus className="text-4xl text-white ml-3" />
+                </button>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <p className="text-2xl text-[#686D76]">Intervals</p>
-              <p className="text-xl text-black">{exercise.intervals}</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p className="text-2xl text-[#686D76]">Rest time</p>
-              <p className="text-xl text-black">{exercise.rest}</p>
-            </div>
-            <IoTrashOutline className="text-3xl ml-3 text-black cursor-pointer" />
+
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId={`day-${selectedDay}`}>
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {exercises[selectedDay].exercises.map((exercise, index) => (
+                      <ExerciseCard
+                        key={exercise.id}
+                        exercise={exercise}
+                        index={index}
+                        onValueChange={(field, value) =>
+                          handleValueChange(selectedDay, index, field, value)
+                        }
+                      />
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           </div>
         </div>
-      )}
-    </Draggable>
-  );
+      </div>
+    );
+  };
+
+  const MuscleGroup = [
+    "Chest",
+    "Back",
+    "Legs",
+    "Shoulders",
+    "Arms",
+    "Core",
+    "Full Body",
+  ];
+
+  const EquipmentGroup = [
+    "Barbell",
+    "Dumbbell",
+    "Kettlebell",
+    "Machine",
+    "Cable",
+    "Bodyweight",
+  ];
+
+  const ExerciseGroup = [
+    {
+      image: examplePic2,
+      title: "Bench Press",
+      body: "Chest",
+    },
+    {
+      image: examplePic2,
+      title: "Deadlift",
+      body: "Back",
+    },
+    {
+      image: examplePic2,
+      title: "Squats",
+      body: "Legs",
+    },
+    {
+      image: examplePic2,
+      title: "Military Press",
+      body: "Shoulders",
+    },
+    {
+      image: examplePic2,
+      title: "Bicep Curls",
+      body: "Arms",
+    },
+  ];
+
+  interface DropdownWithCheckboxProps {
+    items: string[];
+    name: string;
+  }
+
+  const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({
+    items,
+    name,
+  }) => {
+    const [isSelectedItem, setIsSelectedItem] = useState<string[]>([]);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const toggleDropdown = () => setIsOpen(!isOpen);
+
+    const handleSelect = (item: string) => {
+      if (isSelectedItem.includes(item)) {
+        setIsSelectedItem(isSelectedItem.filter((i) => i !== item));
+      } else {
+        setIsSelectedItem([...isSelectedItem, item]);
+      }
+    };
+
+    return (
+      <div className="relative font-montserrat mt-6 text-black">
+        <div
+          className="rounded-xl bg-[#84878D] px-4 py-2 cursor-pointer flex flex-row justify-between items-center"
+          onClick={toggleDropdown}
+        >
+          <div></div>
+          <p className="text-xl">{name}</p>
+          <span className="transform transition-transform">
+            {isOpen ? "▲" : "▼"}
+          </span>
+        </div>
+
+        {isOpen && (
+          <div className="absolute mt-2 w-full z-20 bg-gray-200 text-black border border-gray-300 rounded-xl shadow-md">
+            {items.map((item) => (
+              <label
+                key={item}
+                className="flex items-center space-x-2 cursor-pointer px-4 py-2"
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelectedItem.includes(item)}
+                  onChange={() => handleSelect(item)}
+                  className="w-4 h-4 rounded border-gray-500"
+                />
+                <span className="font-montserrat">{item}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const AddExerciseCard = () => {
+    return (
+      <div className="flex flex-col bg-[#B2B2B2] p-4 rounded-xl mt-6 mx-2">
+        <div className="flex flex-row items-center justify-between">
+          <h1 className="font-bebas text-4xl text-black">Exercise Library</h1>
+          <IoCloseCircleOutline
+            className="text-4xl text-black cursor-pointer"
+            onClick={() => setIsAdding(false)}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <DropdownWithCheckbox items={MuscleGroup} name="Muscle" />
+          <DropdownWithCheckbox items={EquipmentGroup} name="Equipment" />
+        </div>
+
+        <div className="flex flex-row items-center mt-6">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-full bg-[#CDCDCD] p-4 rounded-xl text-black text-xl"
+          />
+          <FaSearch className="text-3xl text-black -mx-12" onClick={() => {}} />
+        </div>
+
+        <div className="flex flex-col mt-6">
+          <h1 className="font-montserrat text-3xl text-black">Exercises</h1>
+          {ExerciseGroup.map((exercise) => (
+            <div
+              key={exercise.title}
+              className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 cursor-pointer my-2"
+            >
+              <img src={exercise.image} alt="" className="w-14 h-14" />
+              <div className="flex flex-col">
+                <h2 className="text-2xl text-black">{exercise.title}</h2>
+                <p className="text-xl text-[#686D76]">{exercise.body}</p>
+              </div>
+              <CiCirclePlus
+                className="text-4xl text-black"
+                onClick={() => {}}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="grid grid-cols-[3fr_7fr] mx-8 pt-10">
-      <div className="flex flex-col mt-4 mx-4">
-        <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
-          My Plans
-        </h1>
-        <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
-          <img src={plan.image} alt="" />
-          <div className="flex flex-col ml-2 mt-6">
-            <h2 className="font-bebas uppercase text-black text-3xl">
-              {plan.title}
-            </h2>
-            <div className="grid grid-cols-2 font-montserrat mt-3">
-              <div className="text-2xl flex flex-row items-center my-2">
-                <TfiCup className="mr-4 text-[#A91D3A]" />
-                <p className="text-black">{plan.goal}</p>
-              </div>
-              <div className="text-2xl flex flex-row items-center">
-                <HiChartBar className="mr-4 text-[#A91D3A]" />
-                <p className="text-black">{plan.difficulty}</p>
-              </div>
-              <div className="text-2xl flex flex-row items-center">
-                <GiBiceps className="mr-4 text-[#A91D3A]" />
-                <p className="text-black">{plan.target}</p>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <h2 className="text-3xl font-bebas text-black mt-6">
-                Plan description
-              </h2>
-              <p className="text-black text-xl mt-2 font-montserrat">
-                {plan.description}
-              </p>
-            </div>
-          </div>
+    <div
+      className={`${
+        isAdding ? "grid grid-cols-[7fr_3fr]" : "grid grid-cols-[3fr_7fr]"
+      } mx-8 pt-10`}
+    >
+      <div className="flex flex-col">
+        <div className="flex flex-row">
+          <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
+          <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
+            My Plans
+          </h1>
         </div>
+
+        {isAdding ? <PlanTable /> : <PlanCard />}
       </div>
 
       <div className="flex flex-col mt-10 mx-2">
         <div className="flex justify-end">
           <button
             onClick={handleFinishEdit}
-            className={`px-5 py-2 w-[16%] text-2xl font-montserrat bg-[#A91D3A] text-white rounded-xl mx-2`}
+            className={`px-5 py-2 ${
+              isAdding ? "w-[40%]" : "w-[16%]"
+            } text-2xl font-montserrat bg-[#A91D3A] text-white rounded-xl mx-2`}
           >
             Finish edit
           </button>
         </div>
-        <div className="flex flex-col mt-6 mx-2 font-montserrat">
-          <div className="grid grid-cols-7">
-            {exercises.map((exercise, index) => (
-              <div
-                key={index}
-                onClick={() => setSelectedDay(index)}
-                className={`font-montserrat text-xl px-4 py-2 rounded-t-xl mx-0.5 flex justify-center items-center cursor-pointer transition-colors hover:bg-red-500 ${
-                  selectedDay === index
-                    ? "bg-[#C73659] text-white"
-                    : "bg-[#686D76] text-white"
-                }`}
-              >
-                <h2 className="text-2xl">{exercise.days}</h2>
-              </div>
-            ))}
-          </div>
 
-          <div className="bg-[#B2B2B2] p-6 mx-0.5">
-            <div className="flex flex-col mt-2">
-              <h2 className="text-[4rem] text-black ml-4 font-bebas">
-                {exercises[selectedDay].title}
-              </h2>
-              <div className="flex flex-row font-montserrat ml-14">
-                <div className="flex flex-row items-center">
-                  <TbBarbell className="text-[#A91D3A] text-5xl mr-2" />
-                  <p className="text-[#686D76] text-2xl">
-                    Exercises: {exercises[selectedDay].numOfExercises}
-                  </p>
-                </div>
-                <div className="flex flex-row items-center mx-24">
-                  <CiClock2 className="text-[#A91D3A] text-5xl mr-2" />
-                  <p className="text-[#686D76] text-2xl">
-                    Set time: {exercises[selectedDay].setTime}
-                  </p>
-                </div>
-              </div>
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId={`day-${selectedDay}`}>
-                  {(provided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="flex flex-col space-y-4"
-                    >
-                      {exercises[selectedDay].exercises.map(
-                        (exercise, index) => (
-                          <ExerciseCard
-                            key={exercise.id}
-                            exercise={exercise}
-                            index={index}
-                          />
-                        )
-                      )}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </div>
-          </div>
-        </div>
+        {isAdding ? <AddExerciseCard /> : <PlanTable />}
       </div>
     </div>
   );
 };
 
-MyPlansEdit.propTypes = {
-  id: PropTypes.string,
-};
+// MyPlansEdit.propTypes = {
+//   id: PropTypes.string,
+// };
 
 export default MyPlansEdit;
