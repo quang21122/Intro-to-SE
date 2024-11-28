@@ -3,6 +3,7 @@ import loginBg from "../assets/auth-ui/login-bg.jpg";
 import dumbell from "../assets/auth-ui/dumbell.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/header/logo.png";
 
 export default function Login() {
   const [showForgetPassword, setShowForgetPassword] = useState(false);
@@ -42,6 +43,16 @@ export default function Login() {
           backgroundSize: "100% 100%",
         }}
       ></div>
+      <div
+        className="absolute top-10 left-10 flex justify-center z-20 cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        <img src={logo} alt="Logo" className="h-10 cursor-pointer z-20" />
+        <p className="bebas-font text-4xl ml-2 tracking-widest text-white cursor-pointer z-20">
+          HAF
+        </p>
+      </div>
+
       <div className="relative z-10 flex flex-col items-center justify-center h-screen">
         <div className="bg-[#E7E7E7] p-8 rounded-3xl shadow-xl w-[30rem]">
           {!showForgetPassword ? (
