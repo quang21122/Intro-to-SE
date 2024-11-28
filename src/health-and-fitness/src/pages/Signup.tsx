@@ -29,14 +29,14 @@ export default function Signup() {
     <div className="grid grid-cols-[2fr_8fr] h-full bg-gray-200 relative">
       <div className="absolute inset-0 bg-[#A91D3A] z-0"></div>
       <div className="flex flex-col h-screen relative z-10">
-        <a href="" className="flex flex-col h-full w-full">
-          <div className="flex m-6">
-            <img src={logo} alt="Logo" className="h-10" />
-            <p className="bebas-font text-4xl text-white ml-2 tracking-widest">
+        <a className="flex flex-col h-full w-full ">
+          <div className="flex m-6" onClick={() => navigate("/")}>
+            <img src={logo} alt="Logo" className="cursor-pointer h-10" />
+            <p className="cursor-pointer bebas-font text-4xl text-white ml-2 tracking-widest">
               HAF
             </p>
           </div>
-          <div className="flex-grow flex items-end">
+          <div className="flex-grow flex items-end cursor-default">
             <img
               src={illustration}
               alt="Illustration"
