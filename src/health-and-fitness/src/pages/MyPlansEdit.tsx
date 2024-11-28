@@ -422,7 +422,7 @@ const MyPlansEdit: React.FC = () => {
                     <button
                       key={goal}
                       onClick={() => handleGoalChange(goal)}
-                      className={`text-black text-[1.1rem] w-32 my-2 py-2 rounded-xl ${
+                      className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                         activeGoal === goal
                           ? "bg-[#C73659] text-white"
                           : "bg-[#D9D9D9]"
@@ -444,7 +444,7 @@ const MyPlansEdit: React.FC = () => {
                     <button
                       key={difficulty}
                       onClick={() => handleDifficultyChange(difficulty)}
-                      className={`text-black text-[1.1rem] w-32 my-2 py-2 rounded-xl ${
+                      className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                         activeDifficulty === difficulty
                           ? "bg-[#C73659] text-white"
                           : "bg-[#D9D9D9]"
@@ -507,54 +507,6 @@ const MyPlansEdit: React.FC = () => {
     setExercises(newExercises);
   };
 
-  const handleDayValueChange = (field: DayField, value: string) => {
-    const newExercises = [...exercises];
-    newExercises[selectedDay][field] = value;
-    setExercises(newExercises);
-  };
-
-  const handleValueChange = (
-    dayIndex: number,
-    exerciseIndex: number,
-    field: ExerciseField,
-    value: string
-  ) => {
-    const newExercises = [...exercises];
-    newExercises[dayIndex].exercises[exerciseIndex] = {
-      ...newExercises[dayIndex].exercises[exerciseIndex],
-      [field]: value,
-    };
-    setExercises(newExercises);
-  };
-
-  const formatMinutes = (minutes: number) => {
-    return minutes < 10 ? `0${minutes}` : minutes;
-  };
-
-  const formatSeconds = (seconds: number) => {
-    return seconds < 10 ? `0${seconds}` : seconds;
-  };
-  // Add time handlers
-  const handleMinutesChange = (value: string) => {
-    const newExercises = [...exercises];
-    const minutes = parseInt(value) || 0;
-    newExercises[selectedDay].setTime = {
-      ...newExercises[selectedDay].setTime,
-      minutes: Math.min(59, Math.max(0, minutes)),
-    };
-    setExercises(newExercises);
-  };
-
-  const handleSecondsChange = (value: string) => {
-    const newExercises = [...exercises];
-    const seconds = parseInt(value) || 0;
-    newExercises[selectedDay].setTime = {
-      ...newExercises[selectedDay].setTime,
-      seconds: Math.min(59, Math.max(0, seconds)),
-    };
-    setExercises(newExercises);
-  };
-
   const ExerciseCard: React.FC<{
     exercise: Exercise;
     index: number;
@@ -604,7 +556,7 @@ const MyPlansEdit: React.FC = () => {
                   value={localValues.sets}
                   onChange={(e) => handleLocalChange("sets", e.target.value)}
                   onBlur={() => handleBlur("sets")}
-                  className="w-16 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                  className="w-16 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
               <div className="flex flex-col items-center">
@@ -648,6 +600,67 @@ const MyPlansEdit: React.FC = () => {
   };
 
   const PlanTable = () => {
+    const handleDayValueChange = (field: DayField, value: string) => {
+      const newExercises = [...exercises];
+      newExercises[selectedDay][field] = value;
+      setExercises(newExercises);
+    };
+
+    const handleValueChange = (
+      dayIndex: number,
+      exerciseIndex: number,
+      field: ExerciseField,
+      value: string
+    ) => {
+      const newExercises = [...exercises];
+      newExercises[dayIndex].exercises[exerciseIndex] = {
+        ...newExercises[dayIndex].exercises[exerciseIndex],
+        [field]: value,
+      };
+      setExercises(newExercises);
+    };
+
+    const formatMinutes = (minutes: number) => {
+      return minutes < 10 ? `0${minutes}` : minutes;
+    };
+
+    const formatSeconds = (seconds: number) => {
+      return seconds < 10 ? `0${seconds}` : seconds;
+    };
+    // Add time handlers
+    const [localTime, setLocalTime] = useState({
+      minutes: formatMinutes(exercises[selectedDay].setTime.minutes),
+      seconds: formatSeconds(exercises[selectedDay].setTime.seconds),
+    });
+
+    // Update handlers
+    const handleLocalMinutesChange = (value: string) => {
+      setLocalTime((prev) => ({ ...prev, minutes: value }));
+    };
+
+    const handleLocalSecondsChange = (value: string) => {
+      setLocalTime((prev) => ({ ...prev, seconds: value }));
+    };
+
+    // Add blur handlers
+    const handleMinutesBlur = () => {
+      const minutes = Math.min(
+        59,
+        Math.max(0, parseInt(localTime.minutes.toString()) || 0)
+      );
+      handleLocalMinutesChange(minutes.toString());
+    };
+
+    const handleSecondsBlur = () => {
+      const seconds = Math.min(
+        59,
+        Math.max(0, parseInt(localTime.seconds.toString()) || 0)
+      );
+      handleLocalSecondsChange(seconds.toString());
+    };
+
+    const [isTick, setIsTick] = useState(true);
+
     return (
       <div
         className={`flex flex-col mx-2 font-montserrat ${
@@ -676,7 +689,7 @@ const MyPlansEdit: React.FC = () => {
               type="text"
               value={exercises[selectedDay].title}
               onChange={(e) => handleDayValueChange("title", e.target.value)}
-              className="w-[40%] text-[4rem] text-black ml-2 font-bebas bg-transparent border-b border-gray-400 bg-[#CDCDCD] rounded-xl px-2 mb-4"
+              className="w-[40%] text-[4rem] text-black ml-2 font-bebas border-b border-gray-400 bg-[#CDCDCD] rounded-xl px-2 mb-4"
             />
             <div className="flex flex-row justify-between font-montserrat ml-14">
               <div className="flex flex-row items-center">
@@ -685,38 +698,54 @@ const MyPlansEdit: React.FC = () => {
                   Exercises: {exercises[selectedDay].exercises.length}
                 </p>
               </div>
-              <div className="flex flex-row items-center mx-24">
+              <div className="flex flex-row items-center mx-20">
                 <CiClock2 className="text-[#A91D3A] text-5xl mr-2" />
+                <p className="text-[#686D76] text-2xl mr-2">Set time:</p>
                 <div className="flex items-center text-[#686D76]">
                   <input
                     type="number"
                     min="0"
                     max="59"
-                    value={formatMinutes(
-                      exercises[selectedDay].setTime.minutes
-                    )}
-                    onChange={(e) => handleMinutesChange(e.target.value)}
-                    className="w-12 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                    value={isTick ? localTime.minutes : ""}
+                    onChange={(e) => handleLocalMinutesChange(e.target.value)}
+                    onBlur={handleMinutesBlur}
+                    disabled={!isTick}
+                    className={`w-12 py-1 text-xl text-center bg-[#CDCDCD] rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                      !isTick
+                        ? "opacity-50 cursor-not-allowed text-gray-500"
+                        : "text-black"
+                    }`}
                   />
                   <span className="mx-1 text-xl">:</span>
                   <input
                     type="number"
                     min="0"
                     max="59"
-                    value={formatSeconds(
-                      exercises[selectedDay].setTime.seconds
-                    )}
-                    onChange={(e) => handleSecondsChange(e.target.value)}
-                    className="w-12 py-1 text-xl text-black text-center bg-[#CDCDCD] rounded-xl"
+                    value={isTick ? localTime.seconds : ""}
+                    onChange={(e) => handleLocalSecondsChange(e.target.value)}
+                    onBlur={handleSecondsBlur}
+                    disabled={!isTick}
+                    className={`w-12 py-1 text-xl text-center bg-[#CDCDCD] rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                      !isTick
+                        ? "opacity-50 cursor-not-allowed text-gray-500"
+                        : "text-black"
+                    }`}
                   />
-                  <button className="mx-4 border-2 border-black rounded-xl hover:bg-white">
-                    <TiTick className="text-3xl text-black" />
+                  <button
+                    className={`mx-4 border-2 rounded-xl border-black hover:bg-white ${
+                      isTick ? "" : "p-[0.938rem]"
+                    }`}
+                    onClick={() => setIsTick(!isTick)}
+                  >
+                    {isTick && <TiTick className="text-3xl text-black" />}
                   </button>
                 </div>
               </div>
               <div className="-mt-12">
                 <button
-                  className="flex flex-row items-center bg-black rounded-xl px-4 py-2 ml-32 mr-2"
+                  className="flex flex-row items-center bg-black rounded-xl px-4 py-2 ml-32 mr-2 
+                              transform transition-all duration-200 ease-in-out 
+                                hover:scale-105 hover:bg-[#A91D3A] active:scale-95"
                   onClick={() => {
                     setIsAdding(true);
                   }}
@@ -918,7 +947,8 @@ const MyPlansEdit: React.FC = () => {
           </h1>
         </div>
 
-        {isAdding ? <PlanTable /> : <PlanCard />}
+        {/* {isAdding ? <PlanTable /> : <PlanCard />} */}
+        {!isAdding && <PlanCard />}
       </div>
 
       <div className="flex flex-col mt-10 mx-2">
@@ -926,14 +956,34 @@ const MyPlansEdit: React.FC = () => {
           <button
             onClick={handleFinishEdit}
             className={`px-5 py-2 ${
-              isAdding ? "w-[40%]" : "w-[16%]"
+              isAdding ? "w-[18%]" : "w-[16%]"
             } text-2xl font-montserrat bg-[#A91D3A] text-white rounded-xl mx-2`}
           >
             Finish edit
           </button>
         </div>
 
-        {isAdding ? <AddExerciseCard /> : <PlanTable />}
+        <div className="relative">
+          {/* PlanTable with slide transition */}
+          <div
+            className={`transition-transform duration-300 transform ${
+              isAdding ? "translate-x-[-52%] -mt-7 w-[110%]" : "translate-x-0"
+            }`}
+          >
+            <PlanTable />
+          </div>
+
+          {/* AddExerciseCard with slide-in */}
+          <div
+            className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 ${
+              isAdding
+                ? "translate-x-0 opacity-100"
+                : "translate-x-full opacity-0"
+            }`}
+          >
+            {isAdding && <AddExerciseCard />}
+          </div>
+        </div>
       </div>
     </div>
   );
