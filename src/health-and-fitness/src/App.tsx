@@ -6,6 +6,7 @@ import WorkoutPlans from "./pages/WorkoutPlans";
 import WorkoutPlanDetails from "./pages/WorkoutPlanDetails";
 import MyPlans from "./pages/MyPlans";
 import MyPlansEdit from "./pages/MyPlansEdit";
+import Exercises from "./pages/Exercises";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -46,7 +47,11 @@ const router = createBrowserRouter([
       {
         path: "/my-plans-edit/:id",
         element: <MyPlansEdit />,
-      }
+      },
+      {
+        path: "/exercises",
+        element: <Exercises />,
+      },
     ],
   },
 ]);

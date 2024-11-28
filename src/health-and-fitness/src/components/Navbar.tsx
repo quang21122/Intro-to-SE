@@ -40,6 +40,10 @@ export default function Navbar() {
     navigate("/my-plans");
   };
 
+  const handleExercises = () => {
+    navigate("/exercises");
+  };
+
   return (
     <nav className="w-full flex items-center justify-around pt-6 px-4 relative">
       <a href="" className="flex justify-center items-center">
@@ -82,8 +86,8 @@ export default function Navbar() {
 
           <li className="group">
             <a
-              href="#"
-              className="text-white group-hover:bg-gradient-to-b  group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent tracking-[0.2rem]"
+              onClick={handleExercises}
+              className="text-white group-hover:bg-gradient-to-b cursor-pointer group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent tracking-[0.2rem]"
             >
               EXERCISES
             </a>
