@@ -1,7 +1,7 @@
 import muscleController from "../controllers/muscleController.js";
 
 export default async function handler(req, res) {
-    if (true) {
+    if (req.originalUrl.startsWith("/api/muscle")) {
         switch (req.method) {
         case "GET":
             return muscleController.getMuscle(req, res);

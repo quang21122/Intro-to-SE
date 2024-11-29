@@ -1,11 +1,11 @@
 import userController from "../controllers/userController.js";
 
 export default async function handler(req, res) {
-  if ((req.url.startsWith("/api/user/sign-in")|| req.url.startsWith("/sign-in")) && req.method === "POST") {
+  if ((req.originalUrl.startsWith("/api/user/sign-in")) && req.method === "POST") {
     return userController.signIn(req, res);
   }
 
-  if (req.url.startsWith("/api/user")) {
+  if (req.originalUrl.startsWith("/api/user")) {
     console.log(req.url);
     switch (req.method) {
       case "GET":

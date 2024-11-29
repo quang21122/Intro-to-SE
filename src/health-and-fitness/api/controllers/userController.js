@@ -27,8 +27,8 @@ const signIn = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const { username } = req.query;
-  const user = await userService.getUser(username);
+  const { id } = req.query;
+  const user = await userService.getUser(id);
 
   if (user.error) {
     return res.status(user.status).json({ error: user.error });

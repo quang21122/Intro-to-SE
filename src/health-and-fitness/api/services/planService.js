@@ -1,6 +1,21 @@
 import { firestoreDb } from '../firebase.js';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore';
 
+const getPlan = async (id) => {
+    try {
+        // Query Firestore to find the document by name
+        const planDoc = await getDoc(doc(firestoreDb, 'plans', id));
+        if (!planDoc.exists()) {
+            return { error: "Plan not found", status: 404 };
+        }
+
+        return { plan: planDoc.data(), status: 200 };
+
+    } catch (error) {
+        console.error("Error getting plan by id:", error);
+        return { error: error.message, status: 500 };
+    }
+}
 
 const createPlan = async (data) => {
     try {
@@ -76,4 +91,20 @@ const deletePlan = async (name) => {
     }
 }
 
-export default { createPlan, deletePlan };
+const updatePlan = async (id, data) => {
+    try {
+        // Query Firestore to find the document by name
+        const planDoc = await getDoc(doc(firestoreDb, 'plans', id));
+        if (!planDoc.exists()) {
+            return { error: "Plan not found", status: 404 };
+        }
+
+        await updateDoc(doc(firestoreDb, 'plans', planDoc.id), data);
+        return { id: planDoc.id, ...data };
+    } catch (error) {
+        console.error("Error updating plan by id:", error);
+        return { error: error.message, status: 500 };
+    }
+}
+
+export default { createPlan, deletePlan, getPlan, updatePlan };

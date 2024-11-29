@@ -1,7 +1,7 @@
 import equipmentController from "../controllers/equipmentController.js";
 
 export default async function handler(req, res) {
-    if (true) {
+    if (req.originalUrl.startsWith("/api/equipment")) {
         switch (req.method) {
         case "GET":
             return equipmentController.getEquipment(req, res);
