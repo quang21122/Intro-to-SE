@@ -27,7 +27,7 @@ const createEquipment = async (data) => {
 
         // Create a new equipment ID like this Mh5XnJePUHF4EV8S9o1F
         const equipmentId = generateId(20);
-
+        console.log("equipment id: ",equipmentId)
         // Prepare the equipment data
         const equipmentData = {
             name,

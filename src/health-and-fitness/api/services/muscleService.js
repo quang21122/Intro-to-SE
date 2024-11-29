@@ -27,6 +27,7 @@ const createMuscle = async (data) => {
 
         // Create a new Muscles ID like this Mh5XnJePUHF4EV8S9o1F
         const MusclesId = generateId(20);
+        console.log("muscle id: ", MusclesId);
 
         // Prepare the Muscles data
         const MusclesData = {
@@ -70,8 +71,8 @@ const updateMuscle = async (id, data) => {
         if (!muscleDoc.exists()) {
             return { error: "Muscles not found", status: 404 };
         }
-        await updateDoc(doc(firestoreDb, 'muscles', MusclesDoc.id), data);
-        return { id: MusclesDoc.id, ...data };
+        await updateDoc(doc(firestoreDb, 'muscles', muscleDoc.id), data);
+        return { id: muscleDoc.id, ...data };
     } catch (error) {
         console.error("Error updating Muscles by id:", error);
         return { error: error.message, status: 500 };
@@ -85,8 +86,8 @@ const deleteMuscle = async (id) => {
         if (!muscleDoc.exists()) {
             return { error: "Muscles not found", status: 404 };
         }
-        await deleteDoc(doc(firestoreDb, 'muscless', muscleDoc.id));
-        return { id: MusclesDoc.id, ...MusclesDoc.data() };
+        await deleteDoc(doc(firestoreDb, 'muscles', muscleDoc.id));
+        return { id: muscleDoc.id, ...muscleDoc.data() };
     } catch (error) {
         console.error("Error deleting Muscles by id:", error);
         return { error: error.message, status: 500 };

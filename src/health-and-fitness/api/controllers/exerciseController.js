@@ -26,7 +26,7 @@ const createExercise = async (req, res) => {
     }
     
     res.status(201).json(newExercise);
-    };
+};
 
 const updateExercise = async (req, res) => {
     const { name } = req.query;
