@@ -11,8 +11,8 @@ const createPlan = async (req, res) => {
 };
 
 const deletePlan = async (req, res) => {
-  const { name } = req.query;
-  const deletedPlan = await planService.deletePlan(name);
+  const { id } = req.query;
+  const deletedPlan = await planService.deletePlan(id);
 
   if (deletedPlan.error) {
     return res.status(deletedPlan.status).json({ error: deletedPlan.error });

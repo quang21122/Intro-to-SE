@@ -23,7 +23,7 @@ const createPlan = async (data) => {
         // Validate the main plan data
         const { name, image, description, days, goal, muscle, equipment,level, planDetails } = data;
 
-        if (!name || !description || !goal || !level || !Array.isArray(planDetails)) {
+        if (!name || !description || !days || !equipment || !muscle || !image || !goal || !level || !Array.isArray(planDetails)) {
             throw new Error("Invalid plan data. Ensure all required fields are provided.");
         }
 
@@ -46,30 +46,17 @@ const createPlan = async (data) => {
         await setDoc(planRef, plan);
 
         // Add plan details
-        const daysInWeek=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const planDetailsPromises = planDetails.map(async (detail, index) => {
-            let { name, day, exercises } = detail;
+        const planDetailsPromises = planDetails.map(async (detail) => {
+            const { name, day, exercises } = detail;
 
-            if (!Array.isArray(exercises)) {
+            if (!name || !day ||!Array.isArray(exercises)) {
                 throw new Error(`Invalid detail for day ${day}`);
-            }
-            if (!day) {
-                day = daysInWeek[index % daysInWeek.length]; // Vòng lại nếu index vượt qua 7
-            }
-            if (!name){
-                name = ""
-            }
-            if(!exercises){
-                name = "Rest Day"
             }
 
             //find exercise id
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
-                    console.log("Current exercise object:", exercise);
-                    console.log("current exercise name:", exercise.name);
-                    const exerciseData = await getExercise(exercise.name); // Call your getExercise function
-                    console.log("Fetched exercise id:", exerciseData.id);
+                    const exerciseData = await getExercise(exercise.name); 
                     exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
                     return exercise;
                 })
@@ -98,36 +85,80 @@ const createPlan = async (data) => {
     }
 };
 
-const deletePlan = async (name) => {
+const deletePlan = async (id) => {
     try {
-        // Query Firestore to find the document by name
-        const plansCollection = collection(firestoreDb, 'plans');
-        const querySnapshot = await getDocs(query(plansCollection, where("name", "==", name)));
-
-        if (querySnapshot.empty) {
+        const planRef = doc(firestoreDb, "plans", id);
+        const planDoc = await getDoc(planRef);
+        if (!planDoc.exists()) {
             return { error: "Plan not found", status: 404 };
         }
+        const planDetailsCollection = collection(planRef, "planDetails");
+        const planDetailsSnapshot = await getDocs(planDetailsCollection);
 
-        // Extract the first matching document
-        const planDoc = querySnapshot.docs[0];
-        await deleteDoc(doc(firestoreDb, 'plans', planDoc.id));
-        return { id: planDoc.id, ...planDoc.data() };
+        // Xóa từng document trong "planDetails"
+        const deleteDetailsPromises = planDetailsSnapshot.docs.map((detailDoc) =>
+            deleteDoc(detailDoc.ref)
+        );
+
+        await Promise.all(deleteDetailsPromises);
+
+        // Sau khi xóa xong subcollection, xóa document chính
+        await deleteDoc(planRef);
+
+        console.log(`Plan with ID ${id} and all its details deleted successfully.`);
+        return { success: true, message: `Plan with ID ${id} deleted successfully.` };
     } catch (error) {
-        console.error("Error deleting plan by name:", error);
-        return { error: error.message, status: 500 };
+        console.error("Error deleting plan:", error.message);
+        return { success: false, message: error.message };
     }
-}
+};
 
 const updatePlan = async (id, data) => {
     try {
-        // Query Firestore to find the document by name
         const planDoc = await getDoc(doc(firestoreDb, 'plans', id));
         if (!planDoc.exists()) {
             return { error: "Plan not found", status: 404 };
         }
 
-        await updateDoc(doc(firestoreDb, 'plans', planDoc.id), data);
-        return { id: planDoc.id, ...data };
+        const { name, image, description, days, goal, muscle, equipment, level, planDetails } = data;
+        const plan = { name, description, equipment, goal, image, level, muscle, days };
+
+        // Cập nhật tài liệu chính
+        await updateDoc(doc(firestoreDb, 'plans', planDoc.id), plan);
+
+        // Cập nhật từng chi tiết của kế hoạch
+        const planDetailsPromises = planDetails.map(async (detail) => {
+            const { name, day, exercises } = detail;
+
+            const exercisesWithIds = await Promise.all(
+                exercises.map(async (exercise) => {
+                    const exerciseData = await getExercise(exercise.name); 
+                    exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
+                    return exercise;
+                })
+            );
+
+            const exercisesWithoutName = exercisesWithIds.map(({ name, ...rest }) => rest);
+
+            const planDetailsCollection = collection(firestoreDb, `plans/${planDoc.id}/planDetails`);
+            const querySnapshot = await getDocs(query(planDetailsCollection, where("day", "==", day)));
+
+            if (querySnapshot.empty) {
+                console.warn(`Plan detail for day ${day} not found. Skipping update.`);
+                return;
+            }
+
+            const detailDoc = querySnapshot.docs[0];
+            return updateDoc(doc(firestoreDb, `plans/${planDoc.id}/planDetails`, detailDoc.id), {
+                name,
+                day,
+                exercises: exercisesWithoutName,
+            });
+        });
+
+        await Promise.all(planDetailsPromises);
+
+        return { message: "Exercise updated successfully", id: planDoc.id };
     } catch (error) {
         console.error("Error updating plan by id:", error);
         return { error: error.message, status: 500 };
