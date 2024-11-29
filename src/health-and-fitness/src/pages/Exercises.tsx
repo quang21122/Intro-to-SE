@@ -161,7 +161,7 @@ export default function ExerciseFilter() {
         </section>
 
         {/* Exercises List */}
-        <section>
+        <section className="w-full">
           <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">EXERCISES</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {exercises.map((exercise) => (
