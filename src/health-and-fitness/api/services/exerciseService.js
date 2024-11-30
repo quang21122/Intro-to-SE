@@ -5,9 +5,9 @@ const createExercise = async (data) => {
     const {difficulty, instruction, equipment, image, muscle, name, type, video } = data;
     
     try {
-        const query = await getDoc(doc(firestoreDb, 'exercises', name));
-        if (query.exists()) {
-            return { error: "Exercise already exists", status: 400 };
+        const query = await getExercise(name);
+        if (!query.error) {
+            return { error: "Exercise already exists", status: 409 };
         }
         // Get length of exercises collection
         const exercisesCollection = await getDocs(collection(firestoreDb, 'exercises'));
@@ -56,6 +56,7 @@ const getExercise = async (name) => {
 const updateExercise = async (name, data) => {
     try {
         // Query Firestore to find the document by name
+        console.log(name);
         const exercisesCollection = collection(firestoreDb, 'exercises');
         const querySnapshot = await getDocs(query(exercisesCollection, where("name", "==", name)));
 
@@ -67,7 +68,6 @@ const updateExercise = async (name, data) => {
         const exerciseDoc = querySnapshot.docs[0];
         const exerciseId = exerciseDoc.id;
         const newName = data.name;
-
         // Check if the new name is already taken
         const existingExercise = await getExercise(newName);
         if (existingExercise.error) {
