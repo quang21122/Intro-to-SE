@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, 
 
 const createExercise = async (data) => {
     const {difficulty, instruction, equipment, image, muscle, name, type, video } = data;
+    
     try {
         const query = await getDoc(doc(firestoreDb, 'exercises', name));
         if (query.exists()) {
@@ -65,7 +66,13 @@ const updateExercise = async (name, data) => {
         // Assuming `name` is unique, update the first matching document
         const exerciseDoc = querySnapshot.docs[0];
         const exerciseId = exerciseDoc.id;
+        const newName = data.name;
 
+        // Check if the new name is already taken
+        const existingExercise = await getExercise(newName);
+        if (existingExercise.error) {
+            return { error: existingExercise.error, status: existingExercise.status };
+        }
         // Update the document
         await updateDoc(doc(firestoreDb, 'exercises', exerciseId), data);
 
