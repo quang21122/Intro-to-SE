@@ -70,8 +70,8 @@ const updateExercise = async (name, data) => {
         const newName = data.name;
         // Check if the new name is already taken
         const existingExercise = await getExercise(newName);
-        if (existingExercise.error) {
-            return { error: existingExercise.error, status: existingExercise.status };
+        if (!existingExercise.error) {
+            return { error: "Exercise new name already exists", status: 409 };
         }
         // Update the document
         await updateDoc(doc(firestoreDb, 'exercises', exerciseId), data);
