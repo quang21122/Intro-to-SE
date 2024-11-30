@@ -24,6 +24,8 @@ const signInService = async (email, password) => {
 
 // Create a new user with Firebase Auth and store additional data in Firestore
 const createUser = async (data) => {
+  const auth = getAuth();
+
   const { email, password, username } = data;
 
   try {
@@ -52,6 +54,8 @@ const createUser = async (data) => {
 
 // Get user data from Firebase Auth and Firestore
 const getUser = async (userId) => {
+  const auth = getAuth();
+
   try {
     // Get additional data from Firestore
     const userDoc = await getDoc(doc(firestoreDb, 'users', userId));
@@ -68,6 +72,8 @@ const getUser = async (userId) => {
 
 // Update user's password or Firestore data
 const updateUser = async (userId, oldPassword, newPassword) => {
+  const auth = getAuth();
+
   try {
     const user = auth.currentUser;
 
@@ -89,15 +95,25 @@ const updateUser = async (userId, oldPassword, newPassword) => {
   }
 };
 
-// Delete user from Firebase Auth and Firestore
+// Delete user from Firebase Auth and Firestore, for now it is self deletion, real admin deletion need Admin SDK
 const deleteUser = async (userId) => {
+  const auth = getAuth();
+
   try {
-    // Delete user in Firebase Auth
-    const user = auth.currentUser;
-    await firebaseDeleteUser(user);
+    // Get user document from Firestore
+    const userDoc = await getDoc(doc(firestoreDb, 'users', userId));
+    if (!userDoc.exists()) {
+      return { error: "User not found", status: 404 };
+    }
 
     // Delete user document in Firestore
     await deleteDoc(doc(firestoreDb, 'users', userId));
+
+    // Delete user in Firebase Auth
+    const user = auth.currentUser;
+    if (user && user.uid === userId) {
+      await firebaseDeleteUser(user);
+    }
 
     return { message: "User deleted successfully", status: 200 };
   } catch (error) {
