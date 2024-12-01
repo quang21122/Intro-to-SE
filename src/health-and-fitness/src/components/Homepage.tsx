@@ -1,4 +1,3 @@
-import React from "react";
 import GymBanner from "../assets/homepage/gym_banner.png";
 import GymPic from "../assets/homepage/gym_pic.png";
 import Food from "../assets/homepage/food.png";

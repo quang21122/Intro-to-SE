@@ -1,14 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.ts"; // Import the AuthContext
 import loginBg from "../assets/auth-ui/login-bg.jpg";
 import dumbell from "../assets/auth-ui/dumbell.png";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import logo from "../assets/header/logo.png";
 
 export default function Login() {
   const [showForgetPassword, setShowForgetPassword] = useState(false);
   const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
+  const { login } = useAuth(); // Use the login function from context
   const navigate = useNavigate();
 
   const validateEmail = (email: string): boolean => {
@@ -24,11 +26,21 @@ export default function Login() {
     setShowForgetPassword(false);
   };
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateEmail(email)) {
-      localStorage.setItem("isAuthenticated", "true");
-      navigate("/");
+      try {
+        // Call the login function from context
+        const result = await login(email, password);
+        if (result) {
+          alert(result.userId); // Show the user ID
+          localStorage.setItem("isAuthenticated", "true");
+          navigate("/"); // Redirect to the home page if login is successful
+        }
+      } catch (error) {
+        setEmailError("Invalid email or password");
+        console.error("Login failed", error);
+      }
     } else {
       setEmailError("Invalid email address");
     }
@@ -96,6 +108,8 @@ export default function Login() {
                     type="password"
                     id="password"
                     name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full p-2 mt-1 border-2 border-black rounded-2xl focus:outline-none focus:border-red-400 bg-white text-black"
                     autoComplete="off"
                     autoCorrect="off"

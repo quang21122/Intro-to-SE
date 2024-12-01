@@ -7,15 +7,6 @@ import WorkoutPlanDetails from "./pages/WorkoutPlanDetails";
 import MyPlans from "./pages/MyPlans";
 import MyPlansEdit from "./pages/MyPlansEdit";
 import Exercises from "./pages/Exercises";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-
-const root = createRoot(document.getElementById("root")!);
-root.render(
-  <StrictMode>
-    <MyPlans />
-  </StrictMode>
-);
 
 const router = createBrowserRouter([
   {
@@ -57,7 +48,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} />
 }
 
 

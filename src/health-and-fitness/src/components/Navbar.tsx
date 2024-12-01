@@ -1,5 +1,6 @@
 import logo from "../assets/header/logo.png";
 // import edge from "../assets/header/edge.png";
+import { useAuth } from "../hooks/useAuth";
 import humanBg from "../assets/header/human-bg.png";
 import banner from "../assets/header/banner.png";
 import rectangle from "../assets/header/rectangle.png";
@@ -9,6 +10,7 @@ import { useState, useEffect } from "react";
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated");
@@ -28,6 +30,7 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
+    logout();
     localStorage.removeItem("isAuthenticated");
     setIsLoggedIn(false);
   };
