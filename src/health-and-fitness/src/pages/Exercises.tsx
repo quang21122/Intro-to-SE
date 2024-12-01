@@ -3,6 +3,8 @@ import { FaSearch } from "react-icons/fa";
 import abs from "../assets/exercises/abs.png";
 import bodyweights from "../assets/exercises/body-weights.png";
 import barbell from "../assets/exercises/barbell.png";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 interface Exercise {
   id: number;
@@ -102,10 +104,16 @@ const equipment = [
 
 export default function ExerciseFilter() {
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
+
+  const handleExerciseClick = (exercise: Exercise) => {
+    navigate(`/exercises/${exercise.id}`);
+  };
 
   return (
-    <div className="py-6 flex flex-col mx-48">
-      <div className="flex justify-center items-center flex-col font-bebas text-white">
+    <div className="py-2 flex flex-col mx-48 bg-[#232221]">
+      <Navbar isHomepage={false} />
+      <div className="mt-10 flex justify-center items-center flex-col font-bebas text-white">
         {/* Search input */}
         <div className="flex items-center justify-center flex-row relative">
           <input
@@ -161,13 +169,14 @@ export default function ExerciseFilter() {
         </section>
 
         {/* Exercises List */}
-        <section>
+        <section className="w-full">
           <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">EXERCISES</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {exercises.map((exercise) => (
               <div
                 key={exercise.id}
-                className="bg-gray-800 rounded-lg p-4 flex gap-4 hover:bg-gray-700 transition-colors"
+                className="bg-gray-800 rounded-lg p-4 flex gap-4 hover:bg-gray-700 transition-colors cursor-pointer"
+                onClick={() => handleExerciseClick(exercise)}
               >
                 <div className="w-24 h-24 flex-shrink-0">
                   <img
@@ -189,7 +198,7 @@ export default function ExerciseFilter() {
             ))}
           </div>
 
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 my-8">
             {Array.from({ length: 10 }, (_, i) => (
               <button
                 key={i + 1}
