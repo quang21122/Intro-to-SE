@@ -9,7 +9,7 @@ import intensity from "../assets/header/intensity.png";
 export default function Header() {
   return (
     <div className="relative h-screen bg-black text-white overflow-hidden">
-      <Navbar />
+      <Navbar isHomepage={true} />
       <img
         src={rectangle}
         alt="Rectangle"

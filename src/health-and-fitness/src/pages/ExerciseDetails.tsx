@@ -4,6 +4,9 @@ import rightArrow from "../assets/exercises/right-arrow.png";
 import lateralRaise from "../assets/exercises/lateral-raise.png";
 import abs from "../assets/exercises/abs.png";
 import bodyWeight from "../assets/exercises/body-weights.png";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 interface Instruction {
   title: string;
@@ -11,6 +14,15 @@ interface Instruction {
 }
 
 export default function ExerciseDetail() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleBack = () => {
+    navigate("/exercises");
+  };
+
   const instructions: Instruction[] = [
     {
       title: "Hand Placement",
@@ -46,10 +58,14 @@ export default function ExerciseDetail() {
   ];
 
   return (
-    <div className="min-h-screen text-white mx-48 py-6">
+    <div className="min-h-screen text-white mx-48 py-2">
+      <Navbar isHomepage={false} />
       {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        <button className="text-[#FF4D4D]">
+      <div
+        className="mt-10 flex items-center gap-2 mb-6 -ml-3"
+        onClick={handleBack}
+      >
+        <button className="text-[#FF4D4D] cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-8 w-8 mt-1"
@@ -65,7 +81,9 @@ export default function ExerciseDetail() {
             />
           </svg>
         </button>
-        <span className="text-[#FF4D4D] text-3xl font-bold">EXERCISE</span>
+        <span className="text-[#FF4D4D] text-3xl font-bold cursor-pointer">
+          EXERCISE
+        </span>
       </div>
       <div className="grid grid-cols-[4fr_6fr] gap-14">
         {/* Main Exercise Image */}
@@ -82,23 +100,25 @@ export default function ExerciseDetail() {
                 Alternative Abs Exercises
               </h2>
               <div className="flex gap-2">
-                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center cursor-pointer">
                   <img src={leftArrow} alt="Left arrow" />
                 </div>
-                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center cursor-pointer">
                   <img src={rightArrow} alt="Right arrow" />
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               {alternativeExercises.map((exercise, index) => (
-                <div key={index} className="bg-gray-800 rounded-lg p-4">
+                <div key={index} className="relative rounded-lg">
                   <img
                     src={exercise.imageUrl}
                     alt={exercise.name}
-                    className="w-full h-32 object-cover rounded-lg mb-2"
+                    className="w-full h-32 object-cover rounded-lg"
                   />
-                  <p className="text-center text-sm">{exercise.name}</p>
+                  <p className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-sm py-1 rounded-b-lg">
+                    {exercise.name}
+                  </p>
                 </div>
               ))}
             </div>
@@ -112,34 +132,43 @@ export default function ExerciseDetail() {
           </h1>
           <div className="grid grid-cols-2 mr-auto max-w-80">
             <div className="flex flex-col gap-2">
-              <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden">
+              <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden relative">
                 <img
                   src={abs}
                   alt="Abs category"
                   className="w-full h-full object-cover"
                 />
+                <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-xs py-1">
+                  Abs
+                </span>
               </div>
-              <span className="text-sm">Abs</span>
               <div className="rounded-lg mt-4 mb-8">
-                <h2 className="text-gray-400 text-sm mb-1">Difficulty</h2>
-                <p>Intermediate</p>
+                <h2 className="text-white text-md font-medium mb-1">
+                  Difficulty
+                </h2>
+                <p className="text-gray-400">Intermediate</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden">
+              <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden relative">
                 <img
                   src={bodyWeight}
                   alt="Body Weight category"
                   className="w-full h-full object-cover"
                 />
+                <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-xs py-1">
+                  Body Weight
+                </span>
               </div>
-              <span className="text-sm">Body Weight</span>
               <div className="rounded-lg mt-4 mb-8">
-                <h2 className="text-gray-400 text-sm mb-1">Exercise Type</h2>
-                <p>Strength</p>
+                <h2 className="text-white text-md font-medium mb-1">
+                  Exercise Type
+                </h2>
+                <p className="text-gray-400">Strength</p>
               </div>
             </div>
           </div>
+
           {/* Instructions */}
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4">Instruction</h2>
