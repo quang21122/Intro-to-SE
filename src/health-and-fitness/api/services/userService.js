@@ -22,6 +22,10 @@ const signInService = async (email, password) => {
   }
 };
 
+const signUpService = async (email, password, username) => {
+  return createUser({ email, password, username });
+};
+
 // Create a new user with Firebase Auth and store additional data in Firestore
 const createUser = async (data) => {
   const auth = getAuth();
@@ -116,4 +120,4 @@ const deleteUser = async (userId) => {
   }
 };
 
-export default { signInService, createUser, getUser, updateUser, deleteUser };
+export default { signInService, signUpService, createUser, getUser, updateUser, deleteUser };
