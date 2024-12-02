@@ -26,9 +26,36 @@ const signIn = async (req, res) => {
   }
 };
 
+const signUp = async (req, res) => {
+  const { email, password, username } = req.body;
+
+  if (!email || !password || !username) {
+    return res.status(400).json({ error: "Email, password, and username are required" });
+  }
+
+  try {
+    // Call the service to handle Firebase Authentication
+    const result = await userService.signUpService(email, password, username);
+    if (result.error) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    // Successful sign-up, send the response
+    return res.status(201).json({
+      message: "Sign-up successful",
+      userId: result.id,
+      email: result.email,
+      username: result.username
+    });
+  } catch (error) {
+    console.error("Sign-up error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 const getUser = async (req, res) => {
-  const { username } = req.query;
-  const user = await userService.getUser(username);
+  const { id } = req.query;
+  const user = await userService.getUser(id);
 
   if (user.error) {
     return res.status(user.status).json({ error: user.error });
@@ -51,19 +78,19 @@ const updateUser = async (req, res) => {
   // Get the username and data from the request body
   const { username, oldPassword, newPassword} = req.body;
   // Update the user document by username
-  await userService.updateUser(username, oldPassword, newPassword);
+  const newUser = await userService.updateUser(username, oldPassword, newPassword);
 
-  if (updateUser.error) {
-    return res.status(updateUser.status).json({ error: updateUser.error });
+  if (newUser.error) {
+    return res.status(newUser.status).json({ error: newUser.error });
   }
 
   return res.status(200).json({ message: "PUT user" });
 };
 
 const deleteUser = async (req, res) => {
-  const { username } = req.query;
+  const { userId } = req.query;
   // Delete the user document by username
-  await userService.deleteUser(username);
+  await userService.deleteUser(userId);
 
   if (deleteUser.error) {
     return res.status(deleteUser.status).json({ error: deleteUser.error });
@@ -72,4 +99,4 @@ const deleteUser = async (req, res) => {
   return res.status(200).json({ message: "DELETE user" });
 } 
 
-export default { signIn, getUser, createUser, updateUser, deleteUser };
+export default { signIn, signUp, getUser, createUser, updateUser, deleteUser };

@@ -1,6 +1,6 @@
 import Github from "../assets/footer/GitHub.png";
 import Facebook from "../assets/footer/Facebook.png";
-import Youtube from "../assets/footer/Youtube.png";
+import Youtube from "../assets/footer/YouTube.png";
 import Instagram from "../assets/footer/Instagram.png";
 
 export default function Footer() {

@@ -1,4 +1,3 @@
-import React from "react";
 import GymBanner from "../assets/homepage/gym_banner.png";
 import GymPic from "../assets/homepage/gym_pic.png";
 import Food from "../assets/homepage/food.png";
@@ -7,7 +6,7 @@ import FooterPic from "../assets/homepage/footer_pic.png";
 function Homepage() {
   return (
     <>
-      <div className="mx-24 py-10 font-raleway">
+      <div className="mx-24 py-10 font-montserrat">
         <div className="grid grid-cols-[4.5fr_5.5fr] mt-10">
           <div>
             <img src={GymBanner} alt="Gym Banner" />
