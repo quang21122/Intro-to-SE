@@ -58,7 +58,7 @@ export default function ExerciseDetail() {
   ];
 
   return (
-    <div className="min-h-screen text-white mx-48 py-2">
+    <div className="min-h-screen text-white mx-24 py-2">
       <Navbar isHomepage={false} />
       {/* Header */}
       <div

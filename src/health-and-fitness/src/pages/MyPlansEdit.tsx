@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DragDropContext,
   Droppable,
@@ -19,6 +19,7 @@ import { FaSearch } from "react-icons/fa";
 import { IoCloseCircleOutline } from "react-icons/io5";
 // import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 type ExerciseField = "sets" | "reps" | "intervals" | "rest";
 type DayField = "title";
@@ -345,6 +346,10 @@ const MyPlansEdit: React.FC = () => {
   ]);
   const [isAdding, setIsAdding] = useState(false);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const plan = {
     image: examplePic,
     title: "5 DAYS MUSCLE MASS SPLIT",
@@ -417,7 +422,7 @@ const MyPlansEdit: React.FC = () => {
                   <TfiCup className="mr-4 text-[#A91D3A]" />
                   <p className="text-black">Goal</p>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                   {goalOptions.map((goal) => (
                     <button
                       key={goal}
@@ -439,7 +444,7 @@ const MyPlansEdit: React.FC = () => {
                   <HiChartBar className="mr-4 text-[#A91D3A]" />
                   <p className="text-black">Level</p>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2">
                   {difficultyOptions.map((difficulty) => (
                     <button
                       key={difficulty}
@@ -538,8 +543,15 @@ const MyPlansEdit: React.FC = () => {
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             className={`flex flex-col bg-[#D9D9D9] px-4 py-6 mt-6 mx-2 rounded-xl transition-colors ${
-              snapshot.isDragging ? "bg-opacity-70 shadow-lg" : ""
+              snapshot.isDragging ? "bg-opacity-70 shadow-lg z-50" : ""
             }`}
+            style={{
+              ...provided.draggableProps.style,
+              left: "auto",
+              right: "auto",
+              bottom: "auto",
+              top: "auto",
+            }}
           >
             <div className="grid grid-cols-[1fr_3fr_1fr_1.5fr_1.5fr_1.5fr_0.5fr] items-center">
               <img src={examplePic2} alt="" />
@@ -663,7 +675,7 @@ const MyPlansEdit: React.FC = () => {
 
     return (
       <div
-        className={`flex flex-col mx-2 font-montserrat ${
+        className={`flex flex-col font-montserrat ${
           isAdding ? "mt-16" : "mt-8"
         }`}
       >
@@ -685,13 +697,28 @@ const MyPlansEdit: React.FC = () => {
 
         <div className="bg-[#B2B2B2] p-6 mx-0.5">
           <div className="flex flex-col mt-2">
-            <input
-              type="text"
-              value={exercises[selectedDay].title}
-              onChange={(e) => handleDayValueChange("title", e.target.value)}
-              className="w-[40%] text-[4rem] text-black ml-2 font-bebas border-b border-gray-400 bg-[#CDCDCD] rounded-xl px-2 mb-4"
-            />
-            <div className="flex flex-row justify-between font-montserrat ml-14">
+            <div className="flex flex-row justify-between">
+              <input
+                type="text"
+                value={exercises[selectedDay].title}
+                onChange={(e) => handleDayValueChange("title", e.target.value)}
+                className="w-[40%] text-[4rem] text-black ml-2 font-bebas border-b border-gray-400 bg-[#CDCDCD] rounded-xl px-2 mb-4"
+              />
+              <div className="mt-12">
+                <button
+                  className="flex flex-row items-center bg-black rounded-xl px-4 py-2 ml-32 mr-2 
+                              transform transition-all duration-200 ease-in-out 
+                                hover:scale-105 hover:bg-[#A91D3A] active:scale-95"
+                  onClick={() => {
+                    setIsAdding(true);
+                  }}
+                >
+                  <p className="text-white text-3xl">Add</p>
+                  <CiCirclePlus className="text-4xl text-white ml-3" />
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-row justify-between font-montserrat ml-14 w-[80%]">
               <div className="flex flex-row items-center">
                 <TbBarbell className="text-[#A91D3A] text-5xl mr-2" />
                 <p className="text-[#686D76] text-2xl">
@@ -740,19 +767,6 @@ const MyPlansEdit: React.FC = () => {
                     {isTick && <TiTick className="text-3xl text-black" />}
                   </button>
                 </div>
-              </div>
-              <div className="-mt-12">
-                <button
-                  className="flex flex-row items-center bg-black rounded-xl px-4 py-2 ml-32 mr-2 
-                              transform transition-all duration-200 ease-in-out 
-                                hover:scale-105 hover:bg-[#A91D3A] active:scale-95"
-                  onClick={() => {
-                    setIsAdding(true);
-                  }}
-                >
-                  <p className="text-white text-3xl">Add</p>
-                  <CiCirclePlus className="text-4xl text-white ml-3" />
-                </button>
               </div>
             </div>
 
@@ -887,7 +901,7 @@ const MyPlansEdit: React.FC = () => {
 
   const AddExerciseCard = () => {
     return (
-      <div className="flex flex-col bg-[#B2B2B2] p-4 rounded-xl mt-6 mx-2">
+      <div className="flex flex-col bg-[#B2B2B2] p-4 rounded-xl mt-6 z-0">
         <div className="flex flex-row items-center justify-between">
           <h1 className="font-bebas text-4xl text-black">Exercise Library</h1>
           <IoCloseCircleOutline
@@ -934,54 +948,55 @@ const MyPlansEdit: React.FC = () => {
   };
 
   return (
-    <div
-      className={`${
-        isAdding ? "grid grid-cols-[7fr_3fr]" : "grid grid-cols-[3fr_7fr]"
-      } mx-8 pt-10`}
-    >
-      <div className="flex flex-col">
-        <div className="flex flex-row">
-          <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
-          <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
-            My Plans
-          </h1>
-        </div>
-
-        {/* {isAdding ? <PlanTable /> : <PlanCard />} */}
-        {!isAdding && <PlanCard />}
-      </div>
-
-      <div className="flex flex-col mt-10 mx-2">
-        <div className="flex justify-end">
-          <button
-            onClick={handleFinishEdit}
-            className={`px-5 py-2 ${
-              isAdding ? "w-[18%]" : "w-[16%]"
-            } text-2xl font-montserrat bg-[#A91D3A] text-white rounded-xl mx-2`}
-          >
-            Finish edit
-          </button>
-        </div>
-
-        <div className="relative">
-          {/* PlanTable with slide transition */}
-          <div
-            className={`transition-transform duration-300 transform ${
-              isAdding ? "translate-x-[-52%] -mt-7 w-[110%]" : "translate-x-0"
-            }`}
-          >
-            <PlanTable />
+    <div className="flex flex-col mx-24">
+      <Navbar isHomepage={false} />
+      <div className={`grid grid-cols-[3fr_7fr] pt-10`}>
+        <div className="flex flex-col">
+          <div className="flex flex-row">
+            <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
+            <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
+              My Plans
+            </h1>
           </div>
 
-          {/* AddExerciseCard with slide-in */}
-          <div
-            className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 ${
-              isAdding
-                ? "translate-x-0 opacity-100"
-                : "translate-x-full opacity-0"
-            }`}
-          >
-            {isAdding && <AddExerciseCard />}
+          {/* {isAdding ? <PlanTable /> : <PlanCard />} */}
+          {!isAdding && <PlanCard />}
+        </div>
+
+        <div className="flex flex-col mt-10">
+          <div className="flex justify-end">
+            <button
+              onClick={handleFinishEdit}
+              className={`px-5 py-2 ${
+                isAdding ? "w-[18%]" : "w-[16%]"
+              } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
+            >
+              Finish edit
+            </button>
+          </div>
+
+          <div className="relative">
+            {/* PlanTable with slide transition */}
+            <div
+              className={`transition-transform duration-300 transform ${
+                isAdding
+                  ? "translate-x-[-52%] -mt-[3%] w-[100%] ml-[10%]"
+                  : "translate-x-0"
+              }`}
+            >
+              <PlanTable />
+            </div>
+
+            {/* AddExerciseCard with slide-in */}
+            <div
+              className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 w-[40%] ${
+                isAdding
+                  ? "translate-x-0 opacity-100"
+                  : "translate-x-full opacity-0"
+              }`}
+            >
+              {isAdding && <AddExerciseCard />}
+            </div>
           </div>
         </div>
       </div>
