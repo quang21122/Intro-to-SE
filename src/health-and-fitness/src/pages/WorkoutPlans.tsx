@@ -79,7 +79,7 @@ export default function WorkoutPlans() {
         )}
       </div>
 
-      <div className="max-w-[90%] mx-auto relative">
+      <div className="max-w-full mx-auto relative">
         <WorkoutSlider />
       </div>
 
