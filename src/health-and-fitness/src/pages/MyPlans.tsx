@@ -229,7 +229,7 @@ function MyPlans() {
 
         <div className="flex flex-col mt-6">
           <div className="flex justify-end">
-            <button className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%] mr-2">
+            <button className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]">
               Edit
             </button>
           </div>
