@@ -5,6 +5,7 @@ import pen from "../assets/pen.png";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
+  const [ischangePassword, setIsChangePassword] = useState(false);
   const [profile, setProfile] = useState({
     name: "Thien",
     email: "thienHaf@gmail.com",
@@ -69,7 +70,12 @@ export default function Profile() {
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-sm">Password</label>
-                <button className="text-xs underline">Change</button>
+                <button
+                  className="text-xs underline"
+                  onClick={() => setIsChangePassword(!ischangePassword)}
+                >
+                  Change
+                </button>
               </div>
               <div className="text-sm">••••••••••••••</div>
             </div>
@@ -253,6 +259,75 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {ischangePassword && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-[#E7E7E7] p-8 rounded-3xl shadow-xl w-[30rem]">
+            <h2 className="text-2xl mb-4 font-raleway tracking-widest font-bold text-center">
+              Change Password
+            </h2>
+            <div className="mt-2">
+              <label
+                htmlFor="currentPassword"
+                className="block text-[#605D5D] font-raleway font-medium tracking-wider"
+              >
+                Current password
+              </label>
+              <input
+                type="text"
+                id="currentPassword"
+                name="currentPassword"
+                className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                autoComplete="off"
+                autoCorrect="off"
+              />
+              <label
+                htmlFor="newPassword"
+                className="block text-[#605D5D] font-raleway font-medium tracking-wider"
+              >
+                New password
+              </label>
+              <input
+                type="text"
+                id="newPassword"
+                name="newPassword"
+                className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                autoComplete="off"
+                autoCorrect="off"
+              />
+
+              <label
+                htmlFor="verifyPassword"
+                className="block text-[#605D5D] font-raleway font-medium tracking-wider"
+              >
+                Verify password
+              </label>
+              <input
+                type="text"
+                id="verifyPassword"
+                name="verifyPassword"
+                className="w-full p-2 mt-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                autoComplete="off"
+                autoCorrect="off"
+              />
+              <button
+                type="submit"
+                onClick={() => setIsChangePassword(false)}
+                className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold hover:bg-[#605D5D]"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setIsChangePassword(false)}
+                className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

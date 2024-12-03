@@ -154,7 +154,7 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             <div className="absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent border-b-white group-hover:border-b-[#b0b0b0] cursor-pointer"></div>
             <div
               className={`absolute w-full h-4 -bottom-3 right-0 ${
-                isHomepage ? "bg-[#f24b4b]" : "bg-[#232221]"
+                isHomepage ? "bg-[#f24b4b]" : "bg-black bg-opacity-0"
               }`}
             ></div>
             <div className="absolute rounded-xl mt-2 top-full -right-3 hidden group-hover:block bg-white text-black py-2 w-32 z-10">
