@@ -3,25 +3,40 @@ import illustration from "../assets/auth-ui/illustration.png";
 import fitness from "../assets/auth-ui/fitness.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
 
+  const { signup, login } = useAuth();
+
   const validateEmail = (email: string): boolean => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(email);
   };
 
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("name") as string;
+    const password = formData.get("password") as string;
+    const confirm = formData.get("confirm") as string;
+
     if (validateEmail(email)) {
+      if (password !== confirm) {
+        alert("Passwords do not match");
+        return;
+      }
+      await signup(email, password, username);
+      await login(email, password);
       localStorage.setItem("isAuthenticated", "true");
       navigate("/");
     } else {
       setEmailError("Invalid email address");
+      alert("Invalid email address");
     }
   };
 

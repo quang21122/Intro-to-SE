@@ -33,7 +33,6 @@ export default function Login() {
         // Call the login function from context
         const result = await login(email, password);
         if (result) {
-          alert(result.userId); // Show the user ID
           localStorage.setItem("isAuthenticated", "true");
           navigate("/"); // Redirect to the home page if login is successful
         }
