@@ -4,12 +4,13 @@ import { useAuth } from "../hooks/useAuth";
 import humanBg from "../assets/header/human-bg.png";
 import banner from "../assets/header/banner.png";
 import rectangle from "../assets/header/rectangle.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -47,11 +48,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
     <nav
       className={`w-full flex items-center pt-6 relative ${
         isHomepage ? "justify-around px-4" : "justify-between"
-      }`}
+      } ${location.pathname === "/profile" ? "justify-around" : ""}`}
     >
       {/* Logo */}
       <div
-        className="flex justify-center items-center cursor-pointer"
+        className="flex justify-center items-center cursor-pointer -ml-10"
         onClick={() => navigate("/")}
       >
         <img src={logo} alt="Logo" className="h-10" />
@@ -65,8 +66,12 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
         <ul className="flex gap-20 relative mx-28">
           <li className="relative group pr-6">
             <a
-              href="#"
-              className="tracking-[0.2rem] text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
+              onClick={handleWorkoutPlans}
+              className={`tracking-[0.2rem] ${
+                location.pathname === "/workout-plans"
+                  ? "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
+                  : "text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
+              }`}
             >
               WORKOUTS
             </a>
@@ -101,9 +106,9 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             <a
               onClick={handleExercises}
               className={`cursor-pointer tracking-[0.2rem] ${
-                isHomepage
-                  ? "text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
-                  : "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
+                location.pathname === "/exercises"
+                  ? "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
+                  : "text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
               }`}
             >
               EXERCISES
@@ -112,7 +117,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
           <li className="group">
             <a
               href="#"
-              className="text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent tracking-[0.2rem]"
+              className={`tracking-[0.2rem] ${
+                location.pathname === "/meal-plan"
+                  ? "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
+                  : "text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
+              }`}
             >
               MEAL PLAN
             </a>
@@ -123,7 +132,9 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
       {/* User Controls */}
       {isLoggedIn ? (
         <div
-          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "mr-20" : ""}`}
+          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "mr-20" : ""} ${
+            location.pathname === "/profile" ? "" : ""
+          }`}
         >
           <div className="relative group pr-6">
             <a
@@ -132,7 +143,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
                 isHomepage
                   ? "group-hover:from-[#e9e8e8] group-hover:to-[#eaeaea]"
                   : "group-hover:from-[#d7d7d7] group-hover:to-[#d9d8d8]"
-              } `}
+              } ${
+                location.pathname === "/profile"
+                  ? "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
+                  : ""
+              }`}
             >
               MY HAF
             </a>
@@ -145,7 +160,12 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             <div className="absolute rounded-xl mt-2 top-full -right-3 hidden group-hover:block bg-white text-black py-2 w-32 z-10">
               <ul>
                 <li className="px-4 py-1">
-                  <a href="#" className="tracking-widest hover:underline">
+                  <a
+                    onClick={() => navigate("/profile")}
+                    className={`tracking-widest hover:underline cursor-pointer ${
+                      location.pathname === "/profile" ? "text-red-600" : ""
+                    }`}
+                  >
                     Profile
                   </a>
                 </li>
