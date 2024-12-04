@@ -92,7 +92,7 @@ function WorkoutPlanList() {
         {currentPlans.map((plan, index) => (
           <div
             key={index}
-            className="flex flex-col bg-[#B2B2B2] rounded-xl w-[19rem]"
+            className="flex flex-col bg-[#B2B2B2] rounded-xl w-full"
           >
             <img
               src={plan.image}

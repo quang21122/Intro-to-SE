@@ -282,7 +282,7 @@ function WorkoutPlanSchedule() {
   ];
 
   return (
-    <div className="flex flex-col mt-6 mx-2 font-montserrat">
+    <div className="flex flex-col mt-6 font-montserrat">
       <div className="grid grid-cols-7">
         {exercises.map((exercises, index) => (
           <div

@@ -4,6 +4,7 @@ import { MdNavigateNext } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import { FaFilter } from "react-icons/fa";
 import { useState } from "react";
+import Navbar from "../components/Navbar";
 
 export default function WorkoutPlans() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -14,14 +15,15 @@ export default function WorkoutPlans() {
   const levels = ["Beginner", "Intermediate", "Advanced"];
 
   return (
-    <div className="py-6 flex flex-col mx-48">
-      <div className="flex justify-center items-center flex-row font-bebas">
+    <div className="py-6 flex flex-col mx-24">
+      <Navbar isHomepage={false} />
+      <div className="flex justify-center items-center flex-row font-bebas mt-10">
         {/* Search input */}
-        <div className="flex items-center justify-center flex-row">
+        <div className="flex items-center flex-row w-full">
           <input
             type="text"
             placeholder="Search"
-            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-[71rem]"
+            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-[120%]"
           />
           <FaSearch className="text-3xl text-black -mx-12" onClick={() => {}} />
         </div>
@@ -77,7 +79,7 @@ export default function WorkoutPlans() {
         )}
       </div>
 
-      <div className="max-w-6xl mx-auto relative">
+      <div className="max-w-full mx-auto relative">
         <WorkoutSlider />
       </div>
 

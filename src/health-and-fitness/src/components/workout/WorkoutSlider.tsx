@@ -117,15 +117,15 @@ function WorkoutSlider() {
   ];
 
   return (
-    <div className="-mx-[6.4rem]">
+    <div className="-mx-6">
       <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">
         For you
       </h1>
       <Slider {...settings}>
         {plans.map((plan, index) => (
-          <div key={index} className="px-6">
+          <div key={index} className="px-4">
             <div
-              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[14rem] sm:h-[12rem] md:h-[10rem] lg:h-[14rem]"
+              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem] sm:h-[14rem] md:h-[12rem] lg:h-[14rem]"
               style={{ backgroundImage: `url(${plan.image})` }}
             >
               <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-32 rounded-2xl hover:translate-y-12 hover:cursor-pointer font-bebas">
@@ -155,7 +155,7 @@ function NextArrow(props: CustomArrowProps) {
   const { onClick } = props;
   return (
     <div
-      className="text-[#F05454] text-5xl font-bold flex flex-row items-center cursor-pointer absolute -right-[6%] top-1/2 transform -translate-y-1/2"
+      className="text-[#F05454] text-5xl font-bold flex flex-row items-center cursor-pointer absolute -right-[4%] top-1/2 transform -translate-y-1/2"
       onClick={onClick}
     >
       <GrNext />
@@ -167,7 +167,7 @@ function PrevArrow(props: CustomArrowProps) {
   const { onClick } = props;
   return (
     <div
-      className="text-[#F05454] text-5xl font-bold cursor-pointer absolute -left-[6%] top-1/2 transform -translate-y-1/2"
+      className="text-[#F05454] text-5xl font-bold cursor-pointer absolute -left-[4%] top-1/2 transform -translate-y-1/2"
       onClick={onClick}
     >
       <GrPrevious className="red" />

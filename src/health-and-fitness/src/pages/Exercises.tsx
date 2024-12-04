@@ -111,15 +111,15 @@ export default function ExerciseFilter() {
   };
 
   return (
-    <div className="py-2 flex flex-col mx-48 bg-[#232221]">
+    <div className="py-2 flex flex-col mx-24 bg-[#232221]">
       <Navbar isHomepage={false} />
       <div className="mt-10 flex justify-center items-center flex-col font-bebas text-white">
         {/* Search input */}
-        <div className="flex items-center justify-center flex-row relative">
+        <div className="flex items-center justify-center flex-row relative w-full">
           <input
             type="text"
             placeholder="Search"
-            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-[71rem]"
+            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-full"
           />
           <FaSearch
             className="absolute inset-y-3 items-center right-4 text-3xl text-black "

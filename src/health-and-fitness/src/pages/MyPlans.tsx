@@ -6,6 +6,7 @@ import WorkoutPlanSchedule from "../components/workout/WorkoutPlanSchedule";
 import { LuFileCheck } from "react-icons/lu";
 import { IoTrashOutline } from "react-icons/io5";
 import { useState } from "react";
+import Navbar from "../components/Navbar";
 
 interface Plan {
   image: string;
@@ -201,33 +202,39 @@ function MyPlans() {
   });
 
   return (
-    <div className="grid grid-cols-[3fr_7fr] mx-8 pt-10">
-      <div className="flex flex-col mx-3">
-        <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
-          My plans
-        </h1>
-        <div className="mt-14 flex flex-col">
-          {sortedPlans.map((plan) =>
-            plan.id === activePlanId ? (
-              <PlanCard key={plan.id} plan={plan} />
-            ) : (
-              <CompactPlanCard
-                key={plan.id}
-                plan={plan}
-                onApply={setActivePlanId}
-              />
-            )
-          )}
-        </div>
+    <div className="flex flex-col mx-24">
+      <div className="">
+        <Navbar isHomepage={false} />
       </div>
 
-      <div className="flex flex-col mt-6 mx-2">
-        <div className="flex justify-end">
-          <button className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]">
-            Edit
-          </button>
+      <div className="grid grid-cols-[3fr_7fr] pt-10">
+        <div className="flex flex-col mx-3">
+          <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
+            My plans
+          </h1>
+          <div className="mt-14 flex flex-col">
+            {sortedPlans.map((plan) =>
+              plan.id === activePlanId ? (
+                <PlanCard key={plan.id} plan={plan} />
+              ) : (
+                <CompactPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  onApply={setActivePlanId}
+                />
+              )
+            )}
+          </div>
         </div>
-        <WorkoutPlanSchedule />
+
+        <div className="flex flex-col mt-6">
+          <div className="flex justify-end">
+            <button className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]">
+              Edit
+            </button>
+          </div>
+          <WorkoutPlanSchedule />
+        </div>
       </div>
     </div>
   );
