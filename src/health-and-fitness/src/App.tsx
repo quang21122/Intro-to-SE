@@ -8,6 +8,7 @@ import MyPlans from "./pages/MyPlans";
 import MyPlansEdit from "./pages/MyPlansEdit";
 import Exercises from "./pages/Exercises";
 import ExerciseDetail from "./pages/ExerciseDetails";
+import UserProfile from "./pages/UserProfile";
 
 const router = createBrowserRouter([
   {
@@ -48,12 +49,16 @@ const router = createBrowserRouter([
         path: "/exercises/:id",
         element: <ExerciseDetail />,
       },
+      {
+        path: "/profile",
+        element: <UserProfile />,
+      },
     ],
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />
+  return <RouterProvider router={router} />;
 }
 
 export default App;
