@@ -10,6 +10,7 @@ const createUser = async (data) => {
     const userRecord = await auth.createUser({
       email,
       password,
+      displayName: username
     });
 
     const userId = userRecord.uid;
