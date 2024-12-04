@@ -1,61 +1,61 @@
 import userService from "../services/userService.js";
 
-const signIn = async (req, res) => {
-  const { email, password } = req.body;
+// const signIn = async (req, res) => {
+//   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
-  }
+//   if (!email || !password) {
+//     return res.status(400).json({ error: "Email and password are required" });
+//   }
 
-  try {
-    // Call the service to handle Firebase Authentication
-    const result = await userService.signInService(email, password);
-    if (result.error) {
-      return res.status(401).json({ error: result.error });
-    }
+//   try {
+//     // Call the service to handle Firebase Authentication
+//     const result = await userService.signInService(email, password);
+//     if (result.error) {
+//       return res.status(401).json({ error: result.error });
+//     }
 
-    // Successful sign-in, send the response
-    return res.status(200).json({
-      message: "Sign-in successful",
-      userId: result.userId,
-      token: result.token // If you are sending a token (like a JWT or Firebase ID token)
-    });
-  } catch (error) {
-    console.error("Sign-in error:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
+//     // Successful sign-in, send the response
+//     return res.status(200).json({
+//       message: "Sign-in successful",
+//       userId: result.userId,
+//       token: result.token // If you are sending a token (like a JWT or Firebase ID token)
+//     });
+//   } catch (error) {
+//     console.error("Sign-in error:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 
-const signUp = async (req, res) => {
-  const { email, password, username } = req.body;
+// const signUp = async (req, res) => {
+//   const { email, password, username } = req.body;
 
-  if (!email || !password || !username) {
-    return res.status(400).json({ error: "Email, password, and username are required" });
-  }
+//   if (!email || !password || !username) {
+//     return res.status(400).json({ error: "Email, password, and username are required" });
+//   }
 
-  try {
-    // Call the service to handle Firebase Authentication
-    const result = await userService.signUpService(email, password, username);
-    if (result.error) {
-      return res.status(500).json({ error: result.error });
-    }
+//   try {
+//     // Call the service to handle Firebase Authentication
+//     const result = await userService.signUpService(email, password, username);
+//     if (result.error) {
+//       return res.status(500).json({ error: result.error });
+//     }
 
-    // Successful sign-up, send the response
-    return res.status(201).json({
-      message: "Sign-up successful",
-      userId: result.id,
-      email: result.email,
-      username: result.username
-    });
-  } catch (error) {
-    console.error("Sign-up error:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-}
+//     // Successful sign-up, send the response
+//     return res.status(201).json({
+//       message: "Sign-up successful",
+//       userId: result.id,
+//       email: result.email,
+//       username: result.username
+//     });
+//   } catch (error) {
+//     console.error("Sign-up error:", error);
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// }
 
 const getUser = async (req, res) => {
-  const { id } = req.query;
-  const user = await userService.getUser(id);
+  const { userId } = req.query;
+  const user = await userService.getUser(userId);
 
   if (user.error) {
     return res.status(user.status).json({ error: user.error });
@@ -99,4 +99,4 @@ const deleteUser = async (req, res) => {
   return res.status(200).json({ message: "DELETE user" });
 } 
 
-export default { signIn, signUp, getUser, createUser, updateUser, deleteUser };
+export default { getUser, createUser, updateUser, deleteUser };
