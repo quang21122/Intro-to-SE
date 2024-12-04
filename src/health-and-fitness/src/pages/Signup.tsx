@@ -31,7 +31,13 @@ export default function Signup() {
         return;
       }
       await signup(email, password, username);
-      await login(email, password);
+      const signIn = await login(email, password);
+
+      if (!signIn || !signIn.token) {
+        alert("Sign up failed");
+        return;
+      }
+
       localStorage.setItem("isAuthenticated", "true");
       navigate("/");
     } else {

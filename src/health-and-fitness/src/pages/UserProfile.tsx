@@ -2,13 +2,15 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import avatar from "../assets/avatar_default.png";
 import pen from "../assets/pen.png";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [ischangePassword, setIsChangePassword] = useState(false);
+  const { user } = useAuth();
   const [profile, setProfile] = useState({
-    name: "Thien",
-    email: "thienHaf@gmail.com",
+    name: user?.displayName || "",
+    email: user?.email || "",
     height: "",
     weight: "",
     gender: "Select gender",

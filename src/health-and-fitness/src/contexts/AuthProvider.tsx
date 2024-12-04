@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password
       );
+
       const user = userCredential.user;
 
       // Optionally, you can save the token in localStorage or any global state if needed
@@ -47,6 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
     } catch (error) {
       console.error("Login failed", error);
+      return { userId: "", token: "", error };
     }
   };
 
