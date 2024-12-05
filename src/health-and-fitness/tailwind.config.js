@@ -12,6 +12,8 @@ export default {
     extend: {
       fontFamily: {
         raleway: ["Raleway", "sans-serif"],
+        bebas: ["Bebas Neue", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
       },
     },
   },

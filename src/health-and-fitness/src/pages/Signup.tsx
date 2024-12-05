@@ -3,40 +3,61 @@ import illustration from "../assets/auth-ui/illustration.png";
 import fitness from "../assets/auth-ui/fitness.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Signup() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
 
+  const { signup, login } = useAuth();
+
   const validateEmail = (email: string): boolean => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(email);
   };
 
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("name") as string;
+    const password = formData.get("password") as string;
+    const confirm = formData.get("confirm") as string;
+
     if (validateEmail(email)) {
+      if (password !== confirm) {
+        alert("Passwords do not match");
+        return;
+      }
+      await signup(email, password, username);
+      const signIn = await login(email, password);
+
+      if (!signIn || !signIn.token) {
+        alert("Sign up failed");
+        return;
+      }
+
       localStorage.setItem("isAuthenticated", "true");
       navigate("/");
     } else {
       setEmailError("Invalid email address");
+      alert("Invalid email address");
     }
   };
 
   return (
     <div className="grid grid-cols-[2fr_8fr] h-full bg-gray-200 relative">
       <div className="absolute inset-0 bg-[#A91D3A] z-0"></div>
-      <div className="flex flex-col h-full relative z-10">
-        <a href="" className="flex flex-col h-full w-full">
-          <div className="flex m-6">
-            <img src={logo} alt="Logo" className="h-10" />
-            <p className="bebas-font text-4xl text-white ml-2 tracking-widest">
+      <div className="flex flex-col h-screen relative z-10">
+        <a className="flex flex-col h-full w-full ">
+          <div className="flex m-6" onClick={() => navigate("/")}>
+            <img src={logo} alt="Logo" className="cursor-pointer h-10" />
+            <p className="cursor-pointer bebas-font text-4xl text-white ml-2 tracking-widest">
               HAF
             </p>
           </div>
-          <div className="flex-grow flex items-end">
+          <div className="flex-grow flex items-end cursor-default">
             <img
               src={illustration}
               alt="Illustration"

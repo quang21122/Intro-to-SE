@@ -5,6 +5,10 @@ import Login from "./pages/Login";
 import WorkoutPlans from "./pages/WorkoutPlans";
 import WorkoutPlanDetails from "./pages/WorkoutPlanDetails";
 import MyPlans from "./pages/MyPlans";
+import MyPlansEdit from "./pages/MyPlansEdit";
+import Exercises from "./pages/Exercises";
+import ExerciseDetail from "./pages/ExerciseDetails";
+import UserProfile from "./pages/UserProfile";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +36,22 @@ const router = createBrowserRouter([
       {
         path: "/my-plans",
         element: <MyPlans />,
+      },
+      {
+        path: "/my-plans-edit/:id",
+        element: <MyPlansEdit />,
+      },
+      {
+        path: "/exercises",
+        element: <Exercises />,
+      },
+      {
+        path: "/exercises/:id",
+        element: <ExerciseDetail />,
+      },
+      {
+        path: "/profile",
+        element: <UserProfile />,
       },
     ],
   },

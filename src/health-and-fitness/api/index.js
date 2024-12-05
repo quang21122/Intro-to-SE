@@ -1,4 +1,5 @@
 import userRoutes from "./routes/user.js";
+import exerciseRoutes from "./routes/exercise.js";
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config({ path: '../../.env.local' }); // Adjust the path if needed
@@ -35,6 +36,24 @@ export default async function handler(req, res) {
         // Route handling for /api/user
         if (req.url.startsWith('/api/user')) {
             return userRoutes(req, res);
+        }
+        
+        // Route handling for /api/exercise
+        if (req.url.startsWith('/api/exercise')) {
+            return exerciseRoutes(req, res);
+        }
+
+        // Route handling for /api/plan
+        if (req.url.startsWith('/api/plan')) {
+            return planRoutes(req, res);
+        }
+
+        if (req.url.startsWith('/api/equipment')) {
+            return equipmentRoutes(req, res);
+        }
+
+        if (req.url.startsWith('/api/muscle')) {
+            return muscleRoutes(req, res);
         }
 
         // Handle unsupported methods
