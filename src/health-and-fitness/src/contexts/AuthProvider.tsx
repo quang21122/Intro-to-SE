@@ -5,6 +5,9 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   User,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword
 } from "firebase/auth";
 import axios from "axios";
 
@@ -72,6 +75,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value = { user, loading, login, logout, signup }; // Providing the login function through context
+  const changePassword = async (oldPassword: string, newPassword: string) => {
+    try {
+      const user = auth.currentUser;
+      if (user && user.email) {
+        // Re-authenticate the user
+        const credential = EmailAuthProvider.credential(user.email, oldPassword);
+        await reauthenticateWithCredential(user, credential);
+  
+        // Update the password
+        await updatePassword(user, newPassword);
+  
+        // Optionally, refresh the ID token
+        await user.getIdToken(true); // Passing 'true' forces a token refresh
+  
+        // Optionally, update the stored token
+        const token = await user.getIdToken();
+        // Decide where and how to store the token securely
+        // localStorage.setItem("firebaseToken", token);
+  
+        return {
+          userId: user.uid,
+          token: token,
+          message: "Password updated successfully",
+        };
+      } else {
+        throw new Error("User is not authenticated");
+      }
+    } catch (error) {
+      console.error("Change password failed", error);
+    
+      let errorMessage = "An unknown error occurred";
+    
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+    
+      return { userId: "", token: "", error: errorMessage };
+    }
+  };
+
+  const value = { user, loading, login, logout, signup, changePassword }; // Providing the login function through context
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

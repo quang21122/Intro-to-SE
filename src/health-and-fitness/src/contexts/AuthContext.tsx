@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ userId: string; token: string }> | Promise<{ userId: "", token: "", error: FirebaseError }>; // Modify the return type here
   logout: () => void; // Add the logout function
   signup: (email: string, password: string, username: string) => Promise<{ id: string; email: string, username: string } | undefined>; // Add the signup function
+  changePassword: (oldPassword: string, newPassword: string) => Promise<{ userId: string; token: string }> | Promise<{ userId: "", token: "", error: FirebaseError }>; // Add the changePassword function
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -7,7 +7,10 @@ import { useAuth } from "../hooks/useAuth";
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [ischangePassword, setIsChangePassword] = useState(false);
-  const { user } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const { user, changePassword } = useAuth();
   const [profile, setProfile] = useState({
     name: user?.displayName || "",
     email: user?.email || "",
@@ -34,6 +37,42 @@ export default function Profile() {
     setIsEditing(false);
     // Add logic to save changes (e.g., send data to backend)
     console.log("Saved profile:", profile);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Check if the new password and verify password match
+    if (newPassword !== verifyPassword) {
+      alert('New password and verify password do not match');
+      return;
+    }
+
+    if (!user) {
+      alert('User not authenticated');
+      return;
+    }
+
+    // Call the changePassword function from the AuthContext
+    try {
+      const res = await changePassword(currentPassword, newPassword);
+      if ('error' in res) {
+        alert('Failed to change password. Please try again.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setVerifyPassword('');
+        return;
+      }
+      alert('Password changed successfully');
+      // Reset form fields
+      setCurrentPassword('');
+      setNewPassword('');
+      setVerifyPassword('');
+      setIsChangePassword(false);
+    } catch (error) {
+      console.error('Change password failed', error);
+      alert('Failed to change password. Please try again.');
+    }
   };
 
   return (
@@ -283,6 +322,8 @@ export default function Profile() {
                 className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
                 autoComplete="off"
                 autoCorrect="off"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
               />
               <label
                 htmlFor="newPassword"
@@ -297,6 +338,8 @@ export default function Profile() {
                 className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
                 autoComplete="off"
                 autoCorrect="off"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
               />
 
               <label
@@ -312,10 +355,12 @@ export default function Profile() {
                 className="w-full p-2 mt-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
                 autoComplete="off"
                 autoCorrect="off"
+                value={verifyPassword}
+                onChange={(e) => setVerifyPassword(e.target.value)}
               />
               <button
                 type="submit"
-                onClick={() => setIsChangePassword(false)}
+                onClick={handleChangePassword}
                 className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold hover:bg-[#605D5D]"
               >
                 Confirm
