@@ -1,21 +1,48 @@
 import exerciseService from '../services/exerciseService.js';
 
 const getExercise = async (req, res) => {
-    const { name } = req.query;
+    const { name, page } = req.query;
 
-    if (!name) {
-        return res.status(400).json({ error: "Exercise name is required" });
+    if (!name && !page) {
+        return res.status(400).json({ error: "Either 'name' or 'page' query parameter is required" });
     }
 
-    const exercise = await exerciseService.getExercise(name);
+    try {
+        if (name) {
+            // Handle query by name
+            const exercise = await exerciseService.getExercise(name);
 
-    if (exercise.error) {
-        return res.status(exercise.status).json({ error: exercise.error });
+            if (!exercise) {
+                return res.status(404).json({ error: "Exercise not found" });
+            }
+
+            return res.status(200).json({ data: exercise });
+        }
+
+        if (page) {
+            // Validate page number
+            const pageNum = parseInt(page, 10);
+            if (isNaN(pageNum) || pageNum < 1) {
+                return res.status(400).json({ error: "Invalid page number" });
+            }
+
+            // Handle pagination
+            const exercises = await exerciseService.getExercisesByPage(pageNum);
+
+            if (!exercises || exercises.length === 0) {
+                return res.status(404).json({ error: "No exercises found for the specified page" });
+            }
+
+            return res.status(200).json({ 
+                data: exercises,
+                page: pageNum
+            });
+        }
+    } catch (error) {
+        console.error("Error in getExercise:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-
-    res.status(200).json(exercise);
 };
-
 
 const createExercise = async (req, res) => {
     console.log(req.body);
