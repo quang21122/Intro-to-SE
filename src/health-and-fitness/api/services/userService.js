@@ -1,5 +1,6 @@
 import { firestoreDb } from '../firebaseAdmin.js';
 import { auth } from '../firebaseAdmin.js';
+import { User } from '../models/User.js';
 
 // Create a new user with Firebase Auth and store additional data in Firestore
 const createUser = async (data) => {
@@ -15,11 +16,10 @@ const createUser = async (data) => {
 
     const userId = userRecord.uid;
 
+    const newUser = { ...User };
+
     // Store additional user data in Firestore
-    await firestoreDb.collection('users').doc(userId).set({
-      username,
-      createdAt: new Date(),
-    });
+    await firestoreDb.collection('users').doc(userId).set(newUser);
 
     return { id: userId, email, username, status: 201 };
   } catch (error) {

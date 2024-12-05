@@ -9,7 +9,7 @@ export default function Login() {
   const [showForgetPassword, setShowForgetPassword] = useState(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [emailError, setEmailError] = useState<string>("");
+  const [authError, setAuthError] = useState<string>("");
   const { login } = useAuth(); // Use the login function from context
   const navigate = useNavigate();
 
@@ -32,16 +32,20 @@ export default function Login() {
       try {
         // Call the login function from context
         const result = await login(email, password);
-        if (result) {
-          localStorage.setItem("isAuthenticated", "true");
-          navigate("/"); // Redirect to the home page if login is successful
+
+        if ("error" in result) {
+          setAuthError("Invalid email or password");
+          return;
         }
+
+        localStorage.setItem("isAuthenticated", "true");
+        navigate("/"); // Redirect to the home page if login is successful
       } catch (error) {
-        setEmailError("Invalid email or password");
+        setAuthError("Invalid email or password");
         console.error("Login failed", error);
       }
     } else {
-      setEmailError("Invalid email address");
+      setAuthError("Invalid email address");
     }
   };
 
@@ -92,8 +96,8 @@ export default function Login() {
                     autoComplete="off"
                     autoCorrect="off"
                   />
-                  {emailError && (
-                    <p className="text-red-500 text-sm mt-2">{emailError}</p>
+                  {authError && (
+                    <p className="text-red-500 text-sm mt-2">{authError}</p>
                   )}
                 </div>
                 <div className="mb-6">
