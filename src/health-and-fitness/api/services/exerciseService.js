@@ -1,5 +1,5 @@
 import { firestoreDb } from '../firebase.js';
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
 
 const createExercise = async (data) => {
     const {difficulty, instruction, equipment, image, muscle, name, type, video } = data;
@@ -9,11 +9,16 @@ const createExercise = async (data) => {
         if (!query.error) {
             return { error: "Exercise already exists", status: 409 };
         }
-        // Get length of exercises collection
-        const exercisesCollection = await getDocs(collection(firestoreDb, 'exercises'));
-        console.log(exercisesCollection.size);
-        // Create a new user ID
-        const exerciseId = exercisesCollection.size + 1;
+        const generateId = (length) => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        };
+    
+        const exerciseId = generateId(20);
         // Store additional user data in Firestore
         await setDoc(doc(firestoreDb, 'exercises', exerciseId.toString()), {
         difficulty, 
@@ -52,6 +57,55 @@ const getExercise = async (name) => {
         return { error: error.message, status: 500 };
     }
 }
+const getExercisesByPage = async (page, pageSize = 6) => {
+    try {
+        const exercisesCollection = collection(firestoreDb, 'exercises');
+        
+        // Build initial query with ordering and limit
+        let exercisesQuery = query(
+            exercisesCollection,
+            orderBy("name"),
+            limit(pageSize)
+        );
+
+        // If not first page, get the starting point
+        if (page > 1) {
+            // Get the last document from the previous page
+            const lastVisibleDoc = await getDocs(
+                query(
+                    exercisesCollection,
+                    orderBy("name"),
+                    limit((page - 1) * pageSize)
+                )
+            );
+            
+            if (!lastVisibleDoc.empty) {
+                const lastDoc = lastVisibleDoc.docs[lastVisibleDoc.docs.length - 1];
+                exercisesQuery = query(
+                    exercisesCollection,
+                    orderBy("name"),
+                    startAfter(lastDoc),
+                    limit(pageSize)
+                );
+            }
+        }
+
+        const querySnapshot = await getDocs(exercisesQuery);
+        
+        if (querySnapshot.empty) {
+            return [];
+        }
+
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+    } catch (error) {
+        console.error("Error fetching exercises by page:", error);
+        return [];
+    }
+};
 
 const updateExercise = async (name, data) => {
     try {
@@ -99,4 +153,4 @@ const deleteExercise = async (exerciseName) => {
     }
 }
 
-export default{createExercise, getExercise, updateExercise, deleteExercise };
+export default{createExercise, getExercise, updateExercise, deleteExercise, getExercisesByPage};

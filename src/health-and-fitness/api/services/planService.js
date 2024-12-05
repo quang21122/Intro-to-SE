@@ -1,5 +1,5 @@
 import { firestoreDb } from '../firebase.js';
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
 const { getExercise } = exerciseService;
 const getPlan = async (id) => {
@@ -18,6 +18,55 @@ const getPlan = async (id) => {
     }
 }
 
+const getPlansByPage = async (page, pageSize = 6) => {
+    try {
+        const plansCollection = collection(firestoreDb, 'plans');
+        
+        // Build initial query with ordering and limit
+        let plansQuery = query(
+            plansCollection,
+            orderBy("name"),
+            limit(pageSize)
+        );
+
+        // If not first page, get the starting point
+        if (page > 1) {
+            // Get the last document from the previous page
+            const lastVisibleDoc = await getDocs(
+                query(
+                    plansCollection,
+                    orderBy("name"),
+                    limit((page - 1) * pageSize)
+                )
+            );
+            
+            if (!lastVisibleDoc.empty) {
+                const lastDoc = lastVisibleDoc.docs[lastVisibleDoc.docs.length - 1];
+                plansQuery = query(
+                    plansCollection,
+                    orderBy("name"),
+                    startAfter(lastDoc),
+                    limit(pageSize)
+                );
+            }
+        }
+
+        const querySnapshot = await getDocs(plansQuery);
+        
+        if (querySnapshot.empty) {
+            return [];
+        }
+
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+    } catch (error) {
+        console.error("Error fetching plans by page:", error);
+        return [];
+    }
+}
 const createPlan = async (data) => {
     try {
         // Validate the main plan data
@@ -165,4 +214,4 @@ const updatePlan = async (id, data) => {
     }
 }
 
-export default { createPlan, deletePlan, getPlan, updatePlan };
+export default { createPlan, deletePlan, getPlan, updatePlan, getPlansByPage };
