@@ -57,7 +57,7 @@ const getExercise = async (name) => {
         return { error: error.message, status: 500 };
     }
 }
-const getExercisesByPage = async (page, pageSize = 6) => {
+const getExercisesByPage = async (page, pageSize = 10) => {
     try {
         const exercisesCollection = collection(firestoreDb, 'exercises');
         
