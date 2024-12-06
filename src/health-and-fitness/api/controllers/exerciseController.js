@@ -81,6 +81,27 @@ const deleteExercise = async (req, res) => {
     }
     
     res.status(200).json(deletedExercise);
-    };
+};
 
-export default { getExercise, createExercise, updateExercise, deleteExercise };
+const getExercisesByMuscle = async (req, res) => {
+    const { muscle } = req.query;
+
+    if (!muscle) {
+        return res.status(400).json({ error: "Muscle query parameter is required" });
+    }
+
+    try {
+        const exercises = await exerciseService.getExercisesByMuscle(muscle);
+
+        if (!exercises || exercises.length === 0) {
+            return res.status(404).json({ error: "No exercises found for the specified muscle" });
+        }
+
+        return res.status(200).json({ data: exercises });
+    } catch (error) {
+        console.error("Error in getExercisesByMuscle:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export default { getExercise, createExercise, updateExercise, deleteExercise, getExercisesByMuscle };

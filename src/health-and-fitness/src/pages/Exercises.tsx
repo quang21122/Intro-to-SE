@@ -9,7 +9,7 @@ import bodyweights from "../assets/exercises/body-weights.png";
 interface Muscle {
   id: string;
   name: string;
-  image: string; // Optional, if muscles have images
+  image: string; // Optional, if muscleName have images
 }
 
 interface Equipment {
@@ -22,8 +22,9 @@ interface Exercise {
   id: string;
   name: string;
   muscle: string; // Muscle ID (to fetch muscle details)
-  muscles: string[]; // Added muscles property to store muscle names
+  muscleName: string; // Muscle name (to display)
   equipment: string;
+  equipmentName: string;
   description: string;
   image: string;
   video: string;
@@ -123,30 +124,34 @@ export default function ExerciseFilter() {
           }
         }
 
-        // For each exercise, fetch the corresponding muscle data
+        // For each exercise, fetch the corresponding muscle and equipment data
         const updatedExercises = await Promise.all(
           exerciseData.map(async (exercise: Exercise) => {
             const muscleRes = await fetch(
               `http://localhost:3000/api/muscle?id=${exercise.muscle}`
             );
-            if (!muscleRes.ok) {
-              throw new Error(
-                `Failed to fetch muscle for exercise: ${exercise.id}`
-              );
-            }
-
             const muscleData = await muscleRes.json();
-            console.log("Fetched Muscle Data:", muscleData);
 
-            // Update the exercise with the muscle information
+            // Fetch equipment data for the exercise
+            const equipmentRes = await fetch(
+              `http://localhost:3000/api/equipment?id=${exercise.equipment}`
+            );
+            const equipmentData = await equipmentRes.json();
+
             return {
               ...exercise,
-              muscles: muscleData.user ? [muscleData.user.name] : [],
+              muscleName: muscleData.user ? muscleData.user.name : "Unknown",
+              muscleImage: muscleData.user ? muscleData.user.image : "Unknown",
+              equipmentName: equipmentData.user
+                ? equipmentData.user.name
+                : "Unknown",
+              equipmentImage: equipmentData.user
+                ? equipmentData.user.image
+                : "Unknown",
             };
           })
         );
 
-        console.log("Updated Exercises:", updatedExercises); // Final updated exercises
         setExercises(updatedExercises);
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -163,7 +168,10 @@ export default function ExerciseFilter() {
   }, [currentPage]);
 
   const handleExerciseClick = (exercise: Exercise) => {
-    navigate(`/exercises/${exercise.id}`);
+    // Replace spaces with hyphens in the exercise name
+    const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
+    console.log("Exercise state:", exercise);
+    navigate(`/exercises/${formattedName}`, { state: { exercise } });
   };
 
   return (
@@ -273,7 +281,7 @@ export default function ExerciseFilter() {
                   <div>
                     <h3 className="font-bold mb-1">{exercise.name}</h3>
                     <div className="text-[#FF4D4D] text-sm mb-2">
-                      {exercise.muscles.join(" / ")}
+                      {exercise.muscleName}
                     </div>
                     <p className="text-gray-400 text-sm line-clamp-3">
                       {exercise.instruction}
