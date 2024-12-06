@@ -22,10 +22,12 @@ const createUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  const { userId } = req.query;
+
   // Get the username and data from the request body
-  const { username, oldPassword, newPassword} = req.body;
+  const data = req.body;
   // Update the user document by username
-  const newUser = await userService.updateUser(username, oldPassword, newPassword);
+  const newUser = await userService.updateUser(userId, data);
 
   if (newUser.error) {
     return res.status(newUser.status).json({ error: newUser.error });

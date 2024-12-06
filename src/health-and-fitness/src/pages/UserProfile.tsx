@@ -1,26 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import avatar from "../assets/avatar_default.png";
 import pen from "../assets/pen.png";
 import { useAuth } from "../hooks/useAuth";
+import { useProfile } from "../hooks/useProfile";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [ischangePassword, setIsChangePassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [verifyPassword, setVerifyPassword] = useState('');
-  const { user, changePassword } = useAuth();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
+
+  const { user, loading, changePassword } = useAuth();
+  const { myProfile, updateProfile } = useProfile();
+
   const [profile, setProfile] = useState({
-    name: user?.displayName || "",
-    email: user?.email || "",
+    name: "",
+    email: "",
     height: "",
     weight: "",
-    gender: "Select gender",
+    gender: "",
     goalHeight: "",
     goalWeight: "",
-    goalBody: "Select goal body",
+    goalBody: "",
   });
+
+  useEffect(() => {
+    if (!loading && user && myProfile) {
+      setProfile({
+        name: user.displayName || "",
+        email: user.email || "",
+        height: myProfile.height || "",
+        weight: myProfile.weight || "",
+        gender: myProfile.gender || "",
+        goalHeight: myProfile.goalHeight || "",
+        goalWeight: myProfile.goalWeight || "",
+        goalBody: myProfile.goalBody || "",
+      });
+    }
+  }, [user, myProfile, loading]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -35,8 +54,35 @@ export default function Profile() {
 
   const saveChanges = () => {
     setIsEditing(false);
+
     // Add logic to save changes (e.g., send data to backend)
-    console.log("Saved profile:", profile);
+    if (!user) {
+      alert("User not authenticated");
+      return;
+    }
+
+    // use the updateProfile function from the ProfileContext
+    const updatedProfile = {
+      height: profile.height,
+      weight: profile.weight,
+      gender: profile.gender,
+      goalHeight: profile.goalHeight,
+      goalWeight: profile.goalWeight,
+      goalBody: profile.goalBody,
+    };
+
+    updateProfile(user.uid, updatedProfile)
+      .then((res) => {
+        if ("error" in res) {
+          alert("Failed to update profile. Please try again.");
+          return;
+        }
+        alert(res.message);
+      })
+      .catch((error) => {
+        console.error("Update profile failed", error);
+        alert("Failed to update profile. Please try again.");
+      });
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -44,34 +90,34 @@ export default function Profile() {
 
     // Check if the new password and verify password match
     if (newPassword !== verifyPassword) {
-      alert('New password and verify password do not match');
+      alert("New password and verify password do not match");
       return;
     }
 
     if (!user) {
-      alert('User not authenticated');
+      alert("User not authenticated");
       return;
     }
 
     // Call the changePassword function from the AuthContext
     try {
       const res = await changePassword(currentPassword, newPassword);
-      if ('error' in res) {
-        alert('Failed to change password. Please try again.');
-        setCurrentPassword('');
-        setNewPassword('');
-        setVerifyPassword('');
+      if ("error" in res) {
+        alert("Failed to change password. Please try again.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setVerifyPassword("");
         return;
       }
-      alert('Password changed successfully');
+      alert("Password changed successfully");
       // Reset form fields
-      setCurrentPassword('');
-      setNewPassword('');
-      setVerifyPassword('');
+      setCurrentPassword("");
+      setNewPassword("");
+      setVerifyPassword("");
       setIsChangePassword(false);
     } catch (error) {
-      console.error('Change password failed', error);
-      alert('Failed to change password. Please try again.');
+      console.error("Change password failed", error);
+      alert("Failed to change password. Please try again.");
     }
   };
 
@@ -96,17 +142,8 @@ export default function Profile() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm mb-1">Email</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="email"
-                  value={profile.email}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-700 text-white p-2 rounded"
-                />
-              ) : (
-                <div className="text-sm">{profile.email}</div>
-              )}
+
+              <div className="text-sm">{profile.email}</div>
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
