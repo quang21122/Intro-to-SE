@@ -47,7 +47,7 @@ export default function ExerciseDetail() {
       try {
         // Fetch alternative exercises based on the muscle group
         const response = await fetch(
-          `http://localhost:3000/api/exercise?muscle=${exerciseDetails?.muscle}`
+          `http://localhost:3000/api/exercise?muscles=${exerciseDetails?.muscle}`
         );
         const res = await response.json();
 

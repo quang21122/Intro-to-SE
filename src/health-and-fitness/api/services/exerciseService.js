@@ -241,6 +241,85 @@ const getExercisesByMuscles = async (muscles) => {
   }
 };
 
+const getExercisesByEquipments = async (equipments) => {
+  try {
+    const exercisesCollection = collection(firestoreDb, "exercises");
+
+    // Query Firestore to find exercises that match any of the given equipment ids
+    const querySnapshot = await getDocs(
+      query(exercisesCollection, where("equipment", "in", equipments))
+    );
+
+    if (querySnapshot.empty) {
+      return {
+        error: "No exercises found for the specified equipment",
+        status: 404,
+      };
+    }
+
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error getting exercises by equipment:", error);
+    return { error: error.message, status: 500 };
+  }
+};
+
+const getFilteredExercises = async ({ muscles, equipments, page, name }) => {
+  try {
+    const exercisesCollection = collection(firestoreDb, "exercises");
+
+    const conditions = [];
+
+    if (muscles.length > 0) {
+      conditions.push(where("muscle", "in", muscles));
+    }
+
+    if (equipments.length > 0) {
+      conditions.push(where("equipment", "in", equipments));
+    }
+
+    if (name) {
+      conditions.push(where("name", "==", name));
+    }
+
+    let queryRef = query(exercisesCollection, ...conditions);
+
+    // Apply pagination if page is specified
+    const pageSize = 10; // Define the page size
+    if (page) {
+      const pageNum = parseInt(page, 10);
+      if (pageNum < 1) {
+        throw new Error("Invalid page number");
+      }
+
+      // For cursor-based pagination, you would typically store the last document from the previous page.
+      // As an example, we'll order by a field like `name`:
+      queryRef = query(queryRef, orderBy("name"), limit(pageSize));
+
+      // In a real-world scenario, you'd use a startAfter cursor based on the last document of the previous page.
+      // e.g., queryRef = query(queryRef, startAfter(lastDocument), limit(pageSize));
+    }
+
+    const querySnapshot = await getDocs(queryRef);
+
+    if (querySnapshot.empty) {
+      return [];
+    }
+
+    // Map the documents to a response array
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error in getFilteredExercises:", error);
+    throw new Error(error.message);
+  }
+};
+
 export default {
   createExercise,
   getExercise,
@@ -249,4 +328,6 @@ export default {
   getExercisesByPage,
   getExercisesByMuscle,
   getExercisesByMuscles,
+  getExercisesByEquipments,
+  getFilteredExercises,
 };

@@ -38,6 +38,7 @@ export default function ExerciseFilter() {
   const [muscles, setMuscles] = useState<Muscle[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]); // To track selected muscles
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]); // To track selected equipment
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,9 +95,22 @@ export default function ExerciseFilter() {
         // Fetch exercises only if there are selected muscles
         const selectedMusclesParam = selectedMuscles.join(",");
         console.log("Selected Muscles:", selectedMusclesParam);
+        const selectedEquipmentParam = selectedEquipment.join(",");
+        console.log("Selected Equipment:", selectedEquipmentParam);
+
+        const queryParam = new URLSearchParams();
+
+        if (selectedMuscles.length) {
+          queryParam.append("muscles", selectedMusclesParam);
+        }
+
+        if (selectedEquipmentParam.length) {
+          queryParam.append("equipments", selectedEquipmentParam);
+        }
+
         const exerciseRes = await fetch(
-          selectedMuscles.length
-            ? `http://localhost:3000/api/exercise?muscles=${selectedMusclesParam}`
+          selectedMuscles.length || selectedEquipment.length
+            ? `http://localhost:3000/api/exercise?${queryParam.toString()}` // Fetch exercises with selected muscles
             : `http://localhost:3000/api/exercise?page=${currentPage}`
         );
 
@@ -111,10 +125,11 @@ export default function ExerciseFilter() {
         const exercises = exerciseData.data || [];
         console.log("Exercises:", exercises);
 
-        if (selectedMuscles.length) {
-          const filteredExerciseCount = exerciseData.data.length;
-          setTotalPages(Math.ceil(filteredExerciseCount / itemsPerPage));
-        }
+        const filteredExerciseCount = exercises.length;
+        console.log("Filtered Exercise Count:", filteredExerciseCount);
+        const totalPages = Math.ceil(filteredExerciseCount / itemsPerPage);
+        console.log("Total Pages:", totalPages);
+        setTotalPages(totalPages);
 
         // Fetch corresponding muscle and equipment data for each exercise
         const updatedExercises = await Promise.all(
@@ -160,14 +175,14 @@ export default function ExerciseFilter() {
     };
 
     fetchExercises();
-  }, [selectedMuscles, currentPage]); // Re-fetch when selectedMuscles or currentPage changes
+  }, [selectedMuscles, selectedEquipment, currentPage]); // Re-fetch when selectedMuscles or currentPage changes
 
   useEffect(() => {
     setCurrentFilteredPage(1);
     setCurrentPage(1);
     console.log("Current Filtered Page:", currentFilteredPage);
     console.log("Current Page:", currentPage);
-  }, [selectedMuscles]); // Reset currentPage when selectedMuscles changes
+  }, [selectedMuscles, selectedEquipment]); // Reset currentPage when selectedMuscles changes
 
   const handleExerciseClick = (exercise: Exercise) => {
     console.log("Exercise clicked:", exercise);
@@ -180,6 +195,14 @@ export default function ExerciseFilter() {
       prevSelected.includes(muscleId)
         ? prevSelected.filter((id) => id !== muscleId)
         : [...prevSelected, muscleId]
+    );
+  };
+
+  const toggleEquipmentSelection = (equipmentId: string) => {
+    setSelectedEquipment((prevSelected) =>
+      prevSelected.includes(equipmentId)
+        ? prevSelected.filter((id) => id !== equipmentId)
+        : [...prevSelected, equipmentId]
     );
   };
 
@@ -263,14 +286,27 @@ export default function ExerciseFilter() {
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
               {equipment.map((equip) => (
                 <div key={equip.id} className="text-center">
-                  <div className="bg-gray-700 rounded-lg p-2 mb-2">
+                  <div
+                    className={`bg-gray-700 rounded-lg p-2 mb-2 cursor-pointer ${
+                      selectedEquipment.includes(equip.id) ? "bg-red-500" : ""
+                    }`}
+                    onClick={() => toggleEquipmentSelection(equip.id)}
+                  >
                     <img
                       src={equip.image || bodyweights}
                       alt={`${equip.name} exercise`}
                       className="w-full h-24 object-cover"
                     />
                   </div>
-                  <span className="text-sm">{equip.name}</span>
+                  <span
+                    className={`text-sm ${
+                      selectedEquipment.includes(equip.id)
+                        ? "text-[#FF4D4D]"
+                        : ""
+                    }`}
+                  >
+                    {equip.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -289,7 +325,7 @@ export default function ExerciseFilter() {
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {selectedMuscles.length > 0 &&
+              {(selectedMuscles.length > 0 || selectedEquipment.length > 0) &&
                 exercises
                   .slice(
                     (currentFilteredPage - 1) * itemsPerPage,
@@ -320,6 +356,7 @@ export default function ExerciseFilter() {
                     </div>
                   ))}
               {selectedMuscles.length === 0 &&
+                selectedEquipment.length === 0 &&
                 exercises.map((exercise) => (
                   <div
                     key={exercise.id}
@@ -349,7 +386,7 @@ export default function ExerciseFilter() {
 
           {/* Pagination when apply muscles filter, must to calc exactly number of page */}
           {/* You must to slice it to limit display exactly item per page */}
-          {selectedMuscles.length > 0 && (
+          {(selectedMuscles.length > 0 || selectedEquipment.length > 0) && (
             <div className="flex justify-center gap-2 my-8">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
@@ -369,7 +406,7 @@ export default function ExerciseFilter() {
 
           {/* Pagination when not apply muscles filter */}
 
-          {selectedMuscles.length === 0 && (
+          {selectedMuscles.length === 0 && selectedEquipment.length === 0 && (
             <div className="flex justify-center gap-2 my-8">
               {Array.from({ length: 10 }, (_, i) => (
                 <button
