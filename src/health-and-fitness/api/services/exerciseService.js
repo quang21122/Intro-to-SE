@@ -194,79 +194,6 @@ const deleteExercise = async (exerciseName) => {
   }
 };
 
-const getExercisesByMuscle = async (muscle) => {
-  try {
-    const exercisesCollection = collection(firestoreDb, "exercises");
-    const querySnapshot = await getDocs(
-      query(exercisesCollection, where("muscle", "==", muscle))
-    );
-
-    if (querySnapshot.empty) {
-      return { error: "No exercises found for muscle", status: 404 };
-    }
-
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  } catch (error) {
-    console.error("Error getting exercises by muscle:", error);
-    return { error: error.message, status: 500 };
-  }
-};
-
-const getExercisesByMuscles = async (muscles) => {
-  try {
-    const exercisesCollection = collection(firestoreDb, "exercises");
-
-    // Query Firestore to find exercises that match any of the given muscle ids
-    const querySnapshot = await getDocs(
-      query(exercisesCollection, where("muscle", "in", muscles))
-    );
-
-    if (querySnapshot.empty) {
-      return {
-        error: "No exercises found for the specified muscles",
-        status: 404,
-      };
-    }
-
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  } catch (error) {
-    console.error("Error getting exercises by muscles:", error);
-    return { error: error.message, status: 500 };
-  }
-};
-
-const getExercisesByEquipments = async (equipments) => {
-  try {
-    const exercisesCollection = collection(firestoreDb, "exercises");
-
-    // Query Firestore to find exercises that match any of the given equipment ids
-    const querySnapshot = await getDocs(
-      query(exercisesCollection, where("equipment", "in", equipments))
-    );
-
-    if (querySnapshot.empty) {
-      return {
-        error: "No exercises found for the specified equipment",
-        status: 404,
-      };
-    }
-
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  } catch (error) {
-    console.error("Error getting exercises by equipment:", error);
-    return { error: error.message, status: 500 };
-  }
-};
-
 const getFilteredExercises = async ({ muscles, equipments, page, name }) => {
   try {
     const exercisesCollection = collection(firestoreDb, "exercises");
@@ -320,14 +247,45 @@ const getFilteredExercises = async ({ muscles, equipments, page, name }) => {
   }
 };
 
+const searchExercises = async (searchTerm) => {
+  try {
+    const formattedTerm = searchTerm.toLowerCase().trim();
+    console.log("Formatted Search Term:", formattedTerm);
+
+    const exercisesCollection = collection(firestoreDb, "exercises");
+    const querySnapshot = await getDocs(exercisesCollection);
+
+    if (querySnapshot.empty) {
+      return { error: "No exercises found", status: 404 };
+    }
+
+    // Filter documents client-side to allow partial matches
+    const exercises = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((exercise) =>
+        exercise.name.toLowerCase().includes(formattedTerm)
+      );
+
+    if (exercises.length === 0) {
+      return { error: "No exercises found", status: 404 };
+    }
+
+    return { exercises, status: 200 };
+  } catch (error) {
+    console.error("Error in searchExercises:", error);
+    throw new Error(error.message);
+  }
+};
+
 export default {
   createExercise,
   getExercise,
   updateExercise,
   deleteExercise,
   getExercisesByPage,
-  getExercisesByMuscle,
-  getExercisesByMuscles,
-  getExercisesByEquipments,
   getFilteredExercises,
+  searchExercises,
 };

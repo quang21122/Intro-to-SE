@@ -33,7 +33,7 @@ interface Exercise {
   createdAt: string;
 }
 
-export default function ExerciseFilter() {
+export default function Exercises() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [muscles, setMuscles] = useState<Muscle[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -47,7 +47,19 @@ export default function ExerciseFilter() {
   const [totalPages, setTotalPages] = useState(1); // Total pages based on filtered count
   const [currentFilteredPage, setCurrentFilteredPage] = useState(1);
   const [showEquipmentFilter, setShowEquipmentFilter] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchMuscles = async () => {
@@ -100,6 +112,11 @@ export default function ExerciseFilter() {
 
         const queryParam = new URLSearchParams();
 
+        if (debouncedSearchTerm) {
+          queryParam.append("search", debouncedSearchTerm);
+          console.log("Search Term:", debouncedSearchTerm);
+        }
+
         if (selectedMuscles.length) {
           queryParam.append("muscles", selectedMusclesParam);
         }
@@ -109,7 +126,9 @@ export default function ExerciseFilter() {
         }
 
         const exerciseRes = await fetch(
-          selectedMuscles.length || selectedEquipment.length
+          debouncedSearchTerm
+            ? `http://localhost:3000/api/exercise?search=${debouncedSearchTerm}` // Fetch exercises with search term
+            : selectedMuscles.length || selectedEquipment.length
             ? `http://localhost:3000/api/exercise?${queryParam.toString()}` // Fetch exercises with selected muscles
             : `http://localhost:3000/api/exercise?page=${currentPage}`
         );
@@ -122,7 +141,9 @@ export default function ExerciseFilter() {
 
         const exerciseData = await exerciseRes.json();
         console.log("Fetched Exercises:", exerciseData);
-        const exercises = exerciseData.data || [];
+        const exercises = debouncedSearchTerm
+          ? exerciseData.data.exercises
+          : exerciseData.data || [];
         console.log("Exercises:", exercises);
 
         const filteredExerciseCount = exercises.length;
@@ -165,7 +186,7 @@ export default function ExerciseFilter() {
         setExercises(updatedExercises);
       } catch (err) {
         if (err instanceof Error) {
-          setError(err.message || "An error occurred while fetching exercises");
+          setError("No available exercises found");
         } else {
           setError("An unknown error occurred while fetching exercises");
         }
@@ -175,14 +196,14 @@ export default function ExerciseFilter() {
     };
 
     fetchExercises();
-  }, [selectedMuscles, selectedEquipment, currentPage]); // Re-fetch when selectedMuscles or currentPage changes
+  }, [debouncedSearchTerm, selectedMuscles, selectedEquipment, currentPage]); // Re-fetch when selectedMuscles or currentPage changes
 
   useEffect(() => {
     setCurrentFilteredPage(1);
     setCurrentPage(1);
     console.log("Current Filtered Page:", currentFilteredPage);
     console.log("Current Page:", currentPage);
-  }, [selectedMuscles, selectedEquipment]); // Reset currentPage when selectedMuscles changes
+  }, [selectedMuscles, selectedEquipment, debouncedSearchTerm]); // Reset currentPage when selectedMuscles changes
 
   const handleExerciseClick = (exercise: Exercise) => {
     console.log("Exercise clicked:", exercise);
@@ -207,7 +228,7 @@ export default function ExerciseFilter() {
   };
 
   return (
-    <div className="py-2 flex flex-col mx-24 bg-[#232221]">
+    <div className="py-2 flex flex-col mx-24 bg-[#232221] min-h-screen">
       <Navbar isHomepage={false} />
       <div className="mt-10 flex justify-center items-center flex-col font-bebas text-white">
         {/* Search input */}
@@ -216,9 +237,12 @@ export default function ExerciseFilter() {
             type="text"
             placeholder="Search"
             className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-full"
+            style={{ textTransform: "none" }}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <FaSearch
-            className="absolute inset-y-3 items-center right-4 text-3xl text-black"
+            className="absolute inset-y-3 items-center right-4 text-3xl text-black cursor-pointer"
             onClick={() => {}}
           />
         </div>
@@ -325,7 +349,9 @@ export default function ExerciseFilter() {
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(selectedMuscles.length > 0 || selectedEquipment.length > 0) &&
+              {(selectedMuscles.length > 0 ||
+                selectedEquipment.length > 0 ||
+                searchTerm) &&
                 exercises
                   .slice(
                     (currentFilteredPage - 1) * itemsPerPage,
@@ -357,6 +383,7 @@ export default function ExerciseFilter() {
                   ))}
               {selectedMuscles.length === 0 &&
                 selectedEquipment.length === 0 &&
+                searchTerm === "" &&
                 exercises.map((exercise) => (
                   <div
                     key={exercise.id}
@@ -386,7 +413,9 @@ export default function ExerciseFilter() {
 
           {/* Pagination when apply muscles filter, must to calc exactly number of page */}
           {/* You must to slice it to limit display exactly item per page */}
-          {(selectedMuscles.length > 0 || selectedEquipment.length > 0) && (
+          {(selectedMuscles.length > 0 ||
+            selectedEquipment.length > 0 ||
+            searchTerm) && (
             <div className="flex justify-center gap-2 my-8">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
@@ -406,21 +435,23 @@ export default function ExerciseFilter() {
 
           {/* Pagination when not apply muscles filter */}
 
-          {selectedMuscles.length === 0 && selectedEquipment.length === 0 && (
-            <div className="flex justify-center gap-2 my-8">
-              {Array.from({ length: 10 }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-4 py-2 rounded-lg text-white ${
-                    i + 1 === currentPage ? "bg-[#FF4D4D]" : "bg-gray-600"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
+          {selectedMuscles.length === 0 &&
+            selectedEquipment.length === 0 &&
+            debouncedSearchTerm === "" && (
+              <div className="flex justify-center gap-2 my-8">
+                {Array.from({ length: 10 }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      i + 1 === currentPage ? "bg-[#FF4D4D]" : "bg-gray-600"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
         </section>
       </div>
     </div>

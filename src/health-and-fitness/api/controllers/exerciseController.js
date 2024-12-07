@@ -91,91 +91,6 @@ const deleteExercise = async (req, res) => {
   res.status(200).json(deletedExercise);
 };
 
-const getExercisesByMuscle = async (req, res) => {
-  const { muscle } = req.query;
-
-  if (!muscle) {
-    return res
-      .status(400)
-      .json({ error: "Muscle query parameter is required" });
-  }
-
-  try {
-    const exercises = await exerciseService.getExercisesByMuscle(muscle);
-
-    if (!exercises || exercises.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No exercises found for the specified muscle" });
-    }
-
-    return res.status(200).json({ data: exercises });
-  } catch (error) {
-    console.error("Error in getExercisesByMuscle:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-const getExercisesByMuscles = async (req, res) => {
-  const { muscles } = req.query;
-
-  if (!muscles) {
-    return res
-      .status(400)
-      .json({ error: "Muscles query parameter is required" });
-  }
-
-  try {
-    // Convert muscles string (comma-separated) into an array of muscle IDs
-    const muscleIds = muscles.split(",");
-
-    // Call the service to get exercises by multiple muscles
-    const exercises = await exerciseService.getExercisesByMuscles(muscleIds);
-
-    if (!exercises || exercises.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No exercises found for the specified muscles" });
-    }
-
-    return res.status(200).json({ data: exercises });
-  } catch (error) {
-    console.error("Error in getExercisesByMuscles:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-const getExercisesByEquipments = async (req, res) => {
-  const { equipments } = req.query;
-
-  if (!equipments) {
-    return res
-      .status(400)
-      .json({ error: "Equipments query parameter is required" });
-  }
-
-  try {
-    // Convert equipments string (comma-separated) into an array of equipment IDs
-    const equipmentIds = equipments.split(",");
-
-    // Call the service to get exercises by multiple equipments
-    const exercises = await exerciseService.getExercisesByEquipments(
-      equipmentIds
-    );
-
-    if (!exercises || exercises.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No exercises found for the specified equipments" });
-    }
-
-    return res.status(200).json({ data: exercises });
-  } catch (error) {
-    console.error("Error in getExercisesByEquipments:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
 const getFilteredExercisesHandler = async (req, res) => {
   const { muscles, equipments, page, name } = req.query;
 
@@ -221,13 +136,33 @@ const getFilteredExercisesHandler = async (req, res) => {
   }
 };
 
+const searchExercises = async (req, res) => {
+  const { search } = req.query;
+  console.log("query", search);
+
+  if (!search) {
+    return res.status(400).json({ error: "search parameter is required" });
+  }
+
+  try {
+    const exercises = await exerciseService.searchExercises(search);
+
+    if (!exercises || exercises.length === 0) {
+      return res.status(404).json({ error: "No exercises found" });
+    }
+
+    return res.status(200).json({ data: exercises });
+  } catch (error) {
+    console.error("Error in searchExercises:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export default {
   getExercise,
   createExercise,
   updateExercise,
   deleteExercise,
-  getExercisesByMuscle,
-  getExercisesByMuscles,
-  getExercisesByEquipments,
   getFilteredExercisesHandler,
+  searchExercises,
 };
