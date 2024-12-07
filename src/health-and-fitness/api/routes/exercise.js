@@ -2,9 +2,14 @@ import exerciseController from "../controllers/exerciseController.js";
 
 export default async function handler(req, res) {
   if (req.originalUrl.startsWith("/api/exercise")) {
-    const { muscle } = req.query;
-    if (req.method === "GET" && muscle) {
-      return exerciseController.getExercisesByMuscle(req, res);
+    const { muscle, muscles } = req.query;
+
+    if (req.method === "GET") {
+      if (muscles) {
+        return exerciseController.getExercisesByMuscles(req, res);
+      } else if (muscle) {
+        return exerciseController.getExercisesByMuscle(req, res);
+      }
     }
 
     switch (req.method) {

@@ -215,6 +215,32 @@ const getExercisesByMuscle = async (muscle) => {
   }
 };
 
+const getExercisesByMuscles = async (muscles) => {
+  try {
+    const exercisesCollection = collection(firestoreDb, "exercises");
+
+    // Query Firestore to find exercises that match any of the given muscle ids
+    const querySnapshot = await getDocs(
+      query(exercisesCollection, where("muscle", "in", muscles))
+    );
+
+    if (querySnapshot.empty) {
+      return {
+        error: "No exercises found for the specified muscles",
+        status: 404,
+      };
+    }
+
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error getting exercises by muscles:", error);
+    return { error: error.message, status: 500 };
+  }
+};
+
 export default {
   createExercise,
   getExercise,
@@ -222,4 +248,5 @@ export default {
   deleteExercise,
   getExercisesByPage,
   getExercisesByMuscle,
+  getExercisesByMuscles,
 };

@@ -9,7 +9,7 @@ import bodyweights from "../assets/exercises/body-weights.png";
 interface Muscle {
   id: string;
   name: string;
-  image: string; // Optional, if muscleName have images
+  image: string; // Optional, if muscleName has images
 }
 
 interface Equipment {
@@ -33,23 +33,18 @@ interface Exercise {
   createdAt: string;
 }
 
-// const equipment = [
-//   "Barbell",
-//   "Dumbbell",
-//   "Machine",
-//   "Body Weight",
-//   "Kettlebell",
-//   "Resistance Bands",
-// ];
-
 export default function ExerciseFilter() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [muscles, setMuscles] = useState<Muscle[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]); // To track selected muscles
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showMuscleFilter, setShowMuscleFilter] = useState(false);
+  const itemsPerPage = 10; // Items per page
+  const [totalPages, setTotalPages] = useState(1); // Total pages based on filtered count
+  const [currentFilteredPage, setCurrentFilteredPage] = useState(1);
   const [showEquipmentFilter, setShowEquipmentFilter] = useState(false);
   const navigate = useNavigate();
 
@@ -59,10 +54,10 @@ export default function ExerciseFilter() {
         const muscleRes = await fetch(
           "http://localhost:3000/api/muscle?all=true"
         );
-        const muscleData = await muscleRes.json(); // Fetches the response
+        const muscleData = await muscleRes.json();
         if (muscleData.status === 200) {
-          setMuscles(muscleData.muscles); // Set only the muscles array to state
-          console.log("Fetched Muscles:", muscleData.muscles); // Logs the muscles array
+          setMuscles(muscleData.muscles);
+          console.log("Fetched Muscles:", muscleData.muscles);
         } else {
           console.error("Error: Unexpected status code", muscleData.status);
         }
@@ -81,7 +76,6 @@ export default function ExerciseFilter() {
           "http://localhost:3000/api/equipment?all=true"
         );
         const equipmentData = await equipmentRes.json();
-        console.log("Equipment Data:", equipmentData);
         setEquipment(equipmentData);
       } catch (err) {
         console.error("Error fetching equipment:", err);
@@ -97,67 +91,68 @@ export default function ExerciseFilter() {
         setIsLoading(true);
         setError(null);
 
-        // Fetch exercises
+        // Fetch exercises only if there are selected muscles
+        const selectedMusclesParam = selectedMuscles.join(",");
+        console.log("Selected Muscles:", selectedMusclesParam);
         const exerciseRes = await fetch(
-          `http://localhost:3000/api/exercise?page=${currentPage}`
+          selectedMuscles.length
+            ? `http://localhost:3000/api/exercise?muscles=${selectedMusclesParam}`
+            : `http://localhost:3000/api/exercise?page=${currentPage}`
         );
+
         if (!exerciseRes.ok) {
           throw new Error(
             `Failed to fetch exercises: ${exerciseRes.statusText}`
           );
         }
 
-        const contentType = exerciseRes.headers.get("Content-Type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Expected JSON, but received something else.");
+        const exerciseData = await exerciseRes.json();
+        console.log("Fetched Exercises:", exerciseData);
+        const exercises = exerciseData.data || [];
+        console.log("Exercises:", exercises);
+
+        if (selectedMuscles.length) {
+          const filteredExerciseCount = exerciseData.data.length;
+          setTotalPages(Math.ceil(filteredExerciseCount / itemsPerPage));
         }
 
-        let exerciseData = await exerciseRes.json(); // Use `let` here instead of `const`
-
-        if (!Array.isArray(exerciseData)) {
-          if (exerciseData.data && Array.isArray(exerciseData.data)) {
-            exerciseData = exerciseData.data; // Reassign to the correct array
-          } else {
-            throw new Error(
-              "Expected an array, but the response format is different."
-            );
-          }
-        }
-
-        // For each exercise, fetch the corresponding muscle and equipment data
+        // Fetch corresponding muscle and equipment data for each exercise
         const updatedExercises = await Promise.all(
-          exerciseData.map(async (exercise: Exercise) => {
+          exercises.map(async (exercise: Exercise) => {
             const muscleRes = await fetch(
               `http://localhost:3000/api/muscle?id=${exercise.muscle}`
             );
             const muscleData = await muscleRes.json();
 
-            // Fetch equipment data for the exercise
+            if (exercise.equipment === "0x1z1Tz8z06DaanQVvkX") {
+              exercise.equipment = "0XlZ1Tz8zO6DaanQVvkX";
+            }
             const equipmentRes = await fetch(
               `http://localhost:3000/api/equipment?id=${exercise.equipment}`
             );
             const equipmentData = await equipmentRes.json();
+            console.log("Equipment Data:", equipmentData);
 
             return {
               ...exercise,
               muscleName: muscleData.user ? muscleData.user.name : "Unknown",
-              muscleImage: muscleData.user ? muscleData.user.image : "Unknown",
+              muscleImage: muscleData.user ? muscleData.user.image : "",
               equipmentName: equipmentData.user
                 ? equipmentData.user.name
                 : "Unknown",
               equipmentImage: equipmentData.user
                 ? equipmentData.user.image
-                : "Unknown",
+                : "",
             };
           })
         );
 
         setExercises(updatedExercises);
-      } catch (err: unknown) {
+      } catch (err) {
         if (err instanceof Error) {
           setError(err.message || "An error occurred while fetching exercises");
         } else {
-          setError("An unexpected error occurred");
+          setError("An unknown error occurred while fetching exercises");
         }
       } finally {
         setIsLoading(false);
@@ -165,13 +160,27 @@ export default function ExerciseFilter() {
     };
 
     fetchExercises();
-  }, [currentPage]);
+  }, [selectedMuscles, currentPage]); // Re-fetch when selectedMuscles or currentPage changes
+
+  useEffect(() => {
+    setCurrentFilteredPage(1);
+    setCurrentPage(1);
+    console.log("Current Filtered Page:", currentFilteredPage);
+    console.log("Current Page:", currentPage);
+  }, [selectedMuscles]); // Reset currentPage when selectedMuscles changes
 
   const handleExerciseClick = (exercise: Exercise) => {
-    // Replace spaces with hyphens in the exercise name
+    console.log("Exercise clicked:", exercise);
     const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
-    console.log("Exercise state:", exercise);
     navigate(`/exercises/${formattedName}`, { state: { exercise } });
+  };
+
+  const toggleMuscleSelection = (muscleId: string) => {
+    setSelectedMuscles((prevSelected) =>
+      prevSelected.includes(muscleId)
+        ? prevSelected.filter((id) => id !== muscleId)
+        : [...prevSelected, muscleId]
+    );
   };
 
   return (
@@ -218,14 +227,27 @@ export default function ExerciseFilter() {
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
               {muscles.map((muscle) => (
                 <div key={muscle.id} className="text-center">
-                  <div className="bg-gray-700 rounded-lg p-2 mb-2">
+                  <div
+                    className={`bg-gray-700 rounded-lg p-2 mb-2 cursor-pointer ${
+                      selectedMuscles.includes(muscle.id) ? "bg-red-500" : ""
+                    }`}
+                    onClick={() => toggleMuscleSelection(muscle.id)}
+                  >
                     <img
                       src={muscle.image || abs}
                       alt={`${muscle.name} exercise`}
                       className="w-full h-24 object-cover"
                     />
                   </div>
-                  <span className="text-sm">{muscle.name}</span>
+                  <span
+                    className={`text-sm ${
+                      selectedMuscles.includes(muscle.id)
+                        ? "text-[#FF4D4D]"
+                        : ""
+                    }`}
+                  >
+                    {muscle.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -260,53 +282,108 @@ export default function ExerciseFilter() {
           <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">EXERCISES</h2>
 
           {isLoading ? (
-            <p>Loading...</p>
+            <div className="min-h-screen">
+              <p>Loading...</p>
+            </div>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {exercises.map((exercise) => (
-                <div
-                  key={exercise.id}
-                  className="bg-gray-800 rounded-lg p-4 flex gap-4 hover:bg-gray-700 transition-colors cursor-pointer"
-                  onClick={() => handleExerciseClick(exercise)}
-                >
-                  <div className="w-28 h-full flex-shrink-0">
-                    <img
-                      src={exercise.image}
-                      alt={exercise.name}
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-bold mb-1">{exercise.name}</h3>
-                    <div className="text-[#FF4D4D] text-sm mb-2">
-                      {exercise.muscleName}
+              {selectedMuscles.length > 0 &&
+                exercises
+                  .slice(
+                    (currentFilteredPage - 1) * itemsPerPage,
+                    currentFilteredPage * itemsPerPage
+                  )
+                  .map((exercise) => (
+                    <div
+                      key={exercise.id}
+                      className="bg-gray-800 rounded-lg p-4 flex gap-4 hover:bg-gray-700 transition-colors cursor-pointer"
+                      onClick={() => handleExerciseClick(exercise)}
+                    >
+                      <div className="w-28 h-full flex-shrink-0">
+                        <img
+                          src={exercise.image}
+                          alt={exercise.name}
+                          className="w-full h-full object-cover rounded"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-bold mb-1">{exercise.name}</h3>
+                        <div className="text-[#FF4D4D] text-sm mb-2">
+                          {exercise.muscleName}
+                        </div>
+                        <p className="text-gray-400 text-sm line-clamp-3">
+                          {exercise.instruction}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-gray-400 text-sm line-clamp-3">
-                      {exercise.instruction}
-                    </p>
+                  ))}
+              {selectedMuscles.length === 0 &&
+                exercises.map((exercise) => (
+                  <div
+                    key={exercise.id}
+                    className="bg-gray-800 rounded-lg p-4 flex gap-4 hover:bg-gray-700 transition-colors cursor-pointer"
+                    onClick={() => handleExerciseClick(exercise)}
+                  >
+                    <div className="w-28 h-full flex-shrink-0">
+                      <img
+                        src={exercise.image}
+                        alt={exercise.name}
+                        className="w-full h-full object-cover rounded"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold mb-1">{exercise.name}</h3>
+                      <div className="text-[#FF4D4D] text-sm mb-2">
+                        {exercise.muscleName}
+                      </div>
+                      <p className="text-gray-400 text-sm line-clamp-3">
+                        {exercise.instruction}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ))}
+            </div>
+          )}
+
+          {/* Pagination when apply muscles filter, must to calc exactly number of page */}
+          {/* You must to slice it to limit display exactly item per page */}
+          {selectedMuscles.length > 0 && (
+            <div className="flex justify-center gap-2 my-8">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentFilteredPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    i + 1 === currentFilteredPage
+                      ? "bg-[#FF4D4D]"
+                      : "bg-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </button>
               ))}
             </div>
           )}
 
-          <div className="flex justify-center gap-2 my-8">
-            {Array.from({ length: 10 }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`w-8 h-8 rounded ${
-                  currentPage === i + 1
-                    ? "bg-[#FF4D4D] text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
+          {/* Pagination when not apply muscles filter */}
+
+          {selectedMuscles.length === 0 && (
+            <div className="flex justify-center gap-2 my-8">
+              {Array.from({ length: 10 }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    i + 1 === currentPage ? "bg-[#FF4D4D]" : "bg-gray-600"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>
