@@ -8,6 +8,8 @@ export const User = {
     weight: null, // Weight of the user (e.g., in kg)
     mealPerDay: null, // Number of meals per day
     allergy: null, // Allergy information
-    goalStatus: null, // Reference ID for goalStatus document
+    goalHeight: null,
+    goalWeight: null,
+    goalBody: null,
     mealPlan: null, // Reference ID for mealPlans document
 };

@@ -2,7 +2,6 @@ import userController from "../controllers/userController.js";
 
 export default async function handler(req, res) {
   if (req.originalUrl.startsWith("/api/user")) {
-    console.log(req.url);
     switch (req.method) {
       case "GET":
         return userController.getUser(req, res);

@@ -55,17 +55,10 @@ const getUser = async (userId) => {
 };
 
 // Update user's password or Firestore data
-const updateUser = async (userId, newPassword, firestoreData = {}) => {
+const updateUser = async (userId, firestoreData = {}) => {
   try {
-    // Update password if provided
-    if (newPassword) {
-      await auth.updateUser(userId, { password: newPassword });
-    }
-
-    // Update Firestore data if provided
-    if (Object.keys(firestoreData).length > 0) {
-      await firestoreDb.collection('users').doc(userId).update(firestoreData);
-    }
+    // Update user data in Firestore
+    await firestoreDb.collection('users').doc(userId).update(firestoreData);
 
     return { message: "User updated successfully", status: 200 };
   } catch (error) {
