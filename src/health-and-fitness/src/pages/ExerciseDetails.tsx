@@ -1,60 +1,155 @@
-import barbell from "../assets/exercises/barbell.png";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import leftArrow from "../assets/exercises/left-arrow.png";
 import rightArrow from "../assets/exercises/right-arrow.png";
-import lateralRaise from "../assets/exercises/lateral-raise.png";
-import abs from "../assets/exercises/abs.png";
-import bodyWeight from "../assets/exercises/body-weights.png";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 
-interface Instruction {
-  title: string;
-  content: string;
+interface ExerciseDetails {
+  name: string;
+  image: string;
+  video: string;
+  instruction: string;
+  muscle: string;
+  muscleName: string;
+  muscleImage: string;
+  equipment: string;
+  equipmentName: string;
+  equipmentImage: string;
+  difficulty: string;
+  type: string;
 }
 
 export default function ExerciseDetail() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { exercise } = location.state || {};
+  const [exerciseDetails, setExerciseDetails] =
+    useState<ExerciseDetails | null>(exercise || null);
+  const [alternativeMuscleExercises, setAlternativeMuscleExercises] = useState<
+    ExerciseDetails[]
+  >([]);
+  const [currentPage, setCurrentPage] = useState(0); // Track current exercise index
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    if (!exercise) {
+      console.error("No exercise data found in location.state");
+      navigate("/exercises"); // Redirect to a fallback page
+    } else {
+      setExerciseDetails(exercise);
+      setCurrentPage(0); // Reset the current exercise index
+    }
+  }, [exercise, navigate]);
+
+  useEffect(() => {
+    const fetchAlternativeExercises = async () => {
+      try {
+        // Fetch alternative exercises based on the muscle group
+        const response = await fetch(
+          `http://localhost:3000/api/exercise?muscles=${exerciseDetails?.muscle}`
+        );
+        const res = await response.json();
+
+        // Filter out the current exercise from the list
+        const exercises = res.data.filter(
+          (exercise: ExerciseDetails) => exercise.name !== exerciseDetails?.name
+        );
+
+        // Fetch additional details (muscleName, equipmentName, equipmentImage) for each exercise
+        const updatedExercises = await Promise.all(
+          exercises.map(async (exercise: ExerciseDetails) => {
+            // Fetch muscle data for the exercise
+            const muscleRes = await fetch(
+              `http://localhost:3000/api/muscle?id=${exercise.muscle}`
+            );
+            const muscleData = await muscleRes.json();
+
+            // Fetch equipment data for the exercise
+            const equipmentRes = await fetch(
+              `http://localhost:3000/api/equipment?id=${exercise.equipment}`
+            );
+            const equipmentData = await equipmentRes.json();
+
+            // Return the updated exercise object with additional data
+            return {
+              ...exercise,
+              muscleName: muscleData.user ? muscleData.user.name : "Unknown",
+              muscleImage: muscleData.user ? muscleData.user.image : "Unknown",
+              equipmentName: equipmentData.user
+                ? equipmentData.user.name
+                : "Unknown",
+              equipmentImage: equipmentData.user
+                ? equipmentData.user.image
+                : "Unknown",
+            };
+          })
+        );
+
+        setAlternativeMuscleExercises(updatedExercises);
+        console.log("Alternative exercises: ", updatedExercises);
+      } catch (error) {
+        console.error("Failed to fetch alternative exercises", error);
+      }
+    };
+
+    if (exerciseDetails) {
+      fetchAlternativeExercises();
+    }
+  }, [exerciseDetails]);
 
   const handleBack = () => {
     navigate("/exercises");
   };
 
-  const instructions: Instruction[] = [
-    {
-      title: "Hand Placement",
-      content:
-        "Grip the barbell with both hands slightly wider than shoulder-width apart. Your palms should face forward and your thumbs should be wrapped around the bar.",
-    },
-    {
-      title: "Starting Position",
-      content:
-        "Unrack the barbell by straightening your arms and moving the barbell over your chest. Your arms should be perpendicular to the floor.",
-    },
-    {
-      title: "Lowering the Barbell",
-      content:
-        "Lower and press Your barbell slowly and under control to your chest. Your elbows should bend at about a 45-degree angle to your body. Lower the bar until it lightly touches your chest or to just above it. Do not bounce the bar off your chest.",
-    },
-    {
-      title: "Pressing the Barbell",
-      content:
-        "Exhale and press the barbell back up to the starting position by pushing up and slightly forward. Focus on engaging your chest muscles as you lift the weight. Keep your wrists straight and your elbows slightly tucked in to protect your shoulder joints.",
-    },
-  ];
+  const handlePrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1); // Move back by 1 exercise
+    }
+  };
 
-  const alternativeExercises = [
-    {
-      name: "Dumbbell lateral raise",
-      imageUrl: lateralRaise,
-    },
-    {
-      name: "Dumbbell lateral raise",
-      imageUrl: lateralRaise,
-    },
+  const handleNext = () => {
+    if (currentPage < alternativeMuscleExercises.length - 2) {
+      setCurrentPage(currentPage + 1); // Move forward by 1 exercise
+    }
+  };
+
+  const handleAlternativeExerciseClick = (exercise: ExerciseDetails) => {
+    console.log("Alternative exercise clicked: ", exercise);
+    const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
+    navigate(`/exercises/${formattedName}`, {
+      state: { exercise },
+    });
+
+    // Update the current exercise details in the component state
+    setExerciseDetails(exercise);
+  };
+
+  if (!exerciseDetails) {
+    return (
+      <div className="min-h-screen text-white mx-24 py-2">
+        <Navbar isHomepage={false} />
+        <div className="text-center mt-10">Loading...</div>
+      </div>
+    );
+  }
+
+  const {
+    name,
+    video,
+    instruction,
+    muscleName,
+    muscleImage,
+    equipmentName,
+    equipmentImage,
+    difficulty,
+    type,
+  } = exerciseDetails;
+
+  // Get the current two exercises for the page
+  const exercisesToDisplay = [
+    alternativeMuscleExercises[currentPage],
+    alternativeMuscleExercises[currentPage + 1],
   ];
 
   return (
@@ -88,36 +183,61 @@ export default function ExerciseDetail() {
       <div className="grid grid-cols-[4fr_6fr] gap-14">
         {/* Main Exercise Image */}
         <div className="mb-6 flex flex-col">
-          <img
-            src={barbell}
-            alt="Barbell Bench Press demonstration"
-            className="w-full rounded-lg object-cover h-[300px]"
-          />
+          {video ? (
+            <img src={video} alt={name} className="w-full h-96 rounded-lg" />
+          ) : (
+            <div className="text-center">Video not available</div>
+          )}
           {/* Alternative Exercises */}
           <div className="mt-10">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-lg font-bold text-[#F05454]">
-                Alternative Abs Exercises
+                Alternative {muscleName} Exercises
               </h2>
-              <div className="flex gap-2">
-                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center cursor-pointer">
+              <div className="flex gap-2 select-none">
+                <div
+                  className={`w-6 h-6 p-1 rounded-full flex items-center justify-center cursor-pointer ${
+                    currentPage == 0 ? "bg-gray-400" : "bg-[#F05454]"
+                  }`}
+                  onClick={handlePrev}
+                  style={{
+                    cursor: currentPage == 0 ? "not-allowed" : "pointer",
+                  }}
+                >
                   <img src={leftArrow} alt="Left arrow" />
                 </div>
-                <div className="w-6 h-6 p-1 bg-[#F05454] rounded-full flex items-center justify-center cursor-pointer">
+                <div
+                  className={`w-6 h-6 p-1 rounded-full flex items-center justify-center cursor-pointer ${
+                    currentPage === alternativeMuscleExercises.length - 2
+                      ? "bg-gray-400"
+                      : "bg-[#F05454]"
+                  }`}
+                  onClick={handleNext}
+                  style={{
+                    cursor:
+                      currentPage === alternativeMuscleExercises.length - 2
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                >
                   <img src={rightArrow} alt="Right arrow" />
                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {alternativeExercises.map((exercise, index) => (
-                <div key={index} className="relative rounded-lg">
+              {exercisesToDisplay.map((exercise, index) => (
+                <div
+                  key={index}
+                  className="relative rounded-lg cursor-pointer"
+                  onClick={() => handleAlternativeExerciseClick(exercise)}
+                >
                   <img
-                    src={exercise.imageUrl}
-                    alt={exercise.name}
+                    src={exercise?.image}
+                    alt={exercise?.name}
                     className="w-full h-32 object-cover rounded-lg"
                   />
                   <p className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-sm py-1 rounded-b-lg">
-                    {exercise.name}
+                    {exercise?.name}
                   </p>
                 </div>
               ))}
@@ -127,60 +247,48 @@ export default function ExerciseDetail() {
 
         {/* Exercise Title and Categories */}
         <div className="mb-6 flex-col">
-          <h1 className="text-2xl font-bold text-[#FF4D4D] mb-4">
-            BARBELL BENCH PRESS
-          </h1>
+          <h1 className="text-2xl font-bold text-[#FF4D4D] mb-4">{name}</h1>
           <div className="grid grid-cols-2 mr-auto max-w-80">
             <div className="flex flex-col gap-2">
               <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden relative">
                 <img
-                  src={abs}
-                  alt="Abs category"
+                  src={muscleImage}
+                  alt="Muscle category"
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-xs py-1">
-                  Abs
+                  {muscleName}
                 </span>
               </div>
               <div className="rounded-lg mt-4 mb-8">
                 <h2 className="text-white text-md font-medium mb-1">
                   Difficulty
                 </h2>
-                <p className="text-gray-400">Intermediate</p>
+                <p className="text-gray-400">{difficulty}</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden relative">
                 <img
-                  src={bodyWeight}
-                  alt="Body Weight category"
+                  src={equipmentImage}
+                  alt="Equipment"
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-center text-xs py-1">
-                  Body Weight
+                  {equipmentName}
                 </span>
               </div>
               <div className="rounded-lg mt-4 mb-8">
-                <h2 className="text-white text-md font-medium mb-1">
-                  Exercise Type
-                </h2>
-                <p className="text-gray-400">Strength</p>
+                <h2 className="text-white text-md font-medium mb-1">Type</h2>
+                <p className="text-gray-400">{type}</p>
               </div>
             </div>
           </div>
 
-          {/* Instructions */}
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4">Instruction</h2>
-            <div className="space-y-4">
-              {instructions.map((instruction, index) => (
-                <div key={index}>
-                  <h3 className="font-bold mb-2">{instruction.title}:</h3>
-                  <p className="text-gray-300">{instruction.content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-white text-lg font-semibold mb-4">
+            Instructions
+          </h2>
+          <p className="text-gray-400 text-sm">{instruction}</p>
         </div>
       </div>
     </div>
