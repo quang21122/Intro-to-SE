@@ -6,16 +6,8 @@ import examplePic from "../../assets/workout/example_pic.png";
 import { GrPrevious, GrNext } from "react-icons/gr";
 import { useEffect, useState } from "react";
 
-interface Exercise {
+interface Plan {
   id: string;
-  
-};
-
-interface PlanDetail {
-
-};
-
-interface Plans {
   name: string;
   image: string;
   muscle: string;
@@ -24,12 +16,18 @@ interface Plans {
   equipment: string;
   days: number;
   description: string;
-};
+  createdAt: string;
+}
+
+interface PaginatedResponse {
+  data: Plan[];
+  page: number;
+}
 
 function WorkoutSlider() {
-  const [sliderPlans, setSliderPlans] = useState<Plans[]>([]);
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
+  const [sliderPlans, setSliderPlans] = useState<Plan[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const settings: Settings = {
     dots: true,
@@ -67,22 +65,42 @@ function WorkoutSlider() {
   };
 
   useEffect(() => {
-    const fetchSliderPlans = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/plan?all=true");
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          // Extract only needed fields, excluding planDetail
-          const filteredPlans = data.map(({ planDetail, ...rest }) => rest);
-          setSliderPlans(filteredPlans);
-        } else {
-          console.error("Received non-array data:", data);
-          setSliderPlans([]);
+    const fetchPagePlans = async (page: number) => {
+      const response = await fetch(
+        `http://localhost:3000/api/plan?page=${page}&limit=6`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result: PaginatedResponse = await response.json();
+      return result.data || [];
+    };
+
+    const fetchSliderPlans = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [page1Plans, page2Plans] = await Promise.all([
+          fetchPagePlans(1),
+          fetchPagePlans(2),
+        ]);
+
+        setSliderPlans([...page1Plans, ...page2Plans]);
       } catch (error) {
-        console.error("Error fetching plans:", error);
-        setSliderPlans([]);
+        console.error("Error fetching slider plans: ", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch plans"
+        );
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -94,24 +112,36 @@ function WorkoutSlider() {
       <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">
         For you
       </h1>
-      <Slider {...settings}>
-        {sliderPlans.map((plan: Plans, index) => (
-          <div key={index} className="px-4">
-            <div
-              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem] sm:h-[14rem] md:h-[12rem] lg:h-[14rem]"
-              style={{ backgroundImage: `url(${plan.image})` }}
-            >
-              <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-32 rounded-2xl hover:translate-y-12 hover:cursor-pointer font-bebas">
-                <h2 className="text-white text-2xl">{plan.name}</h2>
-                <div className="mt-auto">
-                  <p className="text-white/80 text-lg">{plan.level}</p>
-                  <p className="text-white/80 text-lg">{plan.muscle}</p>
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <Slider {...settings}>
+          {sliderPlans.map((plan) => (
+            <div key={plan.id} className="px-4">
+              <div
+                className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem]"
+                style={{ backgroundImage: `url(${plan.image})` }}
+              >
+                <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-48 rounded-2xl hover:translate-y-20 hover:cursor-pointer font-bebas">
+                  <h3 className="text-[#F05454] text-[2rem] text-center mt-4">
+                    {plan.name}
+                  </h3>
+                  <div className="grid grid-cols-2 py-6 text-center font-montserrat">
+                    <div className="text-white text-xl flex flex-col">
+                      <p>{plan.days}</p>
+                      <p>{plan.muscle}</p>
+                    </div>
+                    <div className="text-white text-xl flex flex-col">
+                      <p>{plan.goal}</p>
+                      <p>{plan.level}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Slider>
+          ))}
+        </Slider>
+      )}
     </div>
   );
 }
