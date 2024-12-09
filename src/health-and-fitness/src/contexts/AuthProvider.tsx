@@ -57,9 +57,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     // Step 2: Sign the user out
-    authInstance.signOut();
+    auth.signOut();
     localStorage.removeItem("firebaseToken");
   };
 
