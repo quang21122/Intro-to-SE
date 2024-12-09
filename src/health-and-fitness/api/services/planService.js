@@ -105,8 +105,11 @@ const createPlan = async (data) => {
             //find exercise id
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
-                    const exerciseData = await getExercise(exercise.name); 
-                    exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
+                    const exerciseData = await getExercise(exercise.name);
+                    if (exerciseData.error) {
+                        throw new Error(exerciseData.error);
+                    }
+                    exercise.id = exerciseData.id; // Assign ID, use 'default id - Barbell Stiff-Leg Deadlift' if not found
                     return exercise;
                 })
             );
@@ -182,7 +185,10 @@ const updatePlan = async (id, data) => {
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
                     const exerciseData = await getExercise(exercise.name); 
-                    exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
+                    if (exerciseData.error) {
+                        throw new Error(exerciseData.error);
+                    }
+                    exercise.id = exerciseData.id 
                     return exercise;
                 })
             );
