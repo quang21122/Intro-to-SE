@@ -2,7 +2,6 @@ import Slider, { CustomArrowProps } from "react-slick";
 import { Settings } from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import examplePic from "../../assets/workout/example_pic.png";
 import { GrPrevious, GrNext } from "react-icons/gr";
 import { useEffect, useState } from "react";
 
