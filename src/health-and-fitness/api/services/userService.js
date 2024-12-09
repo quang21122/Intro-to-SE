@@ -49,7 +49,6 @@ const getUser = async (userId) => {
       status: 200,
     };
   } catch (error) {
-    console.error("Error getting user:", error);
     return { error: error.message, status: 500 };
   }
 };
@@ -62,7 +61,6 @@ const updateUser = async (userId, firestoreData = {}) => {
 
     return { message: "User updated successfully", status: 200 };
   } catch (error) {
-    console.error("Error updating user:", error);
     return { error: error.message, status: 500 };
   }
 };
@@ -78,7 +76,6 @@ const deleteUser = async (userId) => {
 
     return { message: "User deleted successfully", status: 200 };
   } catch (error) {
-    console.error("Error deleting user:", error);
     return { error: error.message, status: 500 };
   }
 };

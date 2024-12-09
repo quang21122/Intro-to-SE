@@ -30,6 +30,7 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
     logout().then(() => {
       localStorage.removeItem("isAuthenticated");
       setIsLoggedIn(false);
+      navigate("/");
     });
   };
 

@@ -65,15 +65,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (email: string, password: string, username: string) => {
     try {
-      const res = await axios.post("http://localhost:3000/api/user", {
-        email: email,
-        password: password,
-        username: username,
-      });
+      const res = await axios.post(
+        "http://localhost:3000/api/user",
+        {
+            email: email,
+            password: password,
+            username: username,
+        },
+        {
+            validateStatus: () => true, // Treat all HTTP status codes as successful
+        }
+    );
+
+    if (res.status !== 201) {
+      return { error: typeof res.data === "string" ? res.data : { message: res.data.error || "Unknown error" } };
+    }
 
       return res.data;
     } catch (error) {
       console.error("Signup failed", error);
+      return { error };
     }
   };
 
