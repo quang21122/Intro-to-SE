@@ -97,6 +97,35 @@ const getExercise = async (name) => {
   }
 };
 
+const getExerciseById = async (id) => {
+  try {
+    const exerciseDoc = await getDoc(doc(firestoreDb, "exercises", id));
+
+    if (!exerciseDoc.exists()) {
+      return {
+        error: "Exercise not found",
+        status: 404,
+      };
+    }
+
+    const exercise = {
+      id: exerciseDoc.id,
+      ...exerciseDoc.data(),
+    };
+
+    return {
+      data: exercise,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error getting exercise by id:", error);
+    return {
+      error: error.message,
+      status: 400,
+    };
+  }
+};
+
 const getExercisesByPage = async (page, pageSize = 10) => {
   try {
     const exercisesCollection = collection(firestoreDb, "exercises");
@@ -283,6 +312,7 @@ const searchExercises = async (searchTerm) => {
 export default {
   createExercise,
   getExercise,
+  getExerciseById,
   updateExercise,
   deleteExercise,
   getExercisesByPage,

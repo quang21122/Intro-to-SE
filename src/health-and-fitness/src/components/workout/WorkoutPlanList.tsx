@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 
 interface Plan {
@@ -20,6 +21,7 @@ interface PaginatedResponse {
 }
 
 function WorkoutPlanList() {
+  const navigate = useNavigate();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,7 +113,8 @@ function WorkoutPlanList() {
         {currentPlans.map((plan, index) => (
           <div
             key={index}
-            className="flex flex-col bg-[#B2B2B2] rounded-xl w-full"
+            className="flex flex-col bg-[#B2B2B2] rounded-xl w-full hover:cursor-pointer"
+            onClick={() => navigate(`/workout-plans/${plan.id}`)}
           >
             <img
               src={plan.image}

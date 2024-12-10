@@ -2,19 +2,39 @@ import { firestoreDb } from '../firebase.js';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
 const { getExercise } = exerciseService;
+
 const getPlan = async (id) => {
     try {
-        // Query Firestore to find the document by name
-        const planDoc = await getDoc(doc(firestoreDb, 'plans', id));
-        if (!planDoc.exists()) {
-            return { error: "Plan not found", status: 404 };
-        }
+      // Get main plan document
+      const planDoc = await getDoc(doc(firestoreDb, "plans", id));
+      if (!planDoc.exists()) {
+        return { error: "Plan not found", status: 404 };
+      }
 
-        return { plan: planDoc.data(), status: 200 };
+      // Get planDetails subcollection
+      const planDetailsRef = collection(
+        doc(firestoreDb, "plans", id),
+        "planDetails"
+      );
+      const planDetailsSnapshot = await getDocs(planDetailsRef);
 
+      // Convert planDetails documents to array
+      const planDetails = planDetailsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      // Combine plan data with planDetails
+      const plan = {
+        id: planDoc.id,
+        ...planDoc.data(),
+        planDetails: planDetails,
+      };
+
+      return { plan, status: 200 };
     } catch (error) {
-        console.error("Error getting plan by id:", error);
-        return { error: error.message, status: 500 };
+      console.error("Error getting plan by id:", error);
+      return { error: error.message, status: 500 };
     }
 }
 

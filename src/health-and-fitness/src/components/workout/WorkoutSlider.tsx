@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { GrPrevious, GrNext } from "react-icons/gr";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Plan {
   id: string;
@@ -27,6 +28,7 @@ function WorkoutSlider() {
   const [sliderPlans, setSliderPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const settings: Settings = {
     dots: true,
@@ -116,7 +118,11 @@ function WorkoutSlider() {
       ) : (
         <Slider {...settings}>
           {sliderPlans.map((plan) => (
-            <div key={plan.id} className="px-4">
+            <div
+              key={plan.id}
+              className="px-4 hover:cursor-pointer"
+              onClick={() => navigate(`/workout-plans/${plan.id}`)}
+            >
               <div
                 className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem]"
                 style={{ backgroundImage: `url(${plan.image})` }}

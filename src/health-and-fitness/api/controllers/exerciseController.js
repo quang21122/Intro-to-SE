@@ -1,12 +1,12 @@
 import exerciseService from "../services/exerciseService.js";
 
 const getExercise = async (req, res) => {
-  const { name, page } = req.query;
+  const { name, page, id } = req.query;
 
-  if (!name && !page) {
+  if (!name && !page && !id) {
     return res
       .status(400)
-      .json({ error: "Either 'name' or 'page' query parameter is required" });
+      .json({ error: "Either 'name', 'page' or 'id' query parameter is required" });
   }
 
   try {
@@ -21,7 +21,18 @@ const getExercise = async (req, res) => {
       return res.status(200).json({ data: exercise });
     }
 
-    if (page) {
+    else if (id) {
+      // Handle query by id
+      const exercise = await exerciseService.getExerciseById(id);
+
+      if (!exercise) {
+        return res.status(404).json({ error: "Exercise not found" });
+      }
+
+      return res.status(200).json({ data: exercise });
+    }
+
+    else if (page) {
       // Validate page number
       const pageNum = parseInt(page, 10);
       if (isNaN(pageNum) || pageNum < 1) {
