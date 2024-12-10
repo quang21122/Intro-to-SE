@@ -233,7 +233,7 @@ function MyPlans() {
               Edit
             </button>
           </div>
-          <WorkoutPlanSchedule />
+          {/* <WorkoutPlanSchedule /> */}
         </div>
       </div>
     </div>
