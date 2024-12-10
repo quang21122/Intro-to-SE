@@ -108,6 +108,10 @@ function WorkoutSlider() {
     fetchSliderPlans();
   }, []);
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="-mx-6">
       <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">
