@@ -1,12 +1,24 @@
 import userService from "../services/userService.js";
 
 const getUser = async (req, res) => {
-  const { userId } = req.query;
-  const user = await userService.getUser(userId);
-
-  if (user.error) {
-    return res.status(user.status).json({ error: user.error });
+  const { userId, email } = req.query;
+  let user;
+  if (!userId && !email) {
+    return res.status(400).json({ error: "userId or email is required" });
   }
+  else if (!userId && email) {
+    user = await userService.getUserByEmail(email);
+    if (user.error) {
+      return res.status(user.status).json({ error: user.error });
+    }
+  }
+  else {
+    user = await userService.getUser(userId);
+    if (user.error) {
+      return res.status(user.status).json({ error: user.error });
+    }
+  }
+
 
   res.status(200).json(user);
 };
