@@ -116,9 +116,6 @@ export default function Signup() {
                 autoComplete="off"
                 autoCorrect="off"
               />
-              {emailError && (
-                <p className="text-red-500 text-sm mt-2">{emailError}</p>
-              )}
             </div>
 
             <label
@@ -150,6 +147,9 @@ export default function Signup() {
                 autoComplete="off"
                 autoCorrect="off"
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-2">{emailError}</p>
+              )}
             </div>
             <button
               type="submit"
