@@ -3,16 +3,84 @@ import WorkoutPlanList from "../components/workout/WorkoutPlanList";
 import { MdNavigateNext } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import { FaFilter } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+
+interface FilterState {
+  Days: string;
+  Muscles: string;
+  Goals: string;
+  Levels: string;
+}
 
 export default function WorkoutPlans() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [muscles, setMuscles] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filterState, setFilterState] = useState<FilterState>({
+    Days: "All",
+    Muscles: "All",
+    Goals: "All",
+    Levels: "All",
+  });
 
-  const days = ["1 day", "2 days", "3 days", "4 days", "5 days", "6 days", "7 days"];
-  const muscles = ["Abs", "Arms", "Back", "Chest", "Legs", "Shoulders"];
-  const goals = ["Gain", "Cut", "Maintain"];
+  const days = [1, 2, 3, 4, 5, 6, 7].map((day) => `${day} days`);
+  const goals = ["Maintaining", "Bulking", "Cutting", "Sport Specific"];
   const levels = ["Beginner", "Intermediate", "Advanced"];
+  const clearAllFilters = () => {
+    setFilterState({
+      Days: "All",
+      Muscles: "All",
+      Goals: "All",
+      Levels: "All",
+    });
+  };
+
+  useEffect(() => {
+    const fetchMuscleNames = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("http://localhost:3000/api/muscle?all=true", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        interface Muscle {
+          name: string;
+        }
+
+        const muscleNames = data.muscles.map((muscle: Muscle) => muscle.name);
+        setMuscles(muscleNames);
+      } catch (error) {
+        console.error("Error fetching muscles:", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch muscles"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMuscleNames();
+  }, []);
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <div className="py-6 flex flex-col mx-24">
@@ -56,20 +124,50 @@ export default function WorkoutPlans() {
               </div>
 
               <div className="space-y-4">
-                {/* Day filter */}
-                <DropdownWithCheckbox items={days} name="Days" />
+                <DropdownWithCheckbox
+                  items={days}
+                  name="Days"
+                  filterState={filterState}
+                  onSelect={(name, value) =>
+                    setFilterState((prev) => ({ ...prev, [name]: value }))
+                  }
+                />
+                <DropdownWithCheckbox
+                  items={muscles}
+                  name="Muscles"
+                  filterState={filterState}
+                  onSelect={(name, value) =>
+                    setFilterState((prev) => ({ ...prev, [name]: value }))
+                  }
+                />
+                <DropdownWithCheckbox
+                  items={goals}
+                  name="Goals"
+                  filterState={filterState}
+                  onSelect={(name, value) =>
+                    setFilterState((prev) => ({ ...prev, [name]: value }))
+                  }
+                />
+                <DropdownWithCheckbox
+                  items={levels}
+                  name="Levels"
+                  filterState={filterState}
+                  onSelect={(name, value) =>
+                    setFilterState((prev) => ({ ...prev, [name]: value }))
+                  }
+                />
 
-                {/* Muscle filter */}
-                <DropdownWithCheckbox items={muscles} name="Muscles" />
-
-                {/* Goal filter */}
-                <DropdownWithCheckbox items={goals} name="Goals" />
-
-                {/* Level filter */}
-                <DropdownWithCheckbox items={levels} name="Levels" />
-
-                <div className="flex flex-row-reverse items-center">
-                  <button className="bg-[#F05454] text-black text-xl px-6 py-2 my-4 rounded-xl hover:text-white">
+                <div className="flex flex-row gap-4 mt-6">
+                  <button
+                    onClick={clearAllFilters}
+                    className="flex-1 bg-gray-400 text-white text-xl px-6 py-2 rounded-xl hover:bg-gray-500 transition-colors"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    className="flex-1 bg-[#F05454] text-black text-xl px-6 py-2 rounded-xl hover:text-white transition-colors"
+                    onClick={() => setIsFilterOpen(false)}
+                  >
                     Apply
                   </button>
                 </div>
@@ -95,47 +193,63 @@ export default function WorkoutPlans() {
 
 interface DropdownWithCheckboxProps {
   items: string[];
-  name: string;
+  name: keyof FilterState;
+  filterState: FilterState;
+  onSelect: (name: keyof FilterState, value: string) => void;
 }
 
-const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({ items, name }) => {
-  const [isSelectedItem, setIsSelectedItem] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({
+  items,
+  name,
+  filterState,
+  onSelect,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const handleSelect = (item: string) => {
-    if (isSelectedItem.includes(item)) {
-      setIsSelectedItem(isSelectedItem.filter((i) => i !== item));
-    } else {
-      setIsSelectedItem([...isSelectedItem, item]);
-    }
+    onSelect(name, item);
+    setIsOpen(false);
   };
 
   return (
     <div className="relative font-montserrat">
       <h3 className="text-2xl mb-3">{name}</h3>
       <div
-        className="border border-gray-300 rounded-xl px-4 py-2 cursor-pointer flex flex-row-reverse items-center"
+        className="border border-gray-300 rounded-xl px-4 py-2 cursor-pointer flex justify-between items-center bg-[#E3E3E3]"
         onClick={toggleDropdown}
       >
-        <span className="transform transition-transform">
+        <span>{filterState[name]}</span>
+        <span className="transform transition-transform duration-200">
           {isOpen ? "▲" : "▼"}
         </span>
       </div>
 
       {isOpen && (
         <div className="absolute mt-2 w-full z-20 bg-[#E3E3E3] border border-gray-300 rounded-xl shadow-md">
+          <label
+            key="all"
+            className="flex items-center space-x-2 cursor-pointer px-4 py-2 hover:bg-gray-200"
+          >
+            <input
+              type="radio"
+              checked={filterState[name] === "All"}
+              onChange={() => handleSelect("All")}
+              className="w-4 h-4 border-gray-500"
+            />
+            <span className="font-montserrat">All</span>
+          </label>
           {items.map((item) => (
             <label
               key={item}
-              className="flex items-center space-x-2 cursor-pointer px-4 py-2"
+              className="flex items-center space-x-2 cursor-pointer px-4 py-2 hover:bg-gray-200"
             >
               <input
-                type="checkbox"
-                checked={isSelectedItem.includes(item)}
+                type="radio"
+                checked={filterState[name] === item}
                 onChange={() => handleSelect(item)}
-                className="w-4 h-4 rounded border-gray-500"
+                className="w-4 h-4 border-gray-500"
               />
               <span className="font-montserrat">{item}</span>
             </label>

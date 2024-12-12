@@ -22,14 +22,37 @@ const deletePlan = async (req, res) => {
 };
 
 const getPlan = async (req, res) => {
-  const { id } = req.query;
-  const plan = await planService.getPlan(id);
-
-  if (plan.error) {
-    return res.status(plan.status).json({ error: plan.error });
+  const {id, page} = req.query;
+  if (!id && !page) {
+    return res.status(400).json({ error: "Either 'id' or 'page' query parameter is required" });
   }
-
-  res.status(200).json(plan);
+  try {
+    if (id) {
+      // Handle query by id
+      const plan = await planService.getPlan(id);
+      if (!plan) {
+        return res.status(404).json({ error: "Plan not found" });
+      }
+      return res.status(200).json({ data: plan });
+    }
+    if (page) {
+      // Validate page number
+      const pageNum = parseInt(page, 10);
+      if (isNaN(pageNum) || pageNum < 1) {
+        return res.status(400).json({ error: "Invalid page number" });
+      }
+      // Handle pagination
+      const plans = await planService.getPlansByPage(pageNum);
+      if (!plans || plans.length === 0) {
+        return res.status(404).json({ error: "No plans found for the specified page" });
+      }
+      return res.status(200).json({ data: plans, page: pageNum });
+    }
+  }
+  catch (error) {
+    console.log("Error in getPlan:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 const updatePlan = async (req, res) => {

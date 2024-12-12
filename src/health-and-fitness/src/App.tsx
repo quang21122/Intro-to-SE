@@ -46,12 +46,12 @@ const router = createBrowserRouter([
         element: <Exercises />,
       },
       {
-        path: "/exercises/:id",
+        path: "/exercises/:exerciseName",
         element: <ExerciseDetail />,
       },
       {
         path: "/profile",
-        element: <UserProfile />,
+        element: <UserProfile />
       },
     ],
   },

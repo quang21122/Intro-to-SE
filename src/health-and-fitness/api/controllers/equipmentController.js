@@ -55,4 +55,14 @@ const deleteEquipment = async (req, res) => {
     res.status(200).json(deletedEquipment);
 }
 
-export default { getEquipment, createEquipment, updateEquipment, deleteEquipment };
+const getAllEquipments = async (req, res) => {
+    const equipments = await equipmentService.getAllEquipments();
+    
+    if (equipments.error) {
+        return res.status(equipments.status).json({ error: equipments.error });
+    }
+    
+    res.status(200).json(equipments);
+}
+
+export default { getEquipment, createEquipment, updateEquipment, deleteEquipment, getAllEquipments };

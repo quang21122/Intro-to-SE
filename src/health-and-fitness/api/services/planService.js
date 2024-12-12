@@ -1,23 +1,92 @@
 import { firestoreDb } from '../firebase.js';
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
 const { getExercise } = exerciseService;
+
 const getPlan = async (id) => {
     try {
-        // Query Firestore to find the document by name
-        const planDoc = await getDoc(doc(firestoreDb, 'plans', id));
-        if (!planDoc.exists()) {
-            return { error: "Plan not found", status: 404 };
-        }
+      // Get main plan document
+      const planDoc = await getDoc(doc(firestoreDb, "plans", id));
+      if (!planDoc.exists()) {
+        return { error: "Plan not found", status: 404 };
+      }
 
-        return { plan: planDoc.data(), status: 200 };
+      // Get planDetails subcollection
+      const planDetailsRef = collection(
+        doc(firestoreDb, "plans", id),
+        "planDetails"
+      );
+      const planDetailsSnapshot = await getDocs(planDetailsRef);
 
+      // Convert planDetails documents to array
+      const planDetails = planDetailsSnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      // Combine plan data with planDetails
+      const plan = {
+        id: planDoc.id,
+        ...planDoc.data(),
+        planDetails: planDetails,
+      };
+
+      return { plan, status: 200 };
     } catch (error) {
-        console.error("Error getting plan by id:", error);
-        return { error: error.message, status: 500 };
+      console.error("Error getting plan by id:", error);
+      return { error: error.message, status: 500 };
     }
 }
 
+const getPlansByPage = async (page, pageSize = 6) => {
+    try {
+        const plansCollection = collection(firestoreDb, 'plans');
+        
+        // Build initial query with ordering and limit
+        let plansQuery = query(
+            plansCollection,
+            orderBy("name"),
+            limit(pageSize)
+        );
+
+        // If not first page, get the starting point
+        if (page > 1) {
+            // Get the last document from the previous page
+            const lastVisibleDoc = await getDocs(
+                query(
+                    plansCollection,
+                    orderBy("name"),
+                    limit((page - 1) * pageSize)
+                )
+            );
+            
+            if (!lastVisibleDoc.empty) {
+                const lastDoc = lastVisibleDoc.docs[lastVisibleDoc.docs.length - 1];
+                plansQuery = query(
+                    plansCollection,
+                    orderBy("name"),
+                    startAfter(lastDoc),
+                    limit(pageSize)
+                );
+            }
+        }
+
+        const querySnapshot = await getDocs(plansQuery);
+        
+        if (querySnapshot.empty) {
+            return [];
+        }
+
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+    } catch (error) {
+        console.error("Error fetching plans by page:", error);
+        return [];
+    }
+}
 const createPlan = async (data) => {
     try {
         // Validate the main plan data
@@ -56,8 +125,11 @@ const createPlan = async (data) => {
             //find exercise id
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
-                    const exerciseData = await getExercise(exercise.name); 
-                    exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
+                    const exerciseData = await getExercise(exercise.name);
+                    if (exerciseData.error) {
+                        throw new Error(exerciseData.error);
+                    }
+                    exercise.id = exerciseData.id; // Assign ID, use 'default id - Barbell Stiff-Leg Deadlift' if not found
                     return exercise;
                 })
             );
@@ -133,7 +205,10 @@ const updatePlan = async (id, data) => {
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
                     const exerciseData = await getExercise(exercise.name); 
-                    exercise.id = exerciseData.id || '100'; // Assign ID, use 'default id - 100' if not found
+                    if (exerciseData.error) {
+                        throw new Error(exerciseData.error);
+                    }
+                    exercise.id = exerciseData.id 
                     return exercise;
                 })
             );
@@ -165,4 +240,4 @@ const updatePlan = async (id, data) => {
     }
 }
 
-export default { createPlan, deletePlan, getPlan, updatePlan };
+export default { createPlan, deletePlan, getPlan, updatePlan, getPlansByPage };
