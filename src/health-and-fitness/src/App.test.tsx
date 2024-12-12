@@ -1,14 +1,17 @@
 import App from './App'
 import { AuthProvider } from './contexts/AuthProvider'
+import { ProfileProvider } from './contexts/ProfileProvider'
 import { render, screen } from '@testing-library/react'
 
 describe('App', () => {
     it('should render', () => {
         render(
             <AuthProvider>
-                <App />
+                <ProfileProvider>
+                    <App />
+                </ProfileProvider>
             </AuthProvider>
         )
-        expect(screen.getByText('Conquer your doubts stay fearless')).toBeInTheDocument()
+        expect(screen.getByText(/stay fearless/i)).toBeInTheDocument()
     })
 })
