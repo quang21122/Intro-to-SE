@@ -1,8 +1,9 @@
 import Signup from './Signup'
 import { AuthProvider } from '../contexts/AuthProvider'
 import { ProfileProvider } from '../contexts/ProfileProvider'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom';
+import { auth } from '../firebaseAdmin.js';
 
 describe('Signup Page', () => {
     it('should render signup form', () => {
@@ -26,9 +27,10 @@ describe('Signup Page', () => {
         expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
     });
 
-    let isAlreadySignedUp = false;
+    // let isAlreadySignedUp = false;
     // it('should allow user to sign up with valid data', async () => {
-    //     const testEmail = 'dohn@Gmail.com';
+
+    //     const testEmail = 'john@gmail.com';
 
     //     if (isAlreadySignedUp) {
     //         console.log(`Email ${testEmail} đã được sử dụng trong lần test trước.`);
@@ -45,61 +47,62 @@ describe('Signup Page', () => {
     //         </MemoryRouter>
     //     );
 
-    //     // Nhập dữ liệu vào form
-    //     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
-    //     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: testEmail } });
-    //     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
-    //     fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } });
+    //     await act(async () => {
+    //         fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
+    //         fireEvent.change(screen.getByLabelText(/email/i), { target: { value: testEmail } });
+    //         fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
+    //         fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password123' } });
+    //         fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
+    //     });
 
-    //     // Nhấn nút "Sign Up"
-    //     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
-
-    //     // Kiểm tra localStorage
-    //     expect(localStorage.getItem('isAuthenticated')).toBe('true');
-        
+    //     waitFor(() => {
+    //         expect(localStorage.getItem('isAuthenticated')).toBe('true');
+    //     })
     //     isAlreadySignedUp = true;
     // });
 
 
-    //     it('should show error message for invalid email format', async () => {
-    //         render(
-    //             <MemoryRouter>
-    //                 <AuthProvider>
-    //                     <ProfileProvider>
-    //                         <Signup />
-    //                     </ProfileProvider>
-    //                 </AuthProvider>
-    //             </MemoryRouter>
-    //         );
+    it('should show error message for invalid email format', async () => {
+        render(
+            <MemoryRouter>
+                <AuthProvider>
+                    <ProfileProvider>
+                        <Signup />
+                    </ProfileProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        );
 
-    //         fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'invalid-email' } });
-    //         fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+        await act(async () => {
+            fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'invalid-email' } });
+            fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+        });
+        await waitFor(() => {
+            expect(screen.getByText(/Invalid email/i)).toBeInTheDocument();
+        });
 
-    //         await waitFor(() => {
-    //             expect(screen.getByText(/Invalid email/i)).toBeInTheDocument();
-    //         });
-
-    //     });
+    });
 
 
 
-    // it('should show error message when passwords do not match', async () => {
-    //     render(
-    //         <MemoryRouter>
-    //             <AuthProvider>
-    //                 <ProfileProvider>
-    //                     <Signup />
-    //                 </ProfileProvider>
-    //             </AuthProvider>
-    //         </MemoryRouter>
-    //     );
-
-    //     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
-    //     fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password1234' } });
-    //     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
-
-    //     await waitFor(() => {
-    //         expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument();
-    //     });
-    // });
+    it('should show error message when passwords do not match', async () => {
+        render(
+            <MemoryRouter>
+                <AuthProvider>
+                    <ProfileProvider>
+                        <Signup />
+                    </ProfileProvider>
+                </AuthProvider>
+            </MemoryRouter>
+        );
+        await act(async () => {
+            fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
+            fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'password1234' } });
+            fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+        })
+       
+        await waitFor(() => {
+            expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument();
+        });
+    });
 });
