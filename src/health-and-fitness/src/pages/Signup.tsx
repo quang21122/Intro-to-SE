@@ -25,16 +25,30 @@ export default function Signup() {
     const password = formData.get("password") as string;
     const confirm = formData.get("confirm") as string;
 
+    if (!username || !email || !password || !confirm) {
+      setEmailError("Please fill in all fields");
+      return;
+    }
+
     if (validateEmail(email)) {
       if (password !== confirm) {
-        alert("Passwords do not match");
+        setEmailError("Passwords do not match");
         return;
       }
-      await signup(email, password, username);
+      const signUp = await signup(email, password, username);
+
+      if ('error' in signUp) {
+        // Handle both string and object errors
+        const errorMessage =
+          typeof signUp.error === "string" ? signUp.error : signUp.error.message;
+        setEmailError(errorMessage);
+        return;
+      }
+
       const signIn = await login(email, password);
 
       if (!signIn || !signIn.token) {
-        alert("Sign up failed");
+        setEmailError("Sign up failed");
         return;
       }
 
@@ -42,7 +56,6 @@ export default function Signup() {
       navigate("/");
     } else {
       setEmailError("Invalid email address");
-      alert("Invalid email address");
     }
   };
 
@@ -77,7 +90,7 @@ export default function Signup() {
           <form className="mt-6" onSubmit={handleSignup}>
             <div className="mb-6">
               <label htmlFor="name" className="block text-[#A1A1A1] font-bold">
-                Full Name
+                Username
               </label>
               <input
                 type="text"

@@ -4,6 +4,8 @@ import avatar from "../assets/avatar_default.png";
 import pen from "../assets/pen.png";
 import { useAuth } from "../hooks/useAuth";
 import { useProfile } from "../hooks/useProfile";
+import { useNavigate } from "react-router-dom";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -11,9 +13,13 @@ export default function Profile() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
 
   const { user, loading, changePassword } = useAuth();
   const { myProfile, updateProfile } = useProfile();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState({
     name: "",
@@ -25,6 +31,11 @@ export default function Profile() {
     goalWeight: "",
     goalBody: "",
   });
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isAuthenticated");
+    if (!isLoggedIn) navigate("/signup");
+  }, [navigate]);
 
   useEffect(() => {
     if (!loading && user && myProfile) {
@@ -167,12 +178,34 @@ export default function Profile() {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl text-white">Profile Information</h1>
             {isEditing ? (
-              <button
-                onClick={saveChanges}
-                className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Save Changes
-              </button>
+              <div className="space-x-4">
+                <button
+                  onClick={
+                    () => {
+                      toggleEditMode();
+                      setProfile({
+                        name: user?.displayName || "",
+                        email: user?.email || "",
+                        height: myProfile.height || "",
+                        weight: myProfile.weight || "",
+                        gender: myProfile.gender || "",
+                        goalHeight: myProfile.goalHeight || "",
+                        goalWeight: myProfile.goalWeight || "",
+                        goalBody: myProfile.goalBody || "",
+                      });
+                    }
+                  }
+                  className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveChanges}
+                  className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Save Changes
+                </button>
+              </div>
             ) : (
               <button
                 onClick={toggleEditMode}
@@ -346,55 +379,109 @@ export default function Profile() {
               Change Password
             </h2>
             <div className="mt-2">
+              {/* Current Password */}
               <label
                 htmlFor="currentPassword"
                 className="block text-[#605D5D] font-raleway font-medium tracking-wider"
               >
                 Current password
               </label>
-              <input
-                type="text"
-                id="currentPassword"
-                name="currentPassword"
-                className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
-                autoComplete="off"
-                autoCorrect="off"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  id="currentPassword"
+                  name="currentPassword"
+                  className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+                <span
+                  className="absolute top-1/3 right-3 cursor-pointer"
+                  onClick={() => setShowCurrentPassword(!showNewPassword)}
+                >
+                  {showCurrentPassword ? (
+                    <div className="text-black">
+                      <FaRegEyeSlash />
+                    </div>
+                  ) : (
+                    <div className="text-black">
+                      <FaRegEye />
+                    </div>
+                  )}
+                </span>
+              </div>
+
+              {/* New Password */}
               <label
                 htmlFor="newPassword"
                 className="block text-[#605D5D] font-raleway font-medium tracking-wider"
               >
                 New password
               </label>
-              <input
-                type="text"
-                id="newPassword"
-                name="newPassword"
-                className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
-                autoComplete="off"
-                autoCorrect="off"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  id="newPassword"
+                  name="newPassword"
+                  className="w-full p-2 my-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <span
+                  className="absolute top-1/3 right-3 cursor-pointer"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? (
+                    <div className="text-black">
+                      <FaRegEyeSlash />
+                    </div>
+                  ) : (
+                    <div className="text-black">
+                      <FaRegEye />
+                    </div>
+                  )}
+                </span>
+              </div>
 
+              {/* Verify Password */}
               <label
                 htmlFor="verifyPassword"
                 className="block text-[#605D5D] font-raleway font-medium tracking-wider"
               >
                 Verify password
               </label>
-              <input
-                type="text"
-                id="verifyPassword"
-                name="verifyPassword"
-                className="w-full p-2 mt-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
-                autoComplete="off"
-                autoCorrect="off"
-                value={verifyPassword}
-                onChange={(e) => setVerifyPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showVerifyPassword ? "text" : "password"}
+                  id="verifyPassword"
+                  name="verifyPassword"
+                  className="w-full p-2 mt-2 border-2 border-black rounded-xl focus:outline-none focus:border-red-400 bg-white text-black"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  value={verifyPassword}
+                  onChange={(e) => setVerifyPassword(e.target.value)}
+                />
+                <span
+                  className="absolute top-1/3 right-3 cursor-pointer"
+                  onClick={() => setShowVerifyPassword(!showVerifyPassword)}
+                >
+                  {showVerifyPassword ? (
+                    <div className="text-black">
+                      <FaRegEyeSlash />
+                    </div>
+                  ) : (
+                    <div className="text-black">
+                      <FaRegEye />
+                    </div>
+                  )}
+                </span>
+              </div>
+
+              {/* Buttons */}
               <button
                 type="submit"
                 onClick={handleChangePassword}
@@ -403,7 +490,12 @@ export default function Profile() {
                 Confirm
               </button>
               <button
-                onClick={() => setIsChangePassword(false)}
+                onClick={() => {
+                  setIsChangePassword(false);
+                  setCurrentPassword("");
+                  setNewPassword("");
+                  setVerifyPassword("");
+                }}
                 className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold hover:bg-gray-400"
               >
                 Cancel

@@ -27,9 +27,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
   };
 
   const handleLogout = () => {
-    logout();
-    localStorage.removeItem("isAuthenticated");
-    setIsLoggedIn(false);
+    logout().then(() => {
+      localStorage.removeItem("isAuthenticated");
+      setIsLoggedIn(false);
+      navigate("/");
+    });
   };
 
   const handleWorkoutPlans = () => {

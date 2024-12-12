@@ -134,6 +134,7 @@ export default function Exercises() {
         );
 
         if (!exerciseRes.ok) {
+          setTotalPages(0);
           throw new Error(
             `Failed to fetch exercises: ${exerciseRes.statusText}`
           );
