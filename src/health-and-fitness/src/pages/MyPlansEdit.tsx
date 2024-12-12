@@ -5,10 +5,7 @@ import {
   Draggable,
   DropResult,
 } from "@hello-pangea/dnd"; // Using more stable fork
-import examplePic from "../assets/workout/example_pic.png";
 import examplePic2 from "../assets/workout/examplePic2.png";
-import { TfiCup } from "react-icons/tfi";
-import { HiChartBar } from "react-icons/hi";
 import { TbBarbell } from "react-icons/tb";
 import { CiClock2 } from "react-icons/ci";
 import { IoTrashOutline } from "react-icons/io5";
@@ -18,13 +15,13 @@ import { GrFormPrevious } from "react-icons/gr";
 import { FaSearch } from "react-icons/fa";
 import { IoCloseCircleOutline } from "react-icons/io5";
 // import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import PlanCard from "../components/myplansedit/PlanCard";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 type ExerciseField = "sets" | "reps" | "intervals" | "rest";
 type DayField = "title";
-type Difficulty = "Beginner" | "Intermediate" | "Advanced";
-type Goal = "Maintain" | "Bulk" | "Cut" | "Strength";
+
 
 interface Exercise {
   id: string;
@@ -345,140 +342,11 @@ const MyPlansEdit: React.FC = () => {
     },
   ]);
   const [isAdding, setIsAdding] = useState(false);
+  const { id } = useParams<{ id: string }>();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const plan = {
-    image: examplePic,
-    title: "5 DAYS MUSCLE MASS SPLIT",
-    target: "Abs",
-    difficulty: "Intermediate",
-    goal: "Maintain",
-    description:
-      "The 5 Day Muscle Mass Split routine by JefitTeam is a 7 day workout plan. It is a intermediate level plan to achieve bulking fitness goals.",
-  };
-
-  const [planDetails, setPlanDetails] = useState({
-    title: plan.title,
-    difficulty: plan.difficulty as Difficulty,
-    goal: plan.goal as Goal,
-    description: plan.description,
-  });
-
-  const difficultyOptions: Difficulty[] = [
-    "Beginner",
-    "Intermediate",
-    "Advanced",
-  ];
-  const goalOptions: Goal[] = ["Maintain", "Bulk", "Cut", "Strength"];
-
-  const PlanCard = () => {
-    const [activeDifficulty, setActiveDifficulty] = useState(
-      planDetails.difficulty
-    );
-    const [activeGoal, setActiveGoal] = useState(planDetails.goal);
-
-    const handleDifficultyChange = (difficulty: Difficulty) => {
-      setActiveDifficulty(difficulty);
-      setPlanDetails((prev) => ({ ...prev, difficulty }));
-    };
-
-    const handleGoalChange = (goal: Goal) => {
-      setActiveGoal(goal);
-      setPlanDetails((prev) => ({ ...prev, goal }));
-    };
-
-    const handleTitleChange = (value: string) => {
-      setPlanDetails((prev) => ({ ...prev, title: value }));
-    };
-
-    const handleDescriptionChange = (value: string) => {
-      setPlanDetails((prev) => ({ ...prev, description: value }));
-    };
-
-    return (
-      <div className="flex flex-col mt-4 mx-4">
-        <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
-          <img src={plan.image} alt="" />
-          <div className="flex flex-col ml-2 mt-6">
-            <div className="flex flex-row items-center justify-between">
-              <input
-                type="text"
-                value={planDetails.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-[75%] font-bebas uppercase text-black text-3xl py-1 px-2 rounded-xl bg-[#D9D9D9] border border-gray-400 focus:outline-none"
-                autoFocus
-              />
-              <p className="bg-[#C73659] font-bebas px-2 py-1 text-2xl text-[#B2B2B2] rounded-xl">
-                Applied
-              </p>
-            </div>
-
-            <div className="flex flex-col font-montserrat mt-3">
-              <div className="flex flex-col">
-                <div className="text-2xl flex flex-row items-center">
-                  <TfiCup className="mr-4 text-[#A91D3A]" />
-                  <p className="text-black">Goal</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {goalOptions.map((goal) => (
-                    <button
-                      key={goal}
-                      onClick={() => handleGoalChange(goal)}
-                      className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
-                        activeGoal === goal
-                          ? "bg-[#C73659] text-white"
-                          : "bg-[#D9D9D9]"
-                      }`}
-                    >
-                      {goal}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col mt-4">
-                <div className="text-2xl flex flex-row items-center">
-                  <HiChartBar className="mr-4 text-[#A91D3A]" />
-                  <p className="text-black">Level</p>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {difficultyOptions.map((difficulty) => (
-                    <button
-                      key={difficulty}
-                      onClick={() => handleDifficultyChange(difficulty)}
-                      className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
-                        activeDifficulty === difficulty
-                          ? "bg-[#C73659] text-white"
-                          : "bg-[#D9D9D9]"
-                      }`}
-                    >
-                      {difficulty}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col">
-              <h2 className="text-3xl font-bebas text-black mt-6">
-                Plan description
-              </h2>
-              <textarea
-                value={planDetails.description}
-                onChange={(e) => handleDescriptionChange(e.target.value)}
-                className="text-black text-xl mt-2 font-montserrat bg-[#D9D9D9] rounded-xl p-2 focus:outline-none"
-                rows={6}
-                autoFocus
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const navigate = useNavigate();
 
@@ -952,7 +820,10 @@ const MyPlansEdit: React.FC = () => {
       <Navbar isHomepage={false} />
       <div className={`grid grid-cols-[3fr_7fr] pt-10`}>
         <div className="flex flex-col">
-          <div className="flex flex-row">
+          <div
+            className="flex flex-row hover:cursor-pointer"
+            onClick={() => navigate("/my-plans")}
+          >
             <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
             <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
               My Plans
@@ -960,7 +831,7 @@ const MyPlansEdit: React.FC = () => {
           </div>
 
           {/* {isAdding ? <PlanTable /> : <PlanCard />} */}
-          {!isAdding && <PlanCard />}
+          {!isAdding && <PlanCard id={id ?? ''} />}
         </div>
 
         <div className="flex flex-col mt-10">

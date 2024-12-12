@@ -137,7 +137,7 @@ function WorkoutSlider() {
                   </h3>
                   <div className="grid grid-cols-2 py-6 text-center font-montserrat">
                     <div className="text-white text-xl flex flex-col">
-                      <p>{plan.days}</p>
+                      <p>{plan.days} days</p>
                       <p>{plan.muscle}</p>
                     </div>
                     <div className="text-white text-xl flex flex-col">

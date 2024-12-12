@@ -126,7 +126,7 @@ function WorkoutPlanList() {
             </h1>
             <div className="grid grid-cols-2 font-montserrat text-[1rem] py-2">
               <div className="flex flex-col pl-4">
-                <p className="text-black">{plan.days}</p>
+                <p className="text-black">{plan.days} days</p>
                 <p className="text-black">{plan.muscle}</p>
               </div>
               <div className="flex flex-col pl-4">
