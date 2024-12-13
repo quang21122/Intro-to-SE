@@ -5,43 +5,43 @@ const { getExercise } = exerciseService;
 
 const getPlan = async (id) => {
     try {
-      // Get main plan document
-      const planDoc = await getDoc(doc(firestoreDb, "plans", id));
-      if (!planDoc.exists()) {
-        return { error: "Plan not found", status: 404 };
-      }
+        // Get main plan document
+        const planDoc = await getDoc(doc(firestoreDb, "plans", id));
+        if (!planDoc.exists()) {
+            return { error: "Plan not found", status: 404 };
+        }
 
-      // Get planDetails subcollection
-      const planDetailsRef = collection(
-        doc(firestoreDb, "plans", id),
-        "planDetails"
-      );
-      const planDetailsSnapshot = await getDocs(planDetailsRef);
+        // Get planDetails subcollection
+        const planDetailsRef = collection(
+            doc(firestoreDb, "plans", id),
+            "planDetails"
+        );
+        const planDetailsSnapshot = await getDocs(planDetailsRef);
 
-      // Convert planDetails documents to array
-      const planDetails = planDetailsSnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
+        // Convert planDetails documents to array
+        const planDetails = planDetailsSnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+        }));
 
-      // Combine plan data with planDetails
-      const plan = {
-        id: planDoc.id,
-        ...planDoc.data(),
-        planDetails: planDetails,
-      };
+        // Combine plan data with planDetails
+        const plan = {
+            id: planDoc.id,
+            ...planDoc.data(),
+            planDetails: planDetails,
+        };
 
-      return { plan, status: 200 };
+        return { plan, status: 200 };
     } catch (error) {
-      console.error("Error getting plan by id:", error);
-      return { error: error.message, status: 500 };
+        console.error("Error getting plan by id:", error);
+        return { error: error.message, status: 500 };
     }
 }
 
 const getPlansByPage = async (page, pageSize = 6) => {
     try {
         const plansCollection = collection(firestoreDb, 'plans');
-        
+
         // Build initial query with ordering and limit
         let plansQuery = query(
             plansCollection,
@@ -59,7 +59,7 @@ const getPlansByPage = async (page, pageSize = 6) => {
                     limit((page - 1) * pageSize)
                 )
             );
-            
+
             if (!lastVisibleDoc.empty) {
                 const lastDoc = lastVisibleDoc.docs[lastVisibleDoc.docs.length - 1];
                 plansQuery = query(
@@ -72,7 +72,7 @@ const getPlansByPage = async (page, pageSize = 6) => {
         }
 
         const querySnapshot = await getDocs(plansQuery);
-        
+
         if (querySnapshot.empty) {
             return [];
         }
@@ -90,7 +90,7 @@ const getPlansByPage = async (page, pageSize = 6) => {
 const createPlan = async (data) => {
     try {
         // Validate the main plan data
-        const { name, image, description, days, goal, muscle, equipment,level, planDetails } = data;
+        const { name, image, description, days, goal, muscle, equipment, level, planDetails } = data;
 
         if (!name || !description || !days || !equipment || !muscle || !image || !goal || !level || !Array.isArray(planDetails)) {
             throw new Error("Invalid plan data. Ensure all required fields are provided.");
@@ -118,7 +118,7 @@ const createPlan = async (data) => {
         const planDetailsPromises = planDetails.map(async (detail) => {
             const { name, day, exercises } = detail;
 
-            if (!name || !day ||!Array.isArray(exercises)) {
+            if (!name || !day || !Array.isArray(exercises)) {
                 throw new Error(`Invalid detail for day ${day}`);
             }
 
@@ -204,11 +204,11 @@ const updatePlan = async (id, data) => {
 
             const exercisesWithIds = await Promise.all(
                 exercises.map(async (exercise) => {
-                    const exerciseData = await getExercise(exercise.name); 
+                    const exerciseData = await getExercise(exercise.name);
                     if (exerciseData.error) {
                         throw new Error(exerciseData.error);
                     }
-                    exercise.id = exerciseData.id 
+                    exercise.id = exerciseData.id
                     return exercise;
                 })
             );
@@ -240,4 +240,97 @@ const updatePlan = async (id, data) => {
     }
 }
 
-export default { createPlan, deletePlan, getPlan, updatePlan, getPlansByPage };
+const getFilteredPlans = async ({ page, muscles, equipments, daysList, levels, name }) => {
+    try {
+        const plansCollection = collection(firestoreDb, "plans");
+
+        const conditions = [];
+
+        if (muscles.length > 0) {
+            conditions.push(where("muscle", "in", muscles));
+        }
+
+        if (equipments.length > 0) {
+            conditions.push(where("equipment", "in", equipments));
+        }
+
+        if (daysList.length > 0) {
+            conditions.push(where("days", "in", days));
+        }
+
+        if (levels.length > 0) {
+            conditions.push(where("level", "in", levels));
+        }
+
+        if (name) {
+            conditions.push(where("name", "==", name));
+        }
+        let queryRef = query(plansCollection, ...conditions);
+
+        // Apply pagination if page is specified
+        const pageSize = 12; // Define the page size
+        if (page) {
+            const pageNum = parseInt(page, 10);
+            if (pageNum < 1) {
+                throw new Error("Invalid page number");
+            }
+
+            // For cursor-based pagination, you would typically store the last document from the previous page.
+            // As an example, we'll order by a field like `name`:
+            queryRef = query(queryRef, limit(pageSize));
+
+            // In a real-world scenario, you'd use a startAfter cursor based on the last document of the previous page.
+            // e.g., queryRef = query(queryRef, startAfter(lastDocument), limit(pageSize));
+        }
+
+        const querySnapshot = await getDocs(queryRef);
+
+        if (querySnapshot.empty) {
+            return [];
+        }
+
+        // Map the documents to a response array
+        return querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    } catch (error) {
+        console.error("Error in getFilteredPlans:", error);
+        throw new Error(error.message);
+    }
+};
+
+const searchPlans = async (searchTerm) => {
+    try {
+        const formattedTerm = searchTerm.toLowerCase().trim();
+        console.log("Formatted Search Term:", formattedTerm);
+
+        const plansCollection = collection(firestoreDb, "plans");
+        const querySnapshot = await getDocs(plansCollection);
+
+        if (querySnapshot.empty) {
+            return { error: "No plans found", status: 404 };
+        }
+
+        // Filter documents client-side to allow partial matches
+        const plans = querySnapshot.docs
+            .map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            .filter((plans) =>
+                plans.name.toLowerCase().includes(formattedTerm)
+            );
+
+        if (plans.length === 0) {
+            return { error: "No plans found", status: 404 };
+        }
+
+        return { plans: plans, status: 200 };
+    } catch (error) {
+        console.error("Error in searchPlans:", error);
+        throw new Error(error.message);
+    }
+};
+
+export default { createPlan, deletePlan, getPlan, updatePlan, getPlansByPage, getFilteredPlans, searchPlans };
