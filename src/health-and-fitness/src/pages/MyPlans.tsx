@@ -50,6 +50,10 @@ function MyPlans() {
   useEffect(() => {
     const fetchMyPlans = async () => {
       try {
+        if (!user) {
+          throw new Error("User is not authenticated");
+        }
+
         const response = await fetch(
           `http://localhost:3000/api/user?userId=${user.uid}`
         );
