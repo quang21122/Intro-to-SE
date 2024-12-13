@@ -1,9 +1,8 @@
 import { firestoreDb } from '../firebase.js';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
-import { useAuth } from "../src/hooks/useAuth";
+import { useAuth } from "../../src/hooks/useAuth";
 import userService from './userService.js';
-import { app } from 'firebase-admin';
 const { getExercise } = exerciseService;
 const { user } = useAuth();
 const { getUser } = userService;

@@ -255,7 +255,7 @@ const getFilteredPlans = async ({ page, muscles, equipments, daysList, levels, n
         }
 
         if (daysList.length > 0) {
-            conditions.push(where("days", "in", days));
+            conditions.push(where("days", "in", daysList));
         }
 
         if (levels.length > 0) {
