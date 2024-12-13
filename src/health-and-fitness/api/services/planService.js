@@ -309,6 +309,7 @@ const getFilteredPlans = async ({
   daysList,
   levels,
   name,
+  goals
 }) => {
   try {
     const plansCollection = collection(firestoreDb, "plans");
@@ -334,6 +335,11 @@ const getFilteredPlans = async ({
     if (name) {
       conditions.push(where("name", "==", name));
     }
+
+    if (goals.length > 0) {
+      conditions.push(where("goal", "in", goals));
+    }
+    
     let queryRef = query(plansCollection, ...conditions);
 
     // Apply pagination if page is specified
