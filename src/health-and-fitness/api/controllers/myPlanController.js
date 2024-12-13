@@ -58,6 +58,7 @@ const updateMyPlan = async (req, res) => {
 
   try {
     if (id){
+      //update plan
       const updatedMyPlan = await myPlanService.updateMyPlan(uid, id, req.body);
       if (updatedMyPlan.error) {
         return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });
@@ -66,6 +67,7 @@ const updateMyPlan = async (req, res) => {
     }
 
     if ( appliedID ) {
+      //update user appliedPlan
       const updatedMyPlan = await myPlanService.appliedPlan(uid, appliedID);
       if (updatedMyPlan.error) {
         return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });

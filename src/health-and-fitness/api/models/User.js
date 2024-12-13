@@ -2,7 +2,6 @@
 export const User = {
     role: "user", // Default role is "user", can be "admin" or "moderator"
     ban: false, // Whether the user is banned
-    myPlans: [], // Array of Firestore document references as strings
     gender: null, // Gender can be "male", "female", or "other"
     height: null, // Height of the user (e.g., in cm)
     weight: null, // Weight of the user (e.g., in kg)
@@ -12,4 +11,5 @@ export const User = {
     goalWeight: null,
     goalBody: null,
     mealPlan: null, // Reference ID for mealPlans document
+    appliedPlan: null, // Reference ID for myPlans document
 };
