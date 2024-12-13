@@ -233,7 +233,7 @@ const updatePlan = async (id, data) => {
 
         await Promise.all(planDetailsPromises);
 
-        return { message: "Exercise updated successfully", id: planDoc.id };
+        return { message: "Plan updated successfully", id: planDoc.id };
     } catch (error) {
         console.error("Error updating plan by id:", error);
         return { error: error.message, status: 500 };

@@ -12,6 +12,9 @@ const createPlan = async (req, res) => {
 
 const deletePlan = async (req, res) => {
   const { id } = req.query;
+  if (!id){
+    return res.status(400).json({ error: "id is required" });
+  }
   const deletedPlan = await planService.deletePlan(id);
 
   if (deletedPlan.error) {
@@ -110,6 +113,9 @@ const getPlan = async (req, res) => {
 
 const updatePlan = async (req, res) => {
   const { id } = req.query;
+  if (!id){
+    return res.status(400).json({ error: "id is required" });
+  }
   const updatedPlan = await planService.updatePlan(id, req.body);
 
   if (updatedPlan.error) {
