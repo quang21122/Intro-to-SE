@@ -87,7 +87,12 @@ const createMyPlan = async (uid, data) => {
                 name: name || "",
                 day: day,
                 exercises: validExercises,
-                startTime: startTime || ""
+                startTime: startTime || 
+                                        {
+                                            hour: 0,
+                                            minute: 0,
+                                            flag: false
+                                        }
             });
         }
 
@@ -184,7 +189,12 @@ const createMyPlanThroughAddPlan = async (uid, originalPlanId) => {
                 name: name || "",
                 day: day,
                 exercises: validExercises,
-                startTime: startTime || ""
+                startTime: startTime || 
+                                        {
+                                            hour: 0,
+                                            minute: 0,
+                                            flag: false
+                                        }
             });
         }
 
