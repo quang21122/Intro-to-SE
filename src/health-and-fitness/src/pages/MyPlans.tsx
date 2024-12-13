@@ -48,6 +48,12 @@ function MyPlans() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [loading, user, navigate]);
+
+  useEffect(() => {
     const fetchMyPlans = async () => {
       try {
         if (!user) {
@@ -285,7 +291,9 @@ function MyPlans() {
             <div className="flex justify-end">
               <button
                 className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
-                onClick={() => activePlan && navigate(`/my-plans-edit/${activePlan.id}`)}
+                onClick={() =>
+                  activePlan && navigate(`/my-plans-edit/${activePlan.id}`)
+                }
               >
                 Edit
               </button>

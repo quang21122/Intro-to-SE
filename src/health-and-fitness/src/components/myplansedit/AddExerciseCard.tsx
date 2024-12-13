@@ -29,9 +29,12 @@ interface Exercise {
   difficulty: string;
   createdAt: string;
 }
-
+interface DropdownItem {
+  id: string;
+  name: string;
+}
 interface DropdownWithCheckboxProps {
-  items: string[];
+  items: DropdownItem[];
   name: string;
   selected: string;
   setSelected: (value: string) => void;
@@ -47,6 +50,15 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [selectedMuscle, setSelectedMuscle] = useState<string>("All");
   const [selectedEquipment, setSelectedEquipment] = useState<string>("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchMuscles = async () => {
@@ -87,35 +99,72 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const exerciseRes = await fetch(
-          "http://localhost:3000/api/exercise?page=1"
-        );
-        const exerciseData = await exerciseRes.json();
+        let url = "http://localhost:3000/api/exercise";
+
+        if (debouncedSearchTerm) {
+          url = `http://localhost:3000/api/exercise?search=${debouncedSearchTerm}`;
+          console.log("URL:", url);
+        } else {
+          const queryParam = new URLSearchParams();
+          if (selectedMuscle === "All" && selectedEquipment === "All") {
+            url = "http://localhost:3000/api/exercise?page=1";
+          } else {
+            if (selectedMuscle !== "All") {
+              queryParam.append("muscles", selectedMuscle);
+            }
+            if (selectedEquipment !== "All") {
+              queryParam.append("equipments", selectedEquipment);
+            }
+          }
+          url = `${url}?${queryParam.toString()}`;
+        }
+
+        const exerciseRes = await fetch(url);
+
+        if (!exerciseRes.ok) {
+          throw new Error(
+            `Failed to fetch exercises: ${exerciseRes.statusText}`
+          );
+        }
+
+        let exerciseData = await exerciseRes.json();
+        if (debouncedSearchTerm) {
+          exerciseData = exerciseData.data.exercises;
+        } else {
+          exerciseData = exerciseData.data;
+        }
+        console.log("Exercise data:", exerciseData);
+
+        if (!exerciseData || exerciseData.length === 0) {
+          // If no exercises are found, clear the state
+          setExercises([]);
+          return;
+        }
 
         // Map exercises with muscle names
-        const exercisesWithMuscles = exerciseData.data.map(
-          (exercise: Exercise) => {
-            const muscle = muscles.find((m) => m.id === exercise.muscle);
-            return {
-              ...exercise,
-              muscleName: muscle ? muscle.name : "Unknown",
-            };
-          }
-        );
+        const exercisesWithMuscles = exerciseData.map((exercise: Exercise) => {
+          const muscle = muscles.find((m) => m.id === exercise.muscle);
+          return {
+            ...exercise,
+            muscleName: muscle ? muscle.name : "Unknown",
+          };
+        });
+
+        console.log("Exercises with muscles:", exercisesWithMuscles);
 
         setExercises(exercisesWithMuscles);
-        console.log("Exercises with muscles:", exercisesWithMuscles);
       } catch (err) {
         console.error("Error fetching exercises:", err);
+        // Optionally clear the state in case of an error
+        setExercises([]);
       }
     };
 
     if (muscles.length > 0) {
       fetchExercises();
     }
-  }, [muscles]);
-    
-    
+  }, [muscles, selectedMuscle, selectedEquipment, debouncedSearchTerm]);
+
   const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({
     items,
     name,
@@ -135,15 +184,18 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
       }
     }, [isOpen]);
 
+    console.log("Selected muscle:", selectedMuscle);
+    console.log("Selected equipment:", selectedEquipment);
+    console.log("Exercises:", exercises);
+
     return (
       <div className="relative font-montserrat mt-6 text-black">
         <div
           className="rounded-xl bg-[#84878D] px-4 py-2 cursor-pointer flex flex-row justify-between items-center"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <div></div>
           <p className="text-lg">
-            {name} : {selected}
+            {name}: {items.find((item) => item.id === selected)?.name || "All"}
           </p>
           <span className="transform transition-transform">
             {isOpen ? "▲" : "▼"}
@@ -173,19 +225,19 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
             </label>
             {items.map((item) => (
               <label
-                key={item}
+                key={item.id}
                 className="flex items-center space-x-2 cursor-pointer px-4 py-2 hover:bg-gray-300"
               >
                 <input
                   type="radio"
-                  checked={selected === item}
+                  checked={selected === item.id}
                   onChange={() => {
-                    setSelected(item);
+                    setSelected(item.id); // Set the ID here
                     setIsOpen(false);
                   }}
                   className="w-4 h-4 border-gray-500"
                 />
-                <span className="font-montserrat text-sm">{item}</span>
+                <span className="font-montserrat text-sm">{item.name}</span>
               </label>
             ))}
           </div>
@@ -208,13 +260,13 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
 
       <div className="grid grid-cols-2 gap-4">
         <DropdownWithCheckbox
-          items={muscles.map((m) => m.name)}
+          items={muscles.map((m) => ({ id: m.id, name: m.name }))}
           name="Muscle"
           selected={selectedMuscle}
           setSelected={setSelectedMuscle}
         />
         <DropdownWithCheckbox
-          items={equipment.map((e) => e.name)}
+          items={equipment.map((e) => ({ id: e.id, name: e.name }))}
           name="Equipment"
           selected={selectedEquipment}
           setSelected={setSelectedEquipment}
@@ -225,6 +277,8 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
         <input
           type="text"
           placeholder="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-[#CDCDCD] p-4 rounded-xl text-black text-xl"
         />
         <FaSearch className="text-3xl text-black -mx-12" onClick={() => {}} />
@@ -232,23 +286,34 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
 
       <div className="flex flex-col mt-6">
         <h1 className="font-montserrat text-3xl text-black">Exercises</h1>
-        {exercises.map((exercise) => (
-          <div
-            key={exercise.id}
-            className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 cursor-pointer my-2"
-          >
-            <img
-              src={exercise.image}
-              alt=""
-              className="w-14 h-14 rounded-full"
-            />
-            <div className="flex flex-col">
-              <h2 className="text-lg text-black">{exercise.name}</h2>
-              <p className="text-lg text-[#686D76]">{exercise.muscleName}</p>
+        {exercises.length > 0 ? (
+          exercises.map((exercise) => (
+            <div
+              key={exercise.id}
+              className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 cursor-pointer my-2"
+            >
+              <img
+                src={exercise.image}
+                alt={exercise.name}
+                className="w-14 h-14 rounded-full"
+              />
+              <div className="flex flex-col">
+                <h2 className="text-lg text-black">{exercise.name}</h2>
+                <p className="text-lg text-[#686D76]">{exercise.muscleName}</p>
+              </div>
+              <CiCirclePlus
+                className="text-4xl text-black"
+                onClick={() => {}}
+              />
             </div>
-            <CiCirclePlus className="text-4xl text-black" onClick={() => {}} />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center bg-[#D9D9D9] rounded-xl p-6 my-2">
+            <p className="text-xl text-[#686D76] font-montserrat">
+              No exercises found
+            </p>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

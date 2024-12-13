@@ -50,8 +50,15 @@ const MyPlansEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [loading, user, navigate]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -137,8 +144,6 @@ const MyPlansEdit: React.FC = () => {
     }
     fetchPlan();
   }, [id, user, loading]);
-
-  const navigate = useNavigate();
 
   const handleFinishEdit = () => {
     navigate("/my-plans"); // Adjust path based on your routing setup
