@@ -145,22 +145,25 @@ const createPlan = async (data) => {
         throw new Error(`Invalid detail for day ${day}`);
       }
 
-      //find exercise id
-      const exercisesWithIds = await Promise.all(
+      // check exercises in library
+      const existedExercises = await Promise.all(
         exercises.map(async (exercise) => {
-          const exerciseData = await getExercise(exercise.name);
-          if (exerciseData.error) {
-            throw new Error(exerciseData.error);
-          }
-          exercise.id = exerciseData.id; // Assign ID, use 'default id - Barbell Stiff-Leg Deadlift' if not found
-          return exercise;
+            const exerciseData = await getExerciseById(exercise.id);
+            if (exerciseData.error) {
+                throw new Error(exerciseData.error);
+            }
+            return exercise;
         })
-      );
+    );
 
-      // Remove name from the exercise objects
-      const exercisesWithoutName = exercisesWithIds.map(
-        ({ name, ...rest }) => rest
-      );
+    // take out id, interval, sets, reps, restTime
+    const validExercises = existedExercises.map(({ id, interval, sets, reps, restTime }) => ({
+        id,
+        interval,
+        sets,
+        reps,
+        restTime
+    }));
 
       // Create a document in the "planDetails" subcollection
       const detailRef = doc(
@@ -170,7 +173,7 @@ const createPlan = async (data) => {
       return setDoc(detailRef, {
         name,
         day,
-        exercises: exercisesWithoutName,
+        exercises: validExercises,
       });
     });
 
@@ -249,20 +252,25 @@ const updatePlan = async (id, data) => {
     const planDetailsPromises = planDetails.map(async (detail) => {
       const { name, day, exercises } = detail;
 
-      const exercisesWithIds = await Promise.all(
+      // check exercises in library
+      const existedExercises = await Promise.all(
         exercises.map(async (exercise) => {
-          const exerciseData = await getExercise(exercise.name);
-          if (exerciseData.error) {
-            throw new Error(exerciseData.error);
-          }
-          exercise.id = exerciseData.id;
-          return exercise;
+            const exerciseData = await getExerciseById(exercise.id);
+            if (exerciseData.error) {
+                throw new Error(exerciseData.error);
+            }
+            return exercise;
         })
-      );
+    );
 
-      const exercisesWithoutName = exercisesWithIds.map(
-        ({ name, ...rest }) => rest
-      );
+    // take out id, interval, sets, reps, restTime
+    const validExercises = existedExercises.map(({ id, interval, sets, reps, restTime }) => ({
+        id,
+        interval,
+        sets,
+        reps,
+        restTime
+    }));
 
       const planDetailsCollection = collection(
         firestoreDb,

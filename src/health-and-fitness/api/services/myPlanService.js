@@ -2,13 +2,25 @@ import { firestoreDb } from '../firebase.js';
 import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit, writeBatch } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
 import userService from './userService.js';
+import planService from './planService.js';
+
 const { getExerciseById } = exerciseService;
 const { getUser } = userService;
+const { getPlan } = planService;
 
 const createMyPlan = async (uid, data) => {
     const batch = writeBatch(firestoreDb);  // Sử dụng batch để xử lý tất cả các ghi dữ liệu đồng thời
 
     try {
+        // Kiểm tra số lượng kế hoạch hiện tại của người dùng
+        const plansQuery = query(collection(firestoreDb, `users/${uid}/myPlans`));
+        const plansSnapshot = await getDocs(plansQuery);
+
+        // Kiểm tra nếu người dùng đã có hơn 4 kế hoạch
+        if (plansSnapshot.size >= 4) {
+            throw new Error("You cannot create more than 4 plans.");
+        }
+
         // Validate the main plan data
         const { name, image, description, days, goal, muscle, level, myPlanDetails } = data;
 
@@ -89,6 +101,103 @@ const createMyPlan = async (uid, data) => {
         return { success: false, message: error.message };
     }
 };
+
+const createMyPlanThroughAddPlan = async (uid, originalPlanId) => {
+    const batch = writeBatch(firestoreDb);  // Sử dụng batch để xử lý tất cả các ghi dữ liệu đồng thời
+    try {
+        // Validate the main plan data
+        // Kiểm tra số lượng kế hoạch hiện tại của người dùng
+        const plansQuery = query(collection(firestoreDb, `users/${uid}/myPlans`));
+        const plansSnapshot = await getDocs(plansQuery);
+
+        // Kiểm tra nếu người dùng đã có hơn 4 kế hoạch
+        if (plansSnapshot.size >= 4) {
+            throw new Error("You cannot create more than 4 plans.");
+        }
+
+        const originalPlan = await getPlan(originalPlanId);
+        if (originalPlan.error) {
+            throw new Error("Can not get orignal plan");
+        }
+  
+        const { name, image, description, days, goal, muscle, level, planDetails: myPlanDetails } = originalPlan.plan;
+        console.log(originalPlan);
+       
+        console.log(myPlanDetails);
+
+        if (!name || !description || !days || !muscle || !image || !goal || !level || !Array.isArray(myPlanDetails)) {
+            throw new Error("Invalid plan data. Ensure all required fields are provided.");
+        }
+
+
+        // Create the main plan document
+        const planRef = doc(collection(firestoreDb, `users/${uid}/myPlans`));
+        const planId = planRef.id;
+
+        const plan = {
+            name,
+            description,
+            goal,
+            image,
+            level,
+            muscle,
+            days,
+            createdAt: new Date().toISOString(),
+        };
+
+        batch.set(planRef, plan);  // Thêm ghi của plan vào batch
+
+        // Add plan details
+        for (let index = 0; index < myPlanDetails.length; index++) {
+            const detail = myPlanDetails[index];
+            const { name, day, exercises, startTime } = detail;
+
+            if (!day || !Array.isArray(exercises)) {
+                throw new Error(`Invalid detail for day ${day || index + 1}`);
+            }
+
+            // check exercises in library
+            const existedExercises = await Promise.all(
+                exercises.map(async (exercise) => {
+                    const exerciseData = await getExerciseById(exercise.id);
+                    if (exerciseData.error) {
+                        throw new Error(exerciseData.error);
+                    }
+                    return exercise;
+                })
+            );
+
+            // take out id, interval, sets, reps, restTime
+            const validExercises = existedExercises.map(({ id, interval, sets, reps, restTime }) => ({
+                id,
+                interval,
+                sets,
+                reps,
+                restTime
+            }));
+
+            // Create a document in the "planDetails" subcollection
+            const detailRef = doc(collection(firestoreDb, `users/${uid}/myPlans/${planId}/myPlanDetails`));
+
+            // Thêm ghi của từng ngày vào batch
+            batch.set(detailRef, {
+                name: name || "",
+                day: day,
+                exercises: validExercises,
+                startTime: startTime || ""
+            });
+        }
+
+        // Commit the transaction (tất cả các thay đổi sẽ được lưu)
+        await batch.commit();
+
+        console.log("My plan and my plan details created through add plan successfully.");
+        return { success: true, planId };
+    } catch (error) {
+        console.error("Error creating my plan through add plan:", error.message);
+        return { success: false, message: error.message };
+    }
+}
 
 const updateMyPlan = async (uid, id, data) => {
     try {
@@ -223,4 +332,19 @@ const getMyPlan = async (uid, id) => {
     }
 }
 
-export default { createMyPlan, deleteMyPlan, getMyPlan, updateMyPlan };
+const getAllMyPlans = async (uid) => {
+    try {
+        const plansRef = collection(firestoreDb, `users/${uid}/myPlans`);
+        const plansSnapshot = await getDocs(plansRef);
+        const plans = plansSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        return { plans, status: 200 };
+    } catch (error) {
+        console.error("Error getting all my plans:", error);
+        return { error: error.message, status: 500 };
+    }
+}
+
+export default { createMyPlan, deleteMyPlan, getMyPlan, updateMyPlan, createMyPlanThroughAddPlan, getAllMyPlans };
