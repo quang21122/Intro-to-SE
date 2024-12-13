@@ -1,29 +1,33 @@
 import { firestoreDb } from '../firebase.js';
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs, collection, query, where, startAfter, orderBy, limit, writeBatch } from 'firebase/firestore';
 import exerciseService from './exerciseService.js';
-import { useAuth } from "../../src/hooks/useAuth.ts";
 import userService from './userService.js';
-const { getExercise } = exerciseService;
-const { user } = useAuth();
+const { getExerciseById } = exerciseService;
 const { getUser } = userService;
 
-const createMyPlan = async (data) => {
+const createMyPlan = async (uid, data) => {
+    const batch = writeBatch(firestoreDb);  // Sử dụng batch để xử lý tất cả các ghi dữ liệu đồng thời
+
     try {
         // Validate the main plan data
-        const { name, image, description, days, goal, muscle, equipment, level, planDetails } = data;
+        const { name, image, description, days, goal, muscle, level, myPlanDetails } = data;
 
-        if (!name || !description || !days || !equipment || !muscle || !image || !goal || !level || !Array.isArray(planDetails)) {
+        if (!name || !description || !days || !muscle || !image || !goal || !level || !Array.isArray(myPlanDetails)) {
             throw new Error("Invalid plan data. Ensure all required fields are provided.");
         }
 
+        // Ensure myPlanDetails has exactly 7 days
+        if (myPlanDetails.length !== 7) {
+            throw new Error("myPlanDetails must contain exactly 7 days.");
+        }
+
         // Create the main plan document
-        const planRef = doc(collection(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`));
+        const planRef = doc(collection(firestoreDb, `users/${uid}/myPlans`));
         const planId = planRef.id;
 
         const plan = {
             name,
             description,
-            equipment,
             goal,
             image,
             level,
@@ -32,43 +36,51 @@ const createMyPlan = async (data) => {
             createdAt: new Date().toISOString(),
         };
 
-        await setDoc(planRef, plan);
+        batch.set(planRef, plan);  // Thêm ghi của plan vào batch
 
         // Add plan details
-        const planDetailsPromises = planDetails.map(async (detail) => {
+        for (let index = 0; index < myPlanDetails.length; index++) {
+            const detail = myPlanDetails[index];
             const { name, day, exercises, startTime } = detail;
 
             if (!day || !Array.isArray(exercises)) {
-                throw new Error(`Invalid detail for day ${day}`);
+                throw new Error(`Invalid detail for day ${day || index + 1}`);
             }
 
-            //find exercise id
-            const exercisesWithIds = await Promise.all(
+            // check exercises in library
+            const existedExercises = await Promise.all(
                 exercises.map(async (exercise) => {
-                    const exerciseData = await getExercise(exercise.name);
+                    const exerciseData = await getExerciseById(exercise.id);
                     if (exerciseData.error) {
                         throw new Error(exerciseData.error);
                     }
-                    exercise.id = exerciseData.id; // Assign ID, use 'default id - Barbell Stiff-Leg Deadlift' if not found
                     return exercise;
                 })
             );
 
-            // Remove name from the exercise objects
-            const exercisesWithoutName = exercisesWithIds.map(({ name, ...rest }) => rest);
+            // take out id, interval, sets, reps, restTime
+            const validExercises = existedExercises.map(({ id, interval, sets, reps, restTime }) => ({
+                id,
+                interval,
+                sets,
+                reps,
+                restTime
+            }));
 
             // Create a document in the "planDetails" subcollection
-            const detailRef = doc(collection(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans/${planId}/myPlanDetails`));
+            const detailRef = doc(collection(firestoreDb, `users/${uid}/myPlans/${planId}/myPlanDetails`));
 
-            return setDoc(detailRef, {
+            // Thêm ghi của từng ngày vào batch
+            batch.set(detailRef, {
                 name: name || "",
-                day,
-                exercises: exercisesWithoutName,
+                day: day,
+                exercises: validExercises,
                 startTime: startTime || ""
             });
-        });
+        }
 
-        await Promise.all(planDetailsPromises);
+        // Commit the transaction (tất cả các thay đổi sẽ được lưu)
+        await batch.commit();
 
         console.log("My plan and my plan details created successfully.");
         return { success: true, planId };
@@ -78,37 +90,44 @@ const createMyPlan = async (data) => {
     }
 };
 
-const updateMyPlan = async (id, data) => {
+const updateMyPlan = async (uid, id, data) => {
     try {
-        const planDoc = await getDoc(doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`, id));
+        const planDoc = await getDoc(doc(firestoreDb, `users/${uid}/myPlans`, id));
         if (!planDoc.exists()) {
             return { error: "My plan not found", status: 404 };
         }
 
-        const { name, image, description, days, goal, muscle, equipment, level, planDetails } = data;
-        const plan = { name, description, equipment, goal, image, level, muscle, days };
+        const { name, image, description, days, goal, muscle, level, myPlanDetails } = data;
+        const plan = { name, description, goal, image, level, muscle, days };
 
         // Cập nhật tài liệu chính
-        await updateDoc(doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`, planDoc.id), plan);
+        await updateDoc(doc(firestoreDb, `users/${uid}/myPlans`, planDoc.id), plan);
 
         // Cập nhật từng chi tiết của kế hoạch
-        const planDetailsPromises = planDetails.map(async (detail) => {
+        const planDetailsPromises = myPlanDetails.map(async (detail) => {
             const { name, day, exercises, startTime } = detail;
 
-            const exercisesWithIds = await Promise.all(
+            // check exercises in library
+            const existedExercises = await Promise.all(
                 exercises.map(async (exercise) => {
-                    const exerciseData = await getExercise(exercise.name);
+                    const exerciseData = await getExerciseById(exercise.id);
                     if (exerciseData.error) {
                         throw new Error(exerciseData.error);
                     }
-                    exercise.id = exerciseData.id
                     return exercise;
                 })
             );
 
-            const exercisesWithoutName = exercisesWithIds.map(({ name, ...rest }) => rest);
+            // take out id, interval, sets, reps, restTime
+            const validExercises = existedExercises.map(({ id, interval, sets, reps, restTime }) => ({
+                id,
+                interval,
+                sets,
+                reps,
+                restTime
+            }));
 
-            const planDetailsCollection = collection(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans/${planDoc.id}/myPlanDetails`);
+            const planDetailsCollection = collection(firestoreDb, `users/${uid}/myPlans/${planDoc.id}/myPlanDetails`);
             const querySnapshot = await getDocs(query(planDetailsCollection, where("day", "==", day)));
 
             if (querySnapshot.empty) {
@@ -117,10 +136,10 @@ const updateMyPlan = async (id, data) => {
             }
 
             const detailDoc = querySnapshot.docs[0];
-            return updateDoc(doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans/${planDoc.id}/myPlanDetails`, detailDoc.id), {
+            return updateDoc(doc(firestoreDb, `users/${uid}/myPlans/${planDoc.id}/myPlanDetails`, detailDoc.id), {
                 name: name || "",
                 day,
-                exercises: exercisesWithoutName,
+                exercises: validExercises,
                 startTime: startTime || ""
             });
         });
@@ -134,21 +153,21 @@ const updateMyPlan = async (id, data) => {
     }
 }
 
-const deleteMyPlan = async (id) => {
+const deleteMyPlan = async (uid, id) => {
     try {
-        const planRef = doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`, id);
+        const planRef = doc(firestoreDb, `users/${uid}/myPlans`, id);
         const planDoc = await getDoc(planRef);
         if (!planDoc.exists()) {
             return { error: "My plan not found", status: 404 };
         }
 
         //clear appliedPlanID if similar
-        // userData=getUser(user.uid);
-        // if (userData.appliedPlan == id){
-        //     await updateDoc(doc(firestoreDb, 'users', user.uid), {
-        //         appliedPlan: ''
-        //     });
-        // }
+        const userData = getUser(uid);
+        if (userData.appliedPlan == id) {
+            await updateDoc(doc(firestoreDb, 'users', user.uid), {
+                appliedPlan: ''
+            });
+        }
         const planDetailsCollection = collection(planRef, "myPlanDetails");
         const planDetailsSnapshot = await getDocs(planDetailsCollection);
 
@@ -170,17 +189,16 @@ const deleteMyPlan = async (id) => {
     }
 };
 
-const getMyPlan = async (id) => {
+const getMyPlan = async (uid, id) => {
     try {
         // Get main plan document
-        const planDoc = await getDoc(doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`, id));
+        const planDoc = await getDoc(doc(firestoreDb, `users/${uid}/myPlans`, id));
         if (!planDoc.exists()) {
             return { error: "Plan not found", status: 404 };
         }
-
         // Get planDetails subcollection
         const planDetailsRef = collection(
-            doc(firestoreDb, `users/2UgtzYLA7wQjEFaB7szjqAkPG3n2/myPlans`, id),
+            doc(firestoreDb, `users/${uid}/myPlans`, id),
             "myPlanDetails"
         );
         const planDetailsSnapshot = await getDocs(planDetailsRef);

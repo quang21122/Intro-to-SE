@@ -1,7 +1,13 @@
 import myPlanService from "../services/myPlanService.js";
 
 const createMyPlan = async (req, res) => {
-  const newMyPlan = await myPlanService.createMyPlan(req.body);
+  const uid = req.query.uid;
+  if (!uid) {
+    return res.status(400).json({ error: "uid is required" });
+  }
+
+  const newMyPlan = await myPlanService.createMyPlan(uid,req.body);
+
   if (newMyPlan.error) {
     return res.status(newMyPlan.status).json({ error: newMyPlan.error });
   }
@@ -9,11 +15,15 @@ const createMyPlan = async (req, res) => {
 };
 
 const deleteMyPlan = async (req, res) => {
-  const { id } = req.query;
+  const { uid, id } = req.query;
+  if (!uid) {
+    return res.status(400).json({ error: "uid is required" });
+  }
   if (!id) {
     return res.status(400).json({ error: "id is required" });
   }
-  const deletedMyPlan = await myPlanService.deleteMyPlan(id);
+
+  const deletedMyPlan = await myPlanService.deleteMyPlan(uid, id);
 
   if (deletedMyPlan.error) {
     return res.status(deletedMyPlan.status).json({ error: deletedMyPlan.error });
@@ -23,11 +33,15 @@ const deleteMyPlan = async (req, res) => {
 };
 
 const updateMyPlan = async (req, res) => {
-  const { id } = req.query;
+  const { uid, id } = req.query;
+  if (!uid) {
+    return res.status(400).json({ error: "uid is required" });
+  }
   if (!id) {
     return res.status(400).json({ error: "id is required" });
   }
-  const updatedMyPlan = await myPlanService.updateMyPlan(id, req.body);
+
+  const updatedMyPlan = await myPlanService.updateMyPlan(uid, id, req.body);
 
   if (updatedMyPlan.error) {
     return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });
@@ -37,14 +51,19 @@ const updateMyPlan = async (req, res) => {
 }
 
 const getMyPlan = async (req, res) => {
-    const { id } = req.query;
+    const { uid, id } = req.query;
+    if (!uid) {
+      return res.status(400).json({ error: "uid is required" });
+    }
+
     if (!id ) {
       return res.status(400).json({ error: "id is required" });
     }
     try {
       if (id) {
         // Handle query by id
-        const myPlan = await myPlanService.getPlan(id);
+        console.log(id);
+        const myPlan = await myPlanService.getMyPlan(uid, id);
         if (!myPlan) {
           return res.status(404).json({ error: "My plan not found" });
         }

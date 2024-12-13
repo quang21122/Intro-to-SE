@@ -2,6 +2,8 @@ import exerciseController from "../controllers/exerciseController.js";
 
 export default async function handler(req, res) {
   if (req.originalUrl.startsWith("/api/exercise")) {
+    const { name } = req.query;
+    console.log("name", name);
     const { search, id } = req.query;
     console.log("search", search);
     if (req.method === "GET" && search) {
