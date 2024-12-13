@@ -347,4 +347,23 @@ const getAllMyPlans = async (uid) => {
     }
 }
 
-export default { createMyPlan, deleteMyPlan, getMyPlan, updateMyPlan, createMyPlanThroughAddPlan, getAllMyPlans };
+const appliedPlan = async (uid, appliedID) => {
+    try {
+        //check id exists
+        const planDoc = await getDoc(doc(firestoreDb, `users/${uid}/myPlans`, appliedID));
+        if (!planDoc.exists()) {
+            return { error: "Plan not found", status: 404 };
+        }
+
+        //update
+        await updateDoc(doc(firestoreDb, 'users', uid), {
+            appliedPlan: appliedID
+        });
+        return { success: true, message: `Applied plan with ID ${appliedID} successfully.` };
+    } catch (error) {
+        console.error("Error applying plan:", error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+export default { createMyPlan, deleteMyPlan, getMyPlan, updateMyPlan, createMyPlanThroughAddPlan, getAllMyPlans, appliedPlan };

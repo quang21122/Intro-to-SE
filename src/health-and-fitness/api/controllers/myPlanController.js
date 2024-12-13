@@ -51,21 +51,33 @@ const deleteMyPlan = async (req, res) => {
 };
 
 const updateMyPlan = async (req, res) => {
-  const { uid, id } = req.query;
+  const { uid, id, appliedID } = req.query;
   if (!uid) {
     return res.status(400).json({ error: "uid is required" });
   }
-  if (!id) {
-    return res.status(400).json({ error: "id is required" });
+
+  try {
+    if (id){
+      const updatedMyPlan = await myPlanService.updateMyPlan(uid, id, req.body);
+      if (updatedMyPlan.error) {
+        return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });
+      }
+      return res.status(200).json(updatedMyPlan);
+    }
+
+    if ( appliedID ) {
+      const updatedMyPlan = await myPlanService.appliedPlan(uid, appliedID);
+      if (updatedMyPlan.error) {
+        return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });
+      }
+      return res.status(200).json(updatedMyPlan);
+    }
+  
+  } catch (error) {
+    console.log("Error in update my plan:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
-
-  const updatedMyPlan = await myPlanService.updateMyPlan(uid, id, req.body);
-
-  if (updatedMyPlan.error) {
-    return res.status(updatedMyPlan.status).json({ error: updatedMyPlan.error });
-  }
-
-  res.status(200).json(updatedMyPlan);
+  
 }
 
 const getMyPlan = async (req, res) => {
