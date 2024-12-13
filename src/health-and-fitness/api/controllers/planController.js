@@ -26,8 +26,8 @@ const deletePlan = async (req, res) => {
 };
 
 const getPlan = async (req, res) => {
-  const { id, page, search, muscles, equipments, daysList, levels, name, goals } = req.query;
-  if (!id && !page && !search && !muscles && !equipments && !daysList && !levels && !name && !goals) {
+  const { id, page, search, muscles, daysList, levels, name, goals } = req.query;
+  if (!id && !page && !search && !muscles && !daysList && !levels && !name && !goals) {
     return res.status(400).json({ error: "Either 'id', 'page', 'search' or filter elements query parameter is required" });
   }
   try {
@@ -49,17 +49,16 @@ const getPlan = async (req, res) => {
       return res.status(200).json({ data: plan });
     }
 
-    if (muscles || equipments || daysList || levels || name || goals) {
+    if (muscles || daysList || levels || name || goals) {
       //Handle filter
-      if (!muscles && !equipments && !page && !name && !daysList && !levels && !goals) {
+      if (!muscles && !page && !name && !daysList && !levels && !goals) {
         return res.status(400).json({
           error:
-            "At least one query parameter (muscles, equipments, page, name, daysList, levels or goals) is required",
+            "At least one query parameter (muscles, page, name, daysList, levels or goals) is required",
         });
       }
     
         const muscleNames = muscles ? muscles.split(",") : [];
-        const equipmentNames = equipments ? equipments.split(",") : [];
         const days = daysList ? daysList.split(",").map(Number) : [];
         const multipleLevels = levels ? levels.split(",") : [];
         const pageNum = page ? parseInt(page, 10) : null;
@@ -72,7 +71,6 @@ const getPlan = async (req, res) => {
 
         const filters = {
           muscles: muscleNames,
-          equipments: equipmentNames,
           daysList: days,
           levels: multipleLevels,
           page: pageNum,

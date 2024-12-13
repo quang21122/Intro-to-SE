@@ -101,7 +101,6 @@ const createPlan = async (data) => {
       days,
       goal,
       muscle,
-      equipment,
       level,
       planDetails,
     } = data;
@@ -110,7 +109,6 @@ const createPlan = async (data) => {
       !name ||
       !description ||
       !days ||
-      !equipment ||
       !muscle ||
       !image ||
       !goal ||
@@ -129,7 +127,6 @@ const createPlan = async (data) => {
     const plan = {
       name,
       description,
-      equipment,
       goal,
       image,
       level,
@@ -232,14 +229,12 @@ const updatePlan = async (id, data) => {
       days,
       goal,
       muscle,
-      equipment,
       level,
       planDetails,
     } = data;
     const plan = {
       name,
       description,
-      equipment,
       goal,
       image,
       level,
@@ -305,7 +300,6 @@ const updatePlan = async (id, data) => {
 const getFilteredPlans = async ({
   page,
   muscles,
-  equipments,
   daysList,
   levels,
   name,
@@ -318,10 +312,6 @@ const getFilteredPlans = async ({
 
     if (muscles.length > 0) {
       conditions.push(where("muscle", "in", muscles));
-    }
-
-    if (equipments.length > 0) {
-      conditions.push(where("equipment", "in", equipments));
     }
 
     if (daysList.length > 0) {
@@ -339,7 +329,7 @@ const getFilteredPlans = async ({
     if (goals.length > 0) {
       conditions.push(where("goal", "in", goals));
     }
-    
+
     let queryRef = query(plansCollection, ...conditions);
 
     // Apply pagination if page is specified
