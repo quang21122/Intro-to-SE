@@ -12,9 +12,10 @@ const createPlan = async (req, res) => {
 
 const deletePlan = async (req, res) => {
   const { id } = req.query;
-  if (!id){
+  if (!id) {
     return res.status(400).json({ error: "id is required" });
   }
+
   const deletedPlan = await planService.deletePlan(id);
 
   if (deletedPlan.error) {
@@ -25,8 +26,8 @@ const deletePlan = async (req, res) => {
 };
 
 const getPlan = async (req, res) => {
-  const { id, page, search, muscles, equipments, daysList, levels, name } = req.query;
-  if (!id && !page && !search && !muscles && !equipments && !daysList && !levels && !name) {
+  const { id, page, search, muscles, daysList, levels, name, goals } = req.query;
+  if (!id && !page && !search && !muscles && !daysList && !levels && !name && !goals) {
     return res.status(400).json({ error: "Either 'id', 'page', 'search' or filter elements query parameter is required" });
   }
   try {
@@ -48,20 +49,20 @@ const getPlan = async (req, res) => {
       return res.status(200).json({ data: plan });
     }
 
-    if (muscles || equipments || daysList || levels || name) {
+    if (muscles || daysList || levels || name || goals) {
       //Handle filter
-      if (!muscles && !equipments && !page && !name && !daysList && !levels) {
+      if (!muscles && !page && !name && !daysList && !levels && !goals) {
         return res.status(400).json({
           error:
-            "At least one query parameter (muscles, equipments, page, name, daysList, levels) is required",
+            "At least one query parameter (muscles, page, name, daysList, levels or goals) is required",
         });
       }
     
         const muscleNames = muscles ? muscles.split(",") : [];
-        const equipmentNames = equipments ? equipments.split(",") : [];
-        const days = daysList ? daysList.split(",") : [];
+        const days = daysList ? daysList.split(",").map(Number) : [];
         const multipleLevels = levels ? levels.split(",") : [];
         const pageNum = page ? parseInt(page, 10) : null;
+        const multipleGoals = goals ? goals.split(",") : [];
 
         // Validate page number if provided
         if (page && (isNaN(pageNum) || pageNum < 1)) {
@@ -70,11 +71,11 @@ const getPlan = async (req, res) => {
 
         const filters = {
           muscles: muscleNames,
-          equipments: equipmentNames,
           daysList: days,
           levels: multipleLevels,
           page: pageNum,
           name,
+          goals: multipleGoals
         };
 
         const plans = await planService.getFilteredPlans(filters);
@@ -113,9 +114,10 @@ const getPlan = async (req, res) => {
 
 const updatePlan = async (req, res) => {
   const { id } = req.query;
-  if (!id){
+  if (!id) {
     return res.status(400).json({ error: "id is required" });
   }
+
   const updatedPlan = await planService.updatePlan(id, req.body);
 
   if (updatedPlan.error) {

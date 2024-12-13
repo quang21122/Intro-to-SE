@@ -13,6 +13,19 @@ interface FilterState {
   Levels: string;
 }
 
+interface Plan {
+  id: string;
+  name: string;
+  image: string;
+  muscle: string;
+  level: string;
+  goal: string;
+  equipment: string;
+  days: number;
+  description: string;
+  createdAt: string;
+}
+
 export default function WorkoutPlans() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [muscles, setMuscles] = useState<string[]>([]);
@@ -24,6 +37,12 @@ export default function WorkoutPlans() {
     Goals: "All",
     Levels: "All",
   });
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Plan[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const days = [1, 2, 3, 4, 5, 6, 7].map((day) => `${day} days`);
   const goals = ["Maintaining", "Bulking", "Cutting", "Sport Specific"];
@@ -38,17 +57,63 @@ export default function WorkoutPlans() {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const searchWorkoutPlans = async () => {
+      if (!debouncedSearchTerm) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+      setSearchError(null);
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/plan?search=${debouncedSearchTerm}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Search failed");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        console.log(data.data.plans);
+        setSearchResults(data.data.plans || []);
+        console.log(searchResults);
+      } catch (err) {
+        setSearchError(err instanceof Error ? err.message : "Search failed");
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    searchWorkoutPlans();
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
     const fetchMuscleNames = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:3000/api/muscle?all=true", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/muscle?all=true",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -87,13 +152,16 @@ export default function WorkoutPlans() {
       <Navbar isHomepage={false} />
       <div className="flex justify-center items-center flex-row font-bebas mt-10">
         {/* Search input */}
-        <div className="flex items-center flex-row w-full">
+        <div className="flex items-center flex-row w-full relative">
           <input
             type="text"
-            placeholder="Search"
-            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-[120%]"
+            placeholder="Search workout plans..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-full"
+            style={{ textTransform: "none" }}
           />
-          <FaSearch className="text-3xl text-black -mx-12" onClick={() => {}} />
+          <FaSearch className="absolute right-4 text-3xl text-black" />
         </div>
 
         {/* Filter */}
@@ -185,7 +253,10 @@ export default function WorkoutPlans() {
         <p className="uppercase font-bebas text-[#F05454] text-5xl mb-12">
           Workout Plans
         </p>
-        <WorkoutPlanList />
+        <WorkoutPlanList
+          searchResults={searchResults}
+          isSearching={searchResults.length !== 0}
+        />
       </div>
     </div>
   );
@@ -259,4 +330,3 @@ const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({
     </div>
   );
 };
-
