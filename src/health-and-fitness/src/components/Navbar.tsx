@@ -77,7 +77,13 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             >
               WORKOUTS
             </a>
-            <div className="absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent border-b-white group-hover:border-b-[#fb6767] cursor-pointer"></div>
+            <div
+              className={`absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent group-hover:border-b-[#fb6767] cursor-pointer ${
+                location.pathname === "/workout-plans"
+                  ? "border-b-red-500"
+                  : "border-b-white"
+              }`}
+            ></div>
             <div
               className={`absolute w-full h-4 -bottom-3 right-0 ${
                 isHomepage ? "bg-black" : "bg-[#232221]"

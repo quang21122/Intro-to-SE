@@ -20,84 +20,100 @@ interface PaginatedResponse {
   page: number;
 }
 
-function WorkoutPlanList() {
+interface WorkoutPlanListProps {
+  searchResults?: Plan[];
+  isSearching?: boolean;
+}
+
+function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
+  console.log("searchResults", searchResults);
+  console.log("isSearching", isSearching);
   const navigate = useNavigate();
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plans, setPlans] = useState<Plan[]>(searchResults || []);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 12;
 
   useEffect(() => {
-    const fetchPage = async (pageNum: number): Promise<Plan[]> => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/plan?page=${pageNum}&limit=6`,
-          {
-            headers: { "Content-Type": "application/json" },
-            // Add timeout
-            signal: AbortSignal.timeout(5000),
-          }
-        );
-
-        // Handle 404 specifically
-        if (response.status === 404) {
-          console.log(`No more pages available after page ${pageNum}`);
-          return [];
-        }
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: PaginatedResponse = await response.json();
-        return data.data || [];
-      } catch (error) {
-        console.error(`Error fetching page ${pageNum}:`, error);
-        throw error;
-      }
-    };
-
-    const fetchAllPlans = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        let allPlans: Plan[] = [];
-        let currentPage = 1;
-        let hasMoreData = true;
-        let retryCount = 3;
-
-        while (hasMoreData && retryCount > 0) {
-          try {
-            const pageData = await fetchPage(currentPage);
-
-            if (pageData.length === 0) {
-              hasMoreData = false;
-            } else {
-              allPlans = [...allPlans, ...pageData];
-              currentPage++;
+    if (!isSearching) {
+      console.log("Fetching plans...");
+      const fetchPage = async (pageNum: number): Promise<Plan[]> => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/plan?page=${pageNum}&limit=6`,
+            {
+              headers: { "Content-Type": "application/json" },
+              // Add timeout
+              signal: AbortSignal.timeout(5000),
             }
-          } catch (error) {
-            retryCount--;
-            if (retryCount === 0) throw error;
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+          );
+
+          // Handle 404 specifically
+          if (response.status === 404) {
+            console.log(`No more pages available after page ${pageNum}`);
+            return [];
           }
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data: PaginatedResponse = await response.json();
+          return data.data || [];
+        } catch (error) {
+          console.error(`Error fetching page ${pageNum}:`, error);
+          throw error;
         }
+      };
 
-        setPlans(allPlans);
-      } catch (error) {
-        console.error("Error fetching plans:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to fetch plans"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const fetchAllPlans = async () => {
+        setIsLoading(true);
+        setError(null);
 
-    fetchAllPlans();
-  }, []);
+        try {
+          let allPlans: Plan[] = [];
+          let currentPage = 1;
+          let hasMoreData = true;
+          let retryCount = 3;
+
+          while (hasMoreData && retryCount > 0) {
+            try {
+              const pageData = await fetchPage(currentPage);
+
+              if (pageData.length === 0) {
+                hasMoreData = false;
+              } else {
+                allPlans = [...allPlans, ...pageData];
+                currentPage++;
+              }
+            } catch (error) {
+              retryCount--;
+              if (retryCount === 0) throw error;
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+          }
+
+          setPlans(allPlans);
+        } catch (error) {
+          console.error("Error fetching plans:", error);
+          setError(
+            error instanceof Error ? error.message : "Failed to fetch plans"
+          );
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchAllPlans();
+    }
+  }, [currentPage, isSearching]);
+
+  useEffect(() => {
+    if (isSearching) {
+      setPlans(searchResults || []);
+    }
+  }, [searchResults, isSearching]);
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
@@ -106,6 +122,8 @@ function WorkoutPlanList() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPlans = plans.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(plans.length / itemsPerPage);
+
+  console.log("plans", plans);
 
   return (
     <div className="flex flex-col gap-6">

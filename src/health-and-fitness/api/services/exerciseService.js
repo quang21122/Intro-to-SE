@@ -73,14 +73,10 @@ const createExercise = async (data) => {
 
 const getExercise = async (name) => {
   try {
-    // Convert hyphenated name back to original format
-    const formattedName = name.replace(/-/g, " ");
-    console.log("Formatted Name:", formattedName);
-
     // Query Firestore to find the document by name
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(
-      query(exercisesCollection, where("name", "==", formattedName))
+      query(exercisesCollection, where("name", "==", name))
     );
     console.log("Query Snapshot Docs:", querySnapshot.docs);
 

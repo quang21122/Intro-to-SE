@@ -101,7 +101,7 @@ export default function WorkoutPlanDetails() {
   if (!plan) return <div>No plan found</div>;
 
   return (
-    <div className="flex flex-col mx-24">
+    <div className="flex flex-col mx-24 h-screen">
       <Navbar isHomepage={false} />
       <div className="grid grid-cols-[3fr_7fr] pt-10">
         <div className="flex flex-col mx-3">
