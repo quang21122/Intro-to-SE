@@ -25,9 +25,10 @@ interface PlanDetail {
   day: string;
   exercises: ExerciseWithName[];
   name: string;
-  setTime?: {
-    minutes: number;
-    seconds: number;
+  startTime?: {
+    hour: number;
+    minute: number;
+    flag: boolean;
   };
 }
 
@@ -94,7 +95,7 @@ const MyPlansEdit: React.FC = () => {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `http://localhost:3000/api/user?userId=${user.uid}`
+            `http://localhost:3000/api/myPlan?uid=${user.uid}`
           );
 
           if (!response.ok) {
@@ -103,16 +104,46 @@ const MyPlansEdit: React.FC = () => {
           }
 
           const data = await response.json();
-          const plans = data.user.myPlans;
-          const plan = plans.find((p: Plan) => p.id === id);
+          const plans = data.data.plans;
+          // Fetch plan details for each plan
+          interface PlanDetailResponse {
+            data: {
+              myPlan: {
+                myPlanDetails: PlanDetail[];
+              };
+            };
+          }
 
+          const plansWithDetails: Plan[] = await Promise.all(
+            plans.map(async (plan: Plan) => {
+              const detailsResponse: Response = await fetch(
+                `http://localhost:3000/api/myPlan?uid=${user.uid}&id=${plan.id}`
+              );
+
+              if (!detailsResponse.ok) {
+                console.error(
+                  `Error fetching plan details: ${detailsResponse.status}`
+                );
+                return plan;
+              }
+
+              const detailsData: PlanDetailResponse =
+                await detailsResponse.json();
+              return {
+                ...plan,
+                myPlanDetails: detailsData.data.myPlan.myPlanDetails,
+              };
+            })
+          );
+
+          const plan = plansWithDetails.find((p: Plan) => p.id === id);
+          console.log("Plan:", plan);
           if (plan) {
             const updatedPlan = {
               ...plan,
               myPlanDetails: await Promise.all(
                 plan.myPlanDetails.map(async (detail: PlanDetail) => ({
                   ...detail,
-                  setTime: detail.setTime || { minutes: 10, seconds: 0 }, // Set default time
                   exercises: await Promise.all(
                     detail.exercises.map(async (exercise: Exercise) => {
                       const exerciseDetails = await fetchExerciseDetails(
@@ -127,6 +158,7 @@ const MyPlansEdit: React.FC = () => {
                 }))
               ),
             };
+
             setPlan(updatedPlan);
           } else {
             console.error("Plan not found");

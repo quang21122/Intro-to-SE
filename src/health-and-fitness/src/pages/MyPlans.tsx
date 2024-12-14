@@ -21,6 +21,11 @@ interface PlanDetail {
   day: string;
   exercises: Exercise[];
   name: string;
+  startTime: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
 }
 
 interface Plan {
@@ -43,6 +48,7 @@ function MyPlans() {
   const [error, setError] = useState<string | null>(null);
   const [activePlan, setActivePlan] = useState<Plan | null>(null);
   const [viewingPlan, setViewingPlan] = useState<Plan | null>(null);
+  const [isAppyling, setIsAppyling] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const { user, loading } = useAuth();
@@ -61,7 +67,7 @@ function MyPlans() {
         }
 
         const response = await fetch(
-          `http://localhost:3000/api/user?userId=${user.uid}`
+          `http://localhost:3000/api/myPlan?uid=${user.uid}`
         );
 
         if (!response.ok) {
@@ -70,13 +76,51 @@ function MyPlans() {
           return;
         }
 
-        const data = await response.json();
-        const plans = data.user.myPlans;
-        setPlans(plans);
+        const userResponse = await fetch(
+          `http://localhost:3000/api/user?userId=${user.uid}`
+        );
 
-        if (plans.length > 0) {
-          setActivePlan(plans[0]);
-          setViewingPlan(plans[0]);
+        const userData = await userResponse.json();
+        setIsAppyling(userData.user.appliedPlan);
+
+        const data = await response.json();
+        const plans = data.data.plans;
+        // Fetch plan details for each plan
+        interface PlanDetailResponse {
+          data: {
+            myPlan: {
+              myPlanDetails: PlanDetail[];
+            };
+          };
+        }
+
+        const plansWithDetails: Plan[] = await Promise.all(
+          plans.map(async (plan: Plan) => {
+            const detailsResponse: Response = await fetch(
+              `http://localhost:3000/api/myPlan?uid=${user.uid}&id=${plan.id}`
+            );
+
+            if (!detailsResponse.ok) {
+              console.error(
+                `Error fetching plan details: ${detailsResponse.status}`
+              );
+              return plan;
+            }
+
+            const detailsData: PlanDetailResponse =
+              await detailsResponse.json();
+            return {
+              ...plan,
+              myPlanDetails: detailsData.data.myPlan.myPlanDetails,
+            };
+          })
+        );
+
+        setPlans(plansWithDetails);
+
+        if (plansWithDetails.length > 0) {
+          setActivePlan(plansWithDetails[0]);
+          setViewingPlan(plansWithDetails[0]);
         }
       } catch (error) {
         console.error("Error fetching plans:", error);
@@ -93,7 +137,10 @@ function MyPlans() {
     fetchMyPlans();
   }, [user, loading]);
 
-  const PlanCard: React.FC<{ plan: Plan }> = ({ plan }) => {
+  const PlanCard: React.FC<{
+    plan: Plan;
+    onApply: (id: string) => void;
+  }> = ({ plan, onApply }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpand = () => {
@@ -108,7 +155,10 @@ function MyPlans() {
         >
           <div className="absolute top-2 right-2 flex space-x-2">
             <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl">
-              <LuFileCheck className="text-white text-2xl" />
+              <LuFileCheck
+                className="text-white text-2xl"
+                onClick={() => onApply(plan.id)}
+              />
             </button>
             <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl">
               <IoTrashOutline className="text-white text-2xl" />
@@ -120,7 +170,7 @@ function MyPlans() {
             <h2 className="font-bebas uppercase text-black text-2xl">
               {plan.name}
             </h2>
-            {activePlan && activePlan.id === plan.id && (
+            {isAppyling && isAppyling === plan.id && (
               <p className="bg-[#C73659] font-bebas px-2 py-1 text-lg text-[#B2B2B2] rounded-xl">
                 Applied
               </p>
@@ -190,9 +240,16 @@ function MyPlans() {
           </button>
         </div>
       </div>
-      <h2 className="font-bebas uppercase text-black text-2xl mt-2">
-        {plan.name}
-      </h2>
+      <div className="flex flex-row justify-between mt-6">
+        <h2 className="font-bebas uppercase text-black text-2xl">
+          {plan.name}
+        </h2>
+        {isAppyling && isAppyling === plan.id && (
+          <p className="bg-[#C73659] font-bebas px-2 py-1 text-lg text-[#B2B2B2] rounded-xl">
+            Applied
+          </p>
+        )}
+      </div>
       {viewingPlan && viewingPlan.id === plan.id && (
         <div className="grid grid-cols-2 font-montserrat mt-3">
           <div className="text-2xl flex flex-row items-center my-2">
@@ -223,6 +280,7 @@ function MyPlans() {
 
   const handleApply = (id: string) => {
     const selectedPlan = plans.find((plan) => plan.id === id) || null;
+    setIsAppyling(selectedPlan?.id || null);
     setActivePlan(selectedPlan);
   };
 
@@ -274,8 +332,8 @@ function MyPlans() {
             </h1>
             <div className="mt-14 flex flex-col">
               {sortedPlans.map((plan) =>
-                activePlan && plan.id === activePlan.id ? (
-                  <PlanCard key={plan.id} plan={plan} />
+                viewingPlan && plan.id === viewingPlan.id ? (
+                  <PlanCard key={plan.id} plan={plan} onApply={handleApply} />
                 ) : (
                   <CompactPlanCard
                     key={plan.id}
@@ -292,14 +350,14 @@ function MyPlans() {
               <button
                 className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
                 onClick={() =>
-                  activePlan && navigate(`/my-plans-edit/${activePlan.id}`)
+                  viewingPlan && navigate(`/my-plans-edit/${viewingPlan.id}`)
                 }
               >
                 Edit
               </button>
             </div>
-            {activePlan && (
-              <WorkoutPlanSchedule planDetails={activePlan.myPlanDetails} />
+            {activePlan && viewingPlan && (
+              <WorkoutPlanSchedule planDetails={viewingPlan.myPlanDetails} />
             )}
           </div>
         </div>

@@ -23,6 +23,7 @@ interface Plan {
 function PlanCard({ id }: { id: string }) {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [appliedId, setAppliedId] = useState<string | null>(null);
   const { user, loading } = useAuth();
   
   useEffect(() => {
@@ -31,7 +32,7 @@ function PlanCard({ id }: { id: string }) {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `http://localhost:3000/api/user?userId=${user.uid}`
+            `http://localhost:3000/api/myPlan?uid=${user.uid}&id=${id}`
           );
 
           if (!response.ok) {
@@ -39,10 +40,15 @@ function PlanCard({ id }: { id: string }) {
             return;
           }
 
-          const data = await response.json();
-          const plan: Plan | undefined = data.user.myPlans.find(
-            (plan: Plan) => plan.id === id
+          const userResponse = await fetch(
+            `http://localhost:3000/api/user?userId=${user.uid}`
           );
+
+          const userData = await userResponse.json();
+          setAppliedId(userData.user.appliedPlan);
+
+          const data = await response.json();
+          const plan = data.data.myPlan;
 
           if (plan) {
             setPlan(plan);
@@ -142,9 +148,11 @@ function PlanCard({ id }: { id: string }) {
               className="w-[75%] font-bebas uppercase text-black text-3xl py-1 px-2 rounded-xl bg-[#D9D9D9] border border-gray-400 focus:outline-none"
               autoFocus
             />
-            <p className="bg-[#C73659] font-bebas px-2 py-1 text-2xl text-[#B2B2B2] rounded-xl">
-              Applied
-            </p>
+            {appliedId === plan?.id && (
+              <p className="bg-[#C73659] font-bebas px-2 py-1 text-2xl text-[#B2B2B2] rounded-xl">
+                Applied
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col font-montserrat mt-3">

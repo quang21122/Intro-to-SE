@@ -19,6 +19,11 @@ interface PlanDetail {
   day: string;
   exercises: ExerciseWithName[];
   name: string;
+  startTime: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
 }
 
 interface WorkoutPlanScheduleProps {

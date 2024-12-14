@@ -1,9 +1,5 @@
-import React, { useState } from "react";
-import {
-  DragDropContext,
-  Droppable,
-  DropResult,
-} from "@hello-pangea/dnd";
+import React, { useState, useEffect } from "react";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import ExerciseCard from "./ExerciseCard";
 import { CiCirclePlus, CiClock2 } from "react-icons/ci";
 import { TbBarbell } from "react-icons/tb";
@@ -27,10 +23,11 @@ interface PlanDetail {
   day: string;
   exercises: ExerciseWithName[];
   name: string;
-  setTime?: {
-    minutes: number;
-    seconds: number;
-  }
+  startTime?: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
 }
 
 interface Plan {
@@ -69,7 +66,13 @@ const PlanTable: React.FC<PlanTableProps> = ({
   });
 
   const [planDetails, setPlanDetails] = useState(sortedPlanDetails);
-  const [isTick, setIsTick] = useState(true);
+  const [isTick, setIsTick] = useState(
+    planDetails[selectedDay].startTime?.flag ?? false
+  );
+
+  useEffect(() => {
+    setIsTick(planDetails[selectedDay].startTime?.flag ?? false);
+  }, [selectedDay, planDetails]);
 
   const handleDayValueChange = (field: keyof PlanDetail, value: string) => {
     const newPlanDetails = [...planDetails];
@@ -97,20 +100,20 @@ const PlanTable: React.FC<PlanTableProps> = ({
     return minutes < 10 ? `0${minutes}` : minutes;
   };
 
-  const formatSeconds = (seconds: number) => {
+  const formatHours = (seconds: number) => {
     return seconds < 10 ? `0${seconds}` : seconds;
   };
 
   const [localTime, setLocalTime] = useState({
-    minutes: formatMinutes(planDetails[selectedDay].setTime?.minutes || 0),
-    seconds: formatSeconds(planDetails[selectedDay].setTime?.seconds || 0),
+    minutes: formatHours(planDetails[selectedDay].startTime?.hour || 0),
+    seconds: formatMinutes(planDetails[selectedDay].startTime?.minute || 0),
   });
 
   const handleLocalMinutesChange = (value: string) => {
     setLocalTime((prev) => ({ ...prev, minutes: value }));
   };
 
-  const handleLocalSecondsChange = (value: string) => {
+  const handleLocalHoursChange = (value: string) => {
     setLocalTime((prev) => ({ ...prev, seconds: value }));
   };
 
@@ -122,12 +125,12 @@ const PlanTable: React.FC<PlanTableProps> = ({
     handleLocalMinutesChange(minutes.toString());
   };
 
-  const handleSecondsBlur = () => {
-    const seconds = Math.min(
-      59,
+  const handleHoursBlur = () => {
+    const hours = Math.min(
+      24,
       Math.max(0, parseInt(localTime.seconds.toString()) || 0)
     );
-    handleLocalSecondsChange(seconds.toString());
+    handleLocalHoursChange(hours.toString());
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -149,6 +152,8 @@ const PlanTable: React.FC<PlanTableProps> = ({
 
     setPlanDetails(newPlanDetails);
   };
+
+  console.log("pl:", planDetails);
 
   return (
     <div
@@ -208,9 +213,9 @@ const PlanTable: React.FC<PlanTableProps> = ({
                   type="number"
                   min="0"
                   max="59"
-                  value={isTick ? localTime.minutes : ""}
-                  onChange={(e) => handleLocalMinutesChange(e.target.value)}
-                  onBlur={handleMinutesBlur}
+                  value={isTick ? localTime.seconds : ""}
+                  onChange={(e) => handleLocalHoursChange(e.target.value)}
+                  onBlur={handleHoursBlur}
                   disabled={!isTick}
                   className={`w-12 py-1 text-xl text-center bg-[#CDCDCD] rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                     !isTick
@@ -223,9 +228,9 @@ const PlanTable: React.FC<PlanTableProps> = ({
                   type="number"
                   min="0"
                   max="59"
-                  value={isTick ? localTime.seconds : ""}
-                  onChange={(e) => handleLocalSecondsChange(e.target.value)}
-                  onBlur={handleSecondsBlur}
+                  value={isTick ? localTime.minutes : ""}
+                  onChange={(e) => handleLocalMinutesChange(e.target.value)}
+                  onBlur={handleMinutesBlur}
                   disabled={!isTick}
                   className={`w-12 py-1 text-xl text-center bg-[#CDCDCD] rounded-xl [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
                     !isTick
@@ -233,6 +238,7 @@ const PlanTable: React.FC<PlanTableProps> = ({
                       : "text-black"
                   }`}
                 />
+
                 <button
                   className={`mx-4 border-2 rounded-xl border-black hover:bg-white ${
                     isTick ? "" : "p-[0.938rem]"
