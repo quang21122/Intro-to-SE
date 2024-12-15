@@ -134,26 +134,23 @@ const PlanTable: React.FC<PlanTableProps> = ({
   };
 
   const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+    const { source, destination } = result;
 
-    const sourceIndex = result.source.index;
-    const destinationIndex = result.destination.index;
+    if (!destination) return;
 
     const newPlanDetails = [...planDetails];
-    const dayExercises = [...newPlanDetails[selectedDay].exercises];
+    const currentDayExercises = [...newPlanDetails[selectedDay].exercises];
 
-    const [reorderedItem] = dayExercises.splice(sourceIndex, 1);
-    dayExercises.splice(destinationIndex, 0, reorderedItem);
+    const [movedExercise] = currentDayExercises.splice(source.index, 1);
+    currentDayExercises.splice(destination.index, 0, movedExercise);
 
     newPlanDetails[selectedDay] = {
       ...newPlanDetails[selectedDay],
-      exercises: dayExercises,
+      exercises: currentDayExercises,
     };
 
     setPlanDetails(newPlanDetails);
   };
-
-  console.log("pl:", planDetails);
 
   return (
     <div
@@ -257,9 +254,10 @@ const PlanTable: React.FC<PlanTableProps> = ({
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {planDetails[selectedDay].exercises.map((exercise, index) => (
                     <ExerciseCard
-                      key={exercise.id}
+                      key={`${selectedDay}-${exercise.id}-${index}`}
                       exercise={exercise}
                       index={index}
+                      dayId={planDetails[selectedDay].day}
                       onValueChange={(field, value) =>
                         handleValueChange(
                           selectedDay,

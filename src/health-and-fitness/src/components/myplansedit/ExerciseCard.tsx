@@ -22,16 +22,16 @@ type ExerciseField = "sets" | "reps" | "interval" | "restTime";
 interface ExerciseCardProps {
   exercise: ExerciseWithName;
   index: number;
+  dayId: string;
   onValueChange: (field: ExerciseField, value: string) => void;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   index,
+  dayId,
   onValueChange,
 }) => {
-
-
   const [localValues, setLocalValues] = useState({
     sets: exercise.sets.toString(),
     reps: exercise.reps,
@@ -51,30 +51,34 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   };
 
   return (
-    <Draggable draggableId={exercise.id} index={index}>
+    <Draggable draggableId={`${dayId}-${exercise.id}-${index}`} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={`flex flex-col bg-[#D9D9D9] px-4 py-6 mt-6 mx-2 rounded-xl transition-colors ${
-            snapshot.isDragging ? "bg-opacity-70 shadow-lg z-50" : ""
+            snapshot.isDragging ? "bg-opacity-70 shadow-lg" : ""
           }`}
           style={{
             ...provided.draggableProps.style,
+            top: "auto",
             left: "auto",
             right: "auto",
             bottom: "auto",
-            top: "auto",
           }}
         >
           <div className="grid grid-cols-[1fr_3fr_1fr_1.5fr_1.5fr_1.5fr_0.5fr] items-center">
-            <img src={exercise.image} alt="" className="rounded-full w-20 h-20"/>
+            <img
+              src={exercise.image}
+              alt=""
+              className="rounded-full w-20 h-20"
+            />
             <div className="flex flex-col ml-5">
-              <h2 className="text-[1.4rem] text-black ml-4">
-                {exercise.name}
-              </h2>
-              <p className="text-xl text-[#686D76] ml-4">{exercise.muscleName}</p>
+              <h2 className="text-[1.4rem] text-black ml-4">{exercise.name}</h2>
+              <p className="text-xl text-[#686D76] ml-4">
+                {exercise.muscleName}
+              </p>
             </div>
             <ExerciseInputField
               label="Sets"
