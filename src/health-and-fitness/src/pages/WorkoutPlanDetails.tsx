@@ -4,7 +4,8 @@ import { GiBiceps } from "react-icons/gi";
 import WorkoutPlanSchedule from "../components/workout/WorkoutPlanSchedule";
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { GrFormPrevious } from "react-icons/gr";
 
 interface Exercise {
   id: string;
@@ -18,6 +19,11 @@ interface PlanDetail {
   day: string;
   exercises: Exercise[];
   name: string;
+  startTime: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
 }
 
 interface Plan {
@@ -46,6 +52,7 @@ export default function WorkoutPlanDetails() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPlanDetails = async () => {
@@ -101,13 +108,19 @@ export default function WorkoutPlanDetails() {
   if (!plan) return <div>No plan found</div>;
 
   return (
-    <div className="flex flex-col mx-24 h-screen">
+    <div className="flex flex-col mx-24 h-full">
       <Navbar isHomepage={false} />
       <div className="grid grid-cols-[3fr_7fr] pt-10">
         <div className="flex flex-col mx-3">
-          <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
-            Plan details
-          </h1>
+          <div
+            className="flex flex-row hover:cursor-pointer"
+            onClick={() => navigate("/workout-plans")}
+          >
+            <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
+            <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
+              Plan Details
+            </h1>
+          </div>
           <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
             <img src={plan.image} alt="" className="rounded-xl" />
             <div className="flex flex-col ml-2 mt-6">
