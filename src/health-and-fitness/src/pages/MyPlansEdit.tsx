@@ -177,7 +177,27 @@ const MyPlansEdit: React.FC = () => {
     fetchPlan();
   }, [id, user, loading]);
 
-  const handleFinishEdit = () => {
+  const handleFinishEdit = async () => {
+    if (!user || !plan) {
+      return;
+    }
+
+    const response = await fetch(
+      `http://localhost:3000/api/myPlan?uid=${user.uid}&id=${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(plan),
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Error updating plan: ${response.status}`);
+      return;
+    }
+
     navigate("/my-plans"); // Adjust path based on your routing setup
   };
 
