@@ -23,18 +23,30 @@ interface PaginatedResponse {
 interface WorkoutPlanListProps {
   searchResults?: Plan[];
   isSearching?: boolean;
+  filteredPlans?: Plan[];
+  isFiltering?: boolean;
+  isEmpty?: boolean;
 }
 
-function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
+function WorkoutPlanList({
+  searchResults,
+  isSearching,
+  filteredPlans,
+  isFiltering,
+  isEmpty,
+}: WorkoutPlanListProps) {
+  console.log("isEmpty", isEmpty);
   const navigate = useNavigate();
-  const [plans, setPlans] = useState<Plan[]>(searchResults || []);
+  const [plans, setPlans] = useState<Plan[]>(
+    searchResults || filteredPlans || []
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 12;
 
   useEffect(() => {
-    if (!isSearching) {
+    if (!isSearching && !isFiltering) {
       const fetchPage = async (pageNum: number): Promise<Plan[]> => {
         try {
           const response = await fetch(
@@ -104,89 +116,100 @@ function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
 
       fetchAllPlans();
     }
-  }, [currentPage, isSearching]);
+  }, [currentPage, isSearching, isFiltering]);
 
   useEffect(() => {
     if (isSearching) {
       setPlans(searchResults || []);
     }
-  }, [searchResults, isSearching]);
+    if (isFiltering) {
+      setPlans(filteredPlans || []);
+    }
+  }, [searchResults, isSearching, filteredPlans, isFiltering]);
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <p className="text-2xl text-red-500">Loading...</p>;
   if (error) return <p>{error}</p>;
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPlans = plans.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPlans = plans && plans.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(plans.length / itemsPerPage);
 
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-4 gap-8">
-        {currentPlans.map((plan, index) => (
-          <div
-            key={index}
-            className="flex flex-col bg-[#B2B2B2] rounded-xl w-full hover:cursor-pointer"
-            onClick={() => navigate(`/workout-plans/${plan.id}`)}
-          >
-            <img
-              src={plan.image}
-              alt="workout"
-              className="flex items-center mx-auto rounded-t-xl w-[94%] h-[75%] mt-2"
-            />
-            <h1 className="font-bebas text-black text-2xl pt-4 pl-4">
-              {plan.name}
-            </h1>
-            <div className="grid grid-cols-2 font-montserrat text-[1rem] py-2">
-              <div className="flex flex-col pl-4">
-                <p className="text-black">{plan.days} days</p>
-                <p className="text-black">{plan.muscle}</p>
+    <>
+      {isEmpty ? (
+        <div className="flex justify-center items-center">
+          <p className="text-2xl text-red-500">No workout plans found</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-4 gap-8">
+            {currentPlans.map((plan, index) => (
+              <div
+                key={index}
+                className="flex flex-col bg-[#B2B2B2] rounded-xl w-full hover:cursor-pointer"
+                onClick={() => navigate(`/workout-plans/${plan.id}`)}
+              >
+                <img
+                  src={plan.image}
+                  alt="workout"
+                  className="flex items-center mx-auto rounded-t-xl w-[94%] h-[75%] mt-2"
+                />
+                <h1 className="font-bebas text-black text-2xl pt-4 pl-4">
+                  {plan.name}
+                </h1>
+                <div className="grid grid-cols-2 font-montserrat text-[1rem] py-2">
+                  <div className="flex flex-col pl-4">
+                    <p className="text-black">{plan.days}</p>
+                    <p className="text-black">{plan.muscle}</p>
+                  </div>
+                  <div className="flex flex-col pl-4">
+                    <p className="text-black">{plan.goal}</p>
+                    <p className="text-black">{plan.level}</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col pl-4">
-                <p className="text-black">{plan.goal}</p>
-                <p className="text-black">{plan.level}</p>
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Pagination Controls */}
-      <div className="flex justify-center gap-2 mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-[#D9D9D9] text-black rounded disabled:opacity-50"
-        >
-          <GrFormPrevious />
-        </button>
+          {/* Pagination Controls */}
+          <div className="flex justify-center gap-2 mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-[#D9D9D9] text-black rounded disabled:opacity-50"
+            >
+              <GrFormPrevious />
+            </button>
 
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === i + 1
-                ? "bg-[#F05454] text-white"
-                : "bg-[#D9D9D9] text-black"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-4 py-2 rounded ${
+                  currentPage === i + 1
+                    ? "bg-[#F05454] text-white"
+                    : "bg-[#D9D9D9] text-black"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
 
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-[#D9D9D9] text-black rounded disabled:opacity-50"
-        >
-          <GrFormNext />
-        </button>
-      </div>
-    </div>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-[#D9D9D9] text-black rounded disabled:opacity-50"
+            >
+              <GrFormNext />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
