@@ -7,6 +7,7 @@ import exerciseRoutes from '../api/routes/exercise.js'; // Adjust path if needed
 import planRoutes from '../api/routes/plan.js'; // Adjust path if needed
 import equipmentRoutes from '../api/routes/equipment.js'; // Adjust path if needed
 import muscleRoutes from '../api/routes/muscle.js'; // Adjust path if needed
+import myPlanRoutes from '../api/routes/myPlan.js'; // Adjust path if needed
 
 // Initialize Express app
 const app = express();
@@ -30,6 +31,8 @@ app.use('/api/exercise', exerciseRoutes);
 app.use('/api/plan', planRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/muscle', muscleRoutes);
+app.use('/api/myPlan', myPlanRoutes);
+
 // Start the server
 const PORT = 3000;
 app.listen(PORT, () => {

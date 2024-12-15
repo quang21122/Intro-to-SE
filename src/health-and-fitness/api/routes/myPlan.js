@@ -1,16 +1,16 @@
-import planController from "../controllers/planController.js";
+import myPlanController from "../controllers/myPlanController.js";
 
 export default async function handler(req, res) {
-    if (req.originalUrl.startsWith("/api/plan")) {
+    if (req.originalUrl.startsWith("/api/myPlan")) {
         switch (req.method) {
             case 'GET':
-                return planController.getPlan(req, res);
+                return myPlanController.getMyPlan(req, res);
             case 'POST':
-                return planController.createPlan(req, res);
+                return myPlanController.createMyPlan(req, res);
             case 'PUT':
-                return planController.updatePlan(req, res);
+                return myPlanController.updateMyPlan(req, res);
             case 'DELETE':
-                return planController.deletePlan(req, res);
+                return myPlanController.deleteMyPlan(req, res);
             default:
                 res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
                 return res.status(405).end(`Method ${req.method} Not Allowed`);

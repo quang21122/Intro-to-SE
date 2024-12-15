@@ -2,10 +2,34 @@ import Slider, { CustomArrowProps } from "react-slick";
 import { Settings } from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import examplePic from "../../assets/workout/example_pic.png"
 import { GrPrevious, GrNext } from "react-icons/gr";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface Plan {
+  id: string;
+  name: string;
+  image: string;
+  muscle: string;
+  level: string;
+  goal: string;
+  equipment: string;
+  days: number;
+  description: string;
+  createdAt: string;
+}
+
+interface PaginatedResponse {
+  data: Plan[];
+  page: number;
+}
 
 function WorkoutSlider() {
+  const [sliderPlans, setSliderPlans] = useState<Plan[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
   const settings: Settings = {
     dots: true,
     infinite: true,
@@ -41,112 +65,92 @@ function WorkoutSlider() {
     ],
   };
 
-  const plans = [
-    {
-      image: examplePic,
-      title: "5 DAYS MUSCLE MASS SPLIT",
-      duration: "5 days",
-      target: "Abs",
-      goal: "Maintain",
-      level: "Intermediate",
-    },
-    {
-      image: examplePic,
-      title: "3 DAYS BEGINNER PLAN",
-      duration: "3 days",
-      target: "Arms",
-      goal: "Cut",
-      level: "Beginner",
-    },
-    {
-      image: examplePic,
-      title: "4 DAYS FAT LOSS PLAN",
-      duration: "4 days",
-      target: "Legs",
-      goal: "Gain",
-      level: "Advanced",
-    },
-    {
-      image: examplePic,
-      title: "5 DAYS MUSCLE MASS SPLIT",
-      duration: "5 days",
-      target: "Abs",
-      goal: "Maintain",
-      level: "Intermediate",
-    },
-    {
-      image: examplePic,
-      title: "3 DAYS BEGINNER PLAN",
-      duration: "3 days",
-      target: "Arms",
-      goal: "Cut",
-      level: "Beginner",
-    },
-    {
-      image: examplePic,
-      title: "4 DAYS FAT LOSS PLAN",
-      duration: "4 days",
-      target: "Legs",
-      goal: "Gain",
-      level: "Advanced",
-    },
-    {
-      image: examplePic,
-      title: "5 DAYS MUSCLE MASS SPLIT",
-      duration: "5 days",
-      target: "Abs",
-      goal: "Maintain",
-      level: "Intermediate",
-    },
-    {
-      image: examplePic,
-      title: "3 DAYS BEGINNER PLAN",
-      duration: "3 days",
-      target: "Arms",
-      goal: "Cut",
-      level: "Beginner",
-    },
-    {
-      image: examplePic,
-      title: "4 DAYS FAT LOSS PLAN",
-      duration: "4 days",
-      target: "Legs",
-      goal: "Gain",
-      level: "Advanced",
-    },
-  ];
+  useEffect(() => {
+    const fetchPagePlans = async (page: number) => {
+      const response = await fetch(
+        `http://localhost:3000/api/plan?page=${page}&limit=6`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result: PaginatedResponse = await response.json();
+      return result.data || [];
+    };
+
+    const fetchSliderPlans = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [page1Plans, page2Plans] = await Promise.all([
+          fetchPagePlans(1),
+          fetchPagePlans(2),
+        ]);
+
+        setSliderPlans([...page1Plans, ...page2Plans]);
+      } catch (error) {
+        console.error("Error fetching slider plans: ", error);
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch plans"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSliderPlans();
+  }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="-mx-6">
       <h1 className="font-bebas uppercase mx-6 my-8 text-[#F05454] font-bold text-5xl">
         For you
       </h1>
-      <Slider {...settings}>
-        {plans.map((plan, index) => (
-          <div key={index} className="px-4">
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <Slider {...settings}>
+          {sliderPlans.map((plan) => (
             <div
-              className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem] sm:h-[14rem] md:h-[12rem] lg:h-[14rem]"
-              style={{ backgroundImage: `url(${plan.image})` }}
+              key={plan.id}
+              className="px-4 hover:cursor-pointer"
+              onClick={() => navigate(`/workout-plans/${plan.id}`)}
             >
-              <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-32 rounded-2xl hover:translate-y-12 hover:cursor-pointer font-bebas">
-                <h3 className="text-[#F05454] text-[2rem] text-center mt-4">
-                  {plan.title}
-                </h3>
-                <div className="grid grid-cols-2 py-6 text-center font-montserrat">
-                  <div className="text-white text-xl flex flex-col">
-                    <p>{plan.duration}</p>
-                    <p>{plan.target}</p>
-                  </div>
-                  <div className="text-white text-xl flex flex-col">
-                    <p>{plan.goal}</p>
-                    <p>{plan.level}</p>
+              <div
+                className="relative rounded-xl overflow-hidden bg-cover bg-center h-[18rem]"
+                style={{ backgroundImage: `url(${plan.image})` }}
+              >
+                <div className="z-10 px-6 py-4 h-full flex flex-col bg-black/50 transition translate-y-48 rounded-2xl hover:translate-y-20 hover:cursor-pointer font-bebas">
+                  <h3 className="text-[#F05454] text-[2rem] text-center mt-4">
+                    {plan.name}
+                  </h3>
+                  <div className="grid grid-cols-2 py-6 text-center font-montserrat">
+                    <div className="text-white text-xl flex flex-col">
+                      <p>{plan.days} days</p>
+                      <p>{plan.muscle}</p>
+                    </div>
+                    <div className="text-white text-xl flex flex-col">
+                      <p>{plan.goal}</p>
+                      <p>{plan.level}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Slider>
+          ))}
+        </Slider>
+      )}
     </div>
   );
 }

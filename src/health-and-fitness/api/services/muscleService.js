@@ -13,7 +13,6 @@ import {
 
 const createMuscle = async (data) => {
   const { image, name } = data;
-  console.log(data);
 
   // Helper function to generate a random alphanumeric string
   const generateId = (length) => {
@@ -34,11 +33,9 @@ const createMuscle = async (data) => {
 
     // Get length of Muscles collection
     const MusclesCollection = await getDocs(collection(firestoreDb, "muscles"));
-    console.log(MusclesCollection.size);
 
     // Create a new Muscles ID like this Mh5XnJePUHF4EV8S9o1F
     const MusclesId = generateId(20);
-    console.log("muscle id: ", MusclesId);
 
     // Prepare the Muscles data
     const MusclesData = {
