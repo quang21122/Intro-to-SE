@@ -90,8 +90,6 @@ const getMyPlan = async (req, res) => {
 
   try {
     if (id) {
-      // Handle query by id
-      console.log(id);
       const myPlan = await myPlanService.getMyPlan(uid, id);
       if (!myPlan) {
         return res.status(404).json({ error: "My plan not found" });

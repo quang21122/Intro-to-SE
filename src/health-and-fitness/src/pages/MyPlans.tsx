@@ -288,7 +288,6 @@ function MyPlans() {
     return <div>{error}</div>;
   }
 
-  console.log(plans);
 
   return (
     <div className="flex flex-col mx-24">

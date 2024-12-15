@@ -84,10 +84,7 @@ export default function WorkoutPlans() {
         }
 
         const data = await response.json();
-        console.log(data);
-        console.log(data.data.plans);
         setSearchResults(data.data.plans || []);
-        console.log(searchResults);
       } catch (err) {
         setSearchError(err instanceof Error ? err.message : "Search failed");
         setSearchResults([]);

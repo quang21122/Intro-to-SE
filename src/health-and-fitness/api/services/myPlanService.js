@@ -99,7 +99,6 @@ const createMyPlan = async (uid, data) => {
         // Commit the transaction (tất cả các thay đổi sẽ được lưu)
         await batch.commit();
 
-        console.log("My plan and my plan details created successfully.");
         return { success: true, planId };
     } catch (error) {
         console.error("Error creating my plan:", error.message);
@@ -126,9 +125,6 @@ const createMyPlanThroughAddPlan = async (uid, originalPlanId) => {
         }
   
         const { name, image, description, days, goal, muscle, level, planDetails: myPlanDetails } = originalPlan.plan;
-        console.log(originalPlan);
-       
-        console.log(myPlanDetails);
 
         if (!name || !description || !days || !muscle || !image || !goal || !level || !Array.isArray(myPlanDetails)) {
             throw new Error("Invalid plan data. Ensure all required fields are provided.");
@@ -216,8 +212,9 @@ const updateMyPlan = async (uid, id, data) => {
             return { error: "My plan not found", status: 404 };
         }
 
-        const { name, image, description, days, goal, muscle, level, myPlanDetails } = data;
-        const plan = { name, description, goal, image, level, muscle, days };
+        const { name, image, description, goal, muscle, level, myPlanDetails } = data;
+        const days = myPlanDetails.filter(detail => detail.exercises.length > 0).length;
+        const plan = { name, description, goal, days, image, level, muscle };
 
         // Cập nhật tài liệu chính
         await updateDoc(doc(firestoreDb, `users/${uid}/myPlans`, planDoc.id), plan);
@@ -228,7 +225,7 @@ const updateMyPlan = async (uid, id, data) => {
 
             // check exercises in library
             const existedExercises = await Promise.all(
-                exercises.map(async (exercise) => {
+                exercises.map(async (exercise) => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
                     const exerciseData = await getExerciseById(exercise.id);
                     if (exerciseData.error) {
                         throw new Error(exerciseData.error);

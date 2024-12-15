@@ -26,8 +26,6 @@ interface WorkoutPlanListProps {
 }
 
 function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
-  console.log("searchResults", searchResults);
-  console.log("isSearching", isSearching);
   const navigate = useNavigate();
   const [plans, setPlans] = useState<Plan[]>(searchResults || []);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,7 +35,6 @@ function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
 
   useEffect(() => {
     if (!isSearching) {
-      console.log("Fetching plans...");
       const fetchPage = async (pageNum: number): Promise<Plan[]> => {
         try {
           const response = await fetch(
@@ -123,7 +120,6 @@ function WorkoutPlanList({ searchResults, isSearching }: WorkoutPlanListProps) {
   const currentPlans = plans.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(plans.length / itemsPerPage);
 
-  console.log("plans", plans);
 
   return (
     <div className="flex flex-col gap-6">

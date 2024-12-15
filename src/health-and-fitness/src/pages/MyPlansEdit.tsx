@@ -137,7 +137,6 @@ const MyPlansEdit: React.FC = () => {
           );
 
           const plan = plansWithDetails.find((p: Plan) => p.id === id);
-          console.log("Plan:", plan);
           if (plan) {
             const updatedPlan = {
               ...plan,

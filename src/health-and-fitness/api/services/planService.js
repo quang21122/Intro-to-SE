@@ -179,7 +179,6 @@ const createPlan = async (data) => {
 
     await Promise.all(planDetailsPromises);
 
-    console.log("Plan and plan details created successfully.");
     return { success: true, planId };
   } catch (error) {
     console.error("Error creating plan:", error.message);
@@ -207,7 +206,6 @@ const deletePlan = async (id) => {
     // Sau khi xóa xong subcollection, xóa document chính
     await deleteDoc(planRef);
 
-    console.log(`Plan with ID ${id} and all its details deleted successfully.`);
     return {
       success: true,
       message: `Plan with ID ${id} deleted successfully.`,
@@ -376,7 +374,6 @@ const getFilteredPlans = async ({
 const searchPlans = async (searchTerm) => {
   try {
     const formattedTerm = searchTerm.toLowerCase().trim();
-    console.log("Formatted Search Term:", formattedTerm);
 
     const plansCollection = collection(firestoreDb, "plans");
     const querySnapshot = await getDocs(plansCollection);

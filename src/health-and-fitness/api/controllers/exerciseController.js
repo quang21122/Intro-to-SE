@@ -2,7 +2,6 @@ import exerciseService from "../services/exerciseService.js";
 
 const getExercise = async (req, res) => {
   const { name, page, id, search, muscles, equipments } = req.query;
-  console.log(req.query);
 
   if (!name && !page && !id && !search && !muscles && !equipments) {
     return res
@@ -111,7 +110,6 @@ const getExercise = async (req, res) => {
 };
 
 const createExercise = async (req, res) => {
-  console.log(req.body);
   const newExercise = await exerciseService.createExercise(req.body);
 
   if (newExercise.error) {

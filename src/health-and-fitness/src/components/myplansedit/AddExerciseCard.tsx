@@ -103,7 +103,6 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
 
         if (debouncedSearchTerm) {
           url = `http://localhost:3000/api/exercise?search=${debouncedSearchTerm}`;
-          console.log("URL:", url);
         } else {
           const queryParam = new URLSearchParams();
           if (selectedMuscle === "All" && selectedEquipment === "All") {
@@ -133,7 +132,6 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
         } else {
           exerciseData = exerciseData.data;
         }
-        console.log("Exercise data:", exerciseData);
 
         if (!exerciseData || exerciseData.length === 0) {
           // If no exercises are found, clear the state
@@ -150,7 +148,6 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
           };
         });
 
-        console.log("Exercises with muscles:", exercisesWithMuscles);
 
         setExercises(exercisesWithMuscles);
       } catch (err) {
@@ -183,10 +180,6 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
         setMaxHeight(`${maxDropdownHeight}px`);
       }
     }, [isOpen]);
-
-    console.log("Selected muscle:", selectedMuscle);
-    console.log("Selected equipment:", selectedEquipment);
-    console.log("Exercises:", exercises);
 
     return (
       <div className="relative font-montserrat mt-6 text-black">
@@ -245,8 +238,6 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
       </div>
     );
   };
-
-  console.log("Exercises:", exercises);
 
   return (
     <div className="flex flex-col bg-[#B2B2B2] p-4 rounded-xl mt-6 z-0">
