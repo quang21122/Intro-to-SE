@@ -46,12 +46,14 @@ interface Plan {
 
 interface PlanTableProps {
   plan: Plan;
+  setPlan: React.Dispatch<React.SetStateAction<Plan | null>>;
   isAdding: boolean;
   setIsAdding: (value: boolean) => void;
 }
 
 const PlanTable: React.FC<PlanTableProps> = ({
   plan,
+  setPlan,
   isAdding,
   setIsAdding,
 }) => {
@@ -150,6 +152,7 @@ const PlanTable: React.FC<PlanTableProps> = ({
     };
 
     setPlanDetails(newPlanDetails);
+    setPlan((prev: Plan | null) => prev ? { ...prev, myPlanDetails: newPlanDetails } : null);
   };
 
   return (

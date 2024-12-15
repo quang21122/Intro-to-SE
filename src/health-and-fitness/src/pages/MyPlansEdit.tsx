@@ -252,6 +252,7 @@ const MyPlansEdit: React.FC = () => {
               {plan && (
                 <PlanTable
                   plan={plan}
+                  setPlan={setPlan}
                   isAdding={isAdding}
                   setIsAdding={setIsAdding}
                 />
