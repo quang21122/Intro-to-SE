@@ -139,6 +139,7 @@ const PlanTable: React.FC<PlanTableProps> = ({
     const newPlanDetails = [...planDetails];
     newPlanDetails[dayIndex].exercises.splice(exerciseIndex, 1);
     setPlanDetails(newPlanDetails);
+    setPlan((prev: Plan | null) => prev ? { ...prev, myPlanDetails: newPlanDetails } : null);
   };
 
   const onDragEnd = (result: DropResult) => {
