@@ -78,7 +78,29 @@ const getUser = async (userId) => {
     return { error: error.message, status: 500 };
   }
 };
+const getUserByEmail = async (email) => {
+  try {
+    // Get user data from Firebase Auth
+    const userRecord = await auth.getUserByEmail(email);
 
+    // Get additional data from Firestore
+    const userDoc = await firestoreDb.collection('users').doc(userRecord.uid).get();
+    if (!userDoc.exists) {
+      return { error: "User data not found in Firestore", status: 404 };
+    }
+
+    return {
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        ...userDoc.data(),
+      },
+      status: 200,
+    };
+  } catch (error) {
+    return { error: error.message, status: 500 };
+  }
+}
 // Update user's password or Firestore data
 const updateUser = async (userId, firestoreData = {}) => {
   try {
@@ -112,4 +134,5 @@ export default {
   getUser,
   updateUser,
   deleteUser,
+  getUserByEmail
 };
