@@ -230,6 +230,7 @@ const MyPlansEdit: React.FC = () => {
     );
   }
 
+  console.log(plan);
   return (
     <div className="flex flex-col mx-24">
       <Navbar isHomepage={false} />

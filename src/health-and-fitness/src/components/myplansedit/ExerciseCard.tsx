@@ -24,6 +24,7 @@ interface ExerciseCardProps {
   index: number;
   dayId: string;
   onValueChange: (field: ExerciseField, value: string) => void;
+  onDelete: () => void;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -31,6 +32,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   index,
   dayId,
   onValueChange,
+  onDelete,
 }) => {
   const [localValues, setLocalValues] = useState({
     sets: exercise.sets.toString(),
@@ -106,7 +108,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               onChange={(value) => handleLocalChange("restTime", value)}
               onBlur={() => handleBlur("restTime")}
             />
-            <IoTrashOutline className="text-3xl ml-3 text-black cursor-pointer" />
+            <IoTrashOutline
+              className="text-3xl ml-3 text-black cursor-pointer"
+              onClick={onDelete}
+            />
           </div>
         </div>
       )}

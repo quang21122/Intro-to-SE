@@ -135,6 +135,13 @@ const PlanTable: React.FC<PlanTableProps> = ({
     handleLocalHoursChange(hours.toString());
   };
 
+  const handleDeleteExercise = (dayIndex: number, exerciseIndex: number) => {
+    const newPlanDetails = [...planDetails];
+    newPlanDetails[dayIndex].exercises.splice(exerciseIndex, 1);
+    setPlanDetails(newPlanDetails);
+    setPlan((prev: Plan | null) => prev ? { ...prev, myPlanDetails: newPlanDetails } : null);
+  };
+
   const onDragEnd = (result: DropResult) => {
     const { source, destination } = result;
 
@@ -269,6 +276,7 @@ const PlanTable: React.FC<PlanTableProps> = ({
                           value
                         )
                       }
+                      onDelete={() => handleDeleteExercise(selectedDay, index)}
                     />
                   ))}
                   {provided.placeholder}
