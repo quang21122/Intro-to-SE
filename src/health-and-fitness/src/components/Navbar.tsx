@@ -49,7 +49,7 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
   return (
     <nav
       className={`w-full flex items-center pt-6 relative ${
-        isHomepage ? "justify-around px-4" : "justify-between"
+        isHomepage ? "justify-around px-4" : "justify-between px-10"
       } ${location.pathname === "/profile" ? "justify-around" : ""}`}
     >
       {/* Logo */}
@@ -140,9 +140,9 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
       {/* User Controls */}
       {isLoggedIn ? (
         <div
-          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "mr-20" : ""} ${
-            location.pathname === "/profile" ? "" : ""
-          }`}
+          className={`hidden md:flex gap-4 z-10 ${
+            isHomepage ? "mr-20" : "-mr-10"
+          } ${location.pathname === "/profile" ? "" : ""}`}
         >
           <div className="relative group pr-6">
             <a
@@ -196,7 +196,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
           </div>
         </div>
       ) : (
-        <div className="hidden md:flex gap-4 z-10">
+        <div
+          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "" : "-mr-10"} ${
+            location.pathname === "/profile" ? "" : ""
+          }`}
+        >
           <button
             onClick={handleLogin}
             className={`px-6 py-2 font-medium rounded-lg ${

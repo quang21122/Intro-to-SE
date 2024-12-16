@@ -288,9 +288,8 @@ function MyPlans() {
     return <div>{error}</div>;
   }
 
-
   return (
-    <div className="flex flex-col mx-24">
+    <div className="flex flex-col mx-24 py-2">
       <div className="">
         <Navbar isHomepage={false} />
       </div>
@@ -325,7 +324,7 @@ function MyPlans() {
 
       {!isLoading && (
         <div className="grid grid-cols-[3fr_7fr] pt-10">
-          <div className="flex flex-col mx-3">
+          <div className="flex flex-col mr-3">
             <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
               My plans
             </h1>

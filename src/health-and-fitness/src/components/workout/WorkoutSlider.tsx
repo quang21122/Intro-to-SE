@@ -118,7 +118,7 @@ function WorkoutSlider() {
         For you
       </h1>
       {isLoading ? (
-        <div>Loading...</div>
+        <p className="text-red-500 text-center text-2xl">Loading...</p>
       ) : (
         <Slider {...settings}>
           {sliderPlans.map((plan) => (

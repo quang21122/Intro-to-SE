@@ -246,7 +246,7 @@ export default function WorkoutPlans() {
   }
 
   return (
-    <div className="py-6 flex flex-col mx-24 min-h-screen">
+    <div className="py-2 flex flex-col mx-24 min-h-screen">
       <Navbar isHomepage={false} />
       <div className="flex justify-center items-center flex-row font-bebas mt-10">
         {/* Search input */}
