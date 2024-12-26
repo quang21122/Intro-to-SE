@@ -45,29 +45,24 @@ interface Plan {
 }
 
 interface PlanTableProps {
-  plan: Plan;
   setPlan: React.Dispatch<React.SetStateAction<Plan | null>>;
   isAdding: boolean;
   setIsAdding: (value: boolean) => void;
+  selectedDay: number;
+  setSelectedDay: React.Dispatch<React.SetStateAction<number>>;
+  planDetails: PlanDetail[];
+  setPlanDetails: React.Dispatch<React.SetStateAction<PlanDetail[]>>;
 }
 
 const PlanTable: React.FC<PlanTableProps> = ({
-  plan,
   setPlan,
   isAdding,
   setIsAdding,
+  selectedDay,
+  setSelectedDay,
+  planDetails,
+  setPlanDetails,
 }) => {
-  const [selectedDay, setSelectedDay] = useState(0);
-  const orderedDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-  // Sort exercises based on day order
-  const sortedPlanDetails = [...plan.myPlanDetails].sort((a, b) => {
-    const dayA = orderedDays.indexOf(a.day);
-    const dayB = orderedDays.indexOf(b.day);
-    return dayA - dayB;
-  });
-
-  const [planDetails, setPlanDetails] = useState(sortedPlanDetails);
   const [isTick, setIsTick] = useState(
     planDetails[selectedDay].startTime?.flag ?? false
   );
@@ -139,7 +134,9 @@ const PlanTable: React.FC<PlanTableProps> = ({
     const newPlanDetails = [...planDetails];
     newPlanDetails[dayIndex].exercises.splice(exerciseIndex, 1);
     setPlanDetails(newPlanDetails);
-    setPlan((prev: Plan | null) => prev ? { ...prev, myPlanDetails: newPlanDetails } : null);
+    setPlan((prev: Plan | null) =>
+      prev ? { ...prev, myPlanDetails: newPlanDetails } : null
+    );
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -159,7 +156,9 @@ const PlanTable: React.FC<PlanTableProps> = ({
     };
 
     setPlanDetails(newPlanDetails);
-    setPlan((prev: Plan | null) => prev ? { ...prev, myPlanDetails: newPlanDetails } : null);
+    setPlan((prev: Plan | null) =>
+      prev ? { ...prev, myPlanDetails: newPlanDetails } : null
+    );
   };
 
   return (

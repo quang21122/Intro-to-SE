@@ -17,6 +17,14 @@ interface Equipment {
 
 interface Exercise {
   id: string;
+  sets: number;
+  reps: string;
+  interval: string;
+  restTime: string;
+}
+
+interface ExerciseDetail {
+  id: string;
   name: string;
   muscle: string; // Muscle ID (to fetch muscle details)
   muscleName?: string; // Muscle name (for display)
@@ -42,10 +50,16 @@ interface DropdownWithCheckboxProps {
 
 interface AddExerciseCardProps {
   setIsAdding: (value: boolean) => void;
+  handleAddExercise: (exercise: Exercise, selectedDay: number) => void;
+  selectedDay: number;
 }
 
-const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ 
+  setIsAdding,
+  handleAddExercise,
+  selectedDay,
+}) => {
+  const [exercises, setExercises] = useState<ExerciseDetail[]>([]);
   const [muscles, setMuscles] = useState<Muscle[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [selectedMuscle, setSelectedMuscle] = useState<string>("All");
@@ -140,7 +154,7 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
         }
 
         // Map exercises with muscle names
-        const exercisesWithMuscles = exerciseData.map((exercise: Exercise) => {
+        const exercisesWithMuscles = exerciseData.map((exercise: ExerciseDetail) => {
           const muscle = muscles.find((m) => m.id === exercise.muscle);
           return {
             ...exercise,
@@ -294,7 +308,18 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ setIsAdding }) => {
               </div>
               <CiCirclePlus
                 className="text-4xl text-black"
-                onClick={() => {}}
+                onClick={() => {
+                  handleAddExercise(
+                    {
+                      id: exercise.id,
+                      sets: 0,
+                      reps: "0",
+                      interval: "00:00",
+                      restTime: "00:00"
+                    }, 
+                    selectedDay
+                  );
+                }}
               />
             </div>
           ))
