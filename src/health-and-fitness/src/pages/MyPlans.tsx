@@ -147,6 +147,31 @@ function MyPlans() {
       setIsExpanded(!isExpanded);
     };
 
+    const handleRemoveMyPlan = async (id: string) => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/myPlan?uid=${user?.uid}&id=${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to remove plan: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.status === 200) {
+          const updatedPlans = plans.filter((plan) => plan.id !== id);
+          setPlans(updatedPlans);
+          setActivePlan(updatedPlans[0] || null);
+          setViewingPlan(updatedPlans[0] || null);
+        }
+      } catch (error) {
+        console.error("Error removing plan:", error);
+      }
+    };
+
     return (
       <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mb-8 flex flex-col">
         <div
@@ -161,7 +186,13 @@ function MyPlans() {
               />
             </button>
             <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl">
-              <IoTrashOutline className="text-white text-2xl" />
+              <IoTrashOutline
+                className="text-white text-2xl"
+                onClick={async () => {
+                  await handleRemoveMyPlan(plan.id);
+                  window.location.reload();
+                }}
+              />
             </button>
           </div>
         </div>
