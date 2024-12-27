@@ -3,7 +3,6 @@ import { AuthProvider } from '../contexts/AuthProvider'
 import { ProfileProvider } from '../contexts/ProfileProvider'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom';
-import { auth } from '../firebaseAdmin.js';
 
 describe('Signup Page', () => {
     it('should render signup form', () => {
