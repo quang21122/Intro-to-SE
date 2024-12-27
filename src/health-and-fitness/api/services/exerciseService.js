@@ -73,16 +73,11 @@ const createExercise = async (data) => {
 
 const getExercise = async (name) => {
   try {
-    // Convert hyphenated name back to original format
-    const formattedName = name.replace(/-/g, " ");
-    console.log("Formatted Name:", formattedName);
-
     // Query Firestore to find the document by name
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(
-      query(exercisesCollection, where("name", "==", formattedName))
+      query(exercisesCollection, where("name", "==", name))
     );
-    console.log("Query Snapshot Docs:", querySnapshot.docs);
 
     if (querySnapshot.empty) {
       return { error: "Exercise not found", status: 404 };
@@ -94,6 +89,35 @@ const getExercise = async (name) => {
   } catch (error) {
     console.error("Error getting exercise by name:", error);
     return { error: error.message, status: 500 };
+  }
+};
+
+const getExerciseById = async (id) => {
+  try {
+    const exerciseDoc = await getDoc(doc(firestoreDb, "exercises", id));
+
+    if (!exerciseDoc.exists()) {
+      return {
+        error: "Exercise not found",
+        status: 404,
+      };
+    }
+
+    const exercise = {
+      id: exerciseDoc.id,
+      ...exerciseDoc.data(),
+    };
+
+    return {
+      data: exercise,
+      status: 200,
+    };
+  } catch (error) {
+    console.error("Error getting exercise by id:", error);
+    return {
+      error: error.message,
+      status: 400,
+    };
   }
 };
 
@@ -148,8 +172,6 @@ const getExercisesByPage = async (page, pageSize = 10) => {
 
 const updateExercise = async (name, data) => {
   try {
-    // Query Firestore to find the document by name
-    console.log(name);
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(
       query(exercisesCollection, where("name", "==", name))
@@ -250,7 +272,6 @@ const getFilteredExercises = async ({ muscles, equipments, page, name }) => {
 const searchExercises = async (searchTerm) => {
   try {
     const formattedTerm = searchTerm.toLowerCase().trim();
-    console.log("Formatted Search Term:", formattedTerm);
 
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(exercisesCollection);
@@ -283,6 +304,7 @@ const searchExercises = async (searchTerm) => {
 export default {
   createExercise,
   getExercise,
+  getExerciseById,
   updateExercise,
   deleteExercise,
   getExercisesByPage,

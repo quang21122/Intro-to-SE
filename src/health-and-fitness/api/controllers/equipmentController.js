@@ -17,7 +17,6 @@ const getEquipment = async (req, res) => {
 };
 
 const createEquipment = async (req, res) => {
-    console.log(req.body);
     const newEquipment = await equipmentService.createEquipment(req.body);
     
     if (newEquipment.error) {

@@ -87,7 +87,6 @@ export default function ExerciseDetail() {
         );
 
         setAlternativeMuscleExercises(updatedExercises);
-        console.log("Alternative exercises: ", updatedExercises);
       } catch (error) {
         console.error("Failed to fetch alternative exercises", error);
       }
@@ -115,7 +114,6 @@ export default function ExerciseDetail() {
   };
 
   const handleAlternativeExerciseClick = (exercise: ExerciseDetails) => {
-    console.log("Alternative exercise clicked: ", exercise);
     const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
     navigate(`/exercises/${formattedName}`, {
       state: { exercise },

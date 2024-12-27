@@ -2,8 +2,25 @@ import GymBanner from "../assets/homepage/gym_banner.png";
 import GymPic from "../assets/homepage/gym_pic.png";
 import Food from "../assets/homepage/food.png";
 import FooterPic from "../assets/homepage/footer_pic.png";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 function Homepage() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const handleJoinNow = () => {
+    if (loading) {
+      return;
+    }
+
+    if (user) {
+      navigate("/profile");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <>
       <div className="mx-24 py-10 font-montserrat">
@@ -12,7 +29,7 @@ function Homepage() {
             <img src={GymBanner} alt="Gym Banner" />
           </div>
           <div className="mx-20 -mt-6">
-            <p className="text-3xl font-semibold tracking-[0.23rem]">
+            <p className="text-3xl font-semibold tracking-[0.23rem] text-white">
               CREATE A CUSTOM <br />
               WORKOUT PLAN
             </p>
@@ -20,8 +37,11 @@ function Homepage() {
               Personalize your training by choosing exercises, adjusting rest
               times, and incorporating equipment to meet your fitness goals.
             </p>
-            <button className="bg-[#F24B4B] rounded-lg text-[1.5rem] text-black px-6 py-1 font-semibold my-6 hover:text-white">
-              <a href="#">Try it</a>
+            <button
+              className="bg-[#F24B4B] rounded-lg text-[1.5rem] text-black px-6 py-1 font-semibold my-6 hover:text-white"
+              onClick={() => navigate("/workout-plans")}
+            >
+              Try it
             </button>
           </div>
         </div>
@@ -36,8 +56,11 @@ function Homepage() {
               Learn the benefits and techniques of each exercise to enhance your
               training.
             </p>
-            <button className="bg-black text-white rounded-lg text-[1.5rem] px-6 py-1 font-semibold my-7 hover:text-black hover:bg-[#F24B4B] mx-10">
-              <a href="#">Try it</a>
+            <button
+              className="bg-black text-white rounded-lg text-[1.5rem] px-6 py-1 font-semibold my-7 hover:text-black hover:bg-[#F24B4B] mx-10"
+              onClick={() => navigate("/exercises")}
+            >
+              Try it
             </button>
           </div>
           <div className="ml-80">
@@ -50,7 +73,7 @@ function Homepage() {
             <img src={Food} alt="Food" />
           </div>
           <div className="mx-24 -mt-6">
-            <p className="text-3xl font-semibold tracking-[0.23rem] uppercase">
+            <p className="text-3xl font-semibold tracking-[0.23rem] uppercase text-white">
               generate Nutrition <br />
               and Meal Plans
             </p>
@@ -59,8 +82,11 @@ function Homepage() {
               Access nutritious recipes to fuel your body for optimal
               performance.
             </p>
-            <button className="bg-[#F24B4B] rounded-lg text-[1.5rem] text-black px-6 py-1 font-semibold my-8 hover:text-white">
-              <a href="#">Try it</a>
+            <button
+              className="bg-[#F24B4B] rounded-lg text-[1.5rem] text-black px-6 py-1 font-semibold my-8 hover:text-white"
+              onClick={() => navigate("/")}
+            >
+              Try it
             </button>
           </div>
         </div>
@@ -75,8 +101,11 @@ function Homepage() {
             </p>
           </div>
           <div>
-            <button className="bg-white rounded-lg text-[1.5rem] text-black px-7 py-3 font-semibold my-8 hover:text-white hover:bg-[#F24B4B] ml-24">
-              <a href="#">Join now</a>
+            <button
+              className="bg-white rounded-lg text-[1.5rem] text-black px-7 py-3 font-semibold my-8 hover:text-white hover:bg-[#F24B4B] ml-24"
+              onClick={handleJoinNow}
+            >
+              Join Now
             </button>
           </div>
         </div>

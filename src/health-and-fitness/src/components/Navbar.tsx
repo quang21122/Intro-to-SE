@@ -49,7 +49,7 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
   return (
     <nav
       className={`w-full flex items-center pt-6 relative ${
-        isHomepage ? "justify-around px-4" : "justify-between"
+        isHomepage ? "justify-around px-4" : "justify-between px-10"
       } ${location.pathname === "/profile" ? "justify-around" : ""}`}
     >
       {/* Logo */}
@@ -77,7 +77,13 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             >
               WORKOUTS
             </a>
-            <div className="absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent border-b-white group-hover:border-b-[#fb6767] cursor-pointer"></div>
+            <div
+              className={`absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent group-hover:border-b-[#fb6767] cursor-pointer ${
+                location.pathname === "/workout-plans"
+                  ? "border-b-red-500"
+                  : "border-b-white"
+              }`}
+            ></div>
             <div
               className={`absolute w-full h-4 -bottom-3 right-0 ${
                 isHomepage ? "bg-black" : "bg-[#232221]"
@@ -134,9 +140,9 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
       {/* User Controls */}
       {isLoggedIn ? (
         <div
-          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "mr-20" : ""} ${
-            location.pathname === "/profile" ? "" : ""
-          }`}
+          className={`hidden md:flex gap-4 z-10 ${
+            isHomepage ? "mr-20" : "-mr-10"
+          } ${location.pathname === "/profile" ? "" : ""}`}
         >
           <div className="relative group pr-6">
             <a
@@ -190,7 +196,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
           </div>
         </div>
       ) : (
-        <div className="hidden md:flex gap-4 z-10">
+        <div
+          className={`hidden md:flex gap-4 z-10 ${isHomepage ? "" : "-mr-10"} ${
+            location.pathname === "/profile" ? "" : ""
+          }`}
+        >
           <button
             onClick={handleLogin}
             className={`px-6 py-2 font-medium rounded-lg ${

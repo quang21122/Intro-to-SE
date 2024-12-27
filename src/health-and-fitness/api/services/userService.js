@@ -35,7 +35,56 @@ const getUser = async (userId) => {
     const userRecord = await auth.getUser(userId);
 
     // Get additional data from Firestore
-    const userDoc = await firestoreDb.collection('users').doc(userId).get();
+    const userDoc = await firestoreDb.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      return { error: "User data not found in Firestore", status: 404 };
+    }
+
+    // Get myPlans subcollection
+    const myPlansRef = firestoreDb
+      .collection("users")
+      .doc(userId)
+      .collection("myPlans");
+    const myPlansSnapshot = await myPlansRef.get();
+
+    // Convert myPlans documents to array and fetch myPlanDetails for each myPlan
+    const myPlans = await Promise.all(
+      myPlansSnapshot.docs.map(async (doc) => {
+        const myPlanData = doc.data();
+        const myPlanDetailsRef = doc.ref.collection("myPlanDetails");
+        const myPlanDetailsSnapshot = await myPlanDetailsRef.get();
+        const myPlanDetails = myPlanDetailsSnapshot.docs.map((detailDoc) => ({
+          ...detailDoc.data(),
+          id: detailDoc.id,
+        }));
+        return {
+          ...myPlanData,
+          id: doc.id,
+          myPlanDetails: myPlanDetails,
+        };
+      })
+    );
+
+    return {
+      user: {
+        uid: userRecord.uid,
+        email: userRecord.email,
+        myPlans: myPlans,
+        ...userDoc.data(),
+      },
+      status: 200,
+    };
+  } catch (error) {
+    return { error: error.message, status: 500 };
+  }
+};
+const getUserByEmail = async (email) => {
+  try {
+    // Get user data from Firebase Auth
+    const userRecord = await auth.getUserByEmail(email);
+
+    // Get additional data from Firestore
+    const userDoc = await firestoreDb.collection('users').doc(userRecord.uid).get();
     if (!userDoc.exists) {
       return { error: "User data not found in Firestore", status: 404 };
     }
@@ -51,8 +100,7 @@ const getUser = async (userId) => {
   } catch (error) {
     return { error: error.message, status: 500 };
   }
-};
-
+}
 // Update user's password or Firestore data
 const updateUser = async (userId, firestoreData = {}) => {
   try {
@@ -86,4 +134,5 @@ export default {
   getUser,
   updateUser,
   deleteUser,
+  getUserByEmail
 };

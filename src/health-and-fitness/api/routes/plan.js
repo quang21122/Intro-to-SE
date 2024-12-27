@@ -12,7 +12,7 @@ export default async function handler(req, res) {
             case 'DELETE':
                 return planController.deletePlan(req, res);
             default:
-                res.setHeader('Allow', ['POST', 'DELETE']);
+                res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
                 return res.status(405).end(`Method ${req.method} Not Allowed`);
         }
     }

@@ -27,7 +27,6 @@ const getMuscle = async (req, res) => {
 };
 
 const createMuscle = async (req, res) => {
-  console.log(req.body);
   const newMuscle = await muscleService.createMuscle(req.body);
 
   if (newMuscle.error) {

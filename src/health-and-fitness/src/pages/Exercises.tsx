@@ -52,6 +52,10 @@ export default function Exercises() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
@@ -70,7 +74,6 @@ export default function Exercises() {
         const muscleData = await muscleRes.json();
         if (muscleData.status === 200) {
           setMuscles(muscleData.muscles);
-          console.log("Fetched Muscles:", muscleData.muscles);
         } else {
           console.error("Error: Unexpected status code", muscleData.status);
         }
@@ -106,15 +109,11 @@ export default function Exercises() {
 
         // Fetch exercises only if there are selected muscles
         const selectedMusclesParam = selectedMuscles.join(",");
-        console.log("Selected Muscles:", selectedMusclesParam);
         const selectedEquipmentParam = selectedEquipment.join(",");
-        console.log("Selected Equipment:", selectedEquipmentParam);
-
         const queryParam = new URLSearchParams();
 
         if (debouncedSearchTerm) {
           queryParam.append("search", debouncedSearchTerm);
-          console.log("Search Term:", debouncedSearchTerm);
         }
 
         if (selectedMuscles.length) {
@@ -141,16 +140,12 @@ export default function Exercises() {
         }
 
         const exerciseData = await exerciseRes.json();
-        console.log("Fetched Exercises:", exerciseData);
         const exercises = debouncedSearchTerm
           ? exerciseData.data.exercises
           : exerciseData.data || [];
-        console.log("Exercises:", exercises);
 
         const filteredExerciseCount = exercises.length;
-        console.log("Filtered Exercise Count:", filteredExerciseCount);
         const totalPages = Math.ceil(filteredExerciseCount / itemsPerPage);
-        console.log("Total Pages:", totalPages);
         setTotalPages(totalPages);
 
         // Fetch corresponding muscle and equipment data for each exercise
@@ -168,7 +163,6 @@ export default function Exercises() {
               `http://localhost:3000/api/equipment?id=${exercise.equipment}`
             );
             const equipmentData = await equipmentRes.json();
-            console.log("Equipment Data:", equipmentData);
 
             return {
               ...exercise,
@@ -202,12 +196,9 @@ export default function Exercises() {
   useEffect(() => {
     setCurrentFilteredPage(1);
     setCurrentPage(1);
-    console.log("Current Filtered Page:", currentFilteredPage);
-    console.log("Current Page:", currentPage);
   }, [selectedMuscles, selectedEquipment, debouncedSearchTerm]); // Reset currentPage when selectedMuscles changes
 
   const handleExerciseClick = (exercise: Exercise) => {
-    console.log("Exercise clicked:", exercise);
     const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
     navigate(`/exercises/${formattedName}`, { state: { exercise } });
   };
