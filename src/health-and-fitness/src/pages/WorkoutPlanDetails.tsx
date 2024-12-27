@@ -133,6 +133,7 @@ export default function WorkoutPlanDetails() {
       }
 
       console.log("Plan added successfully");
+      navigate("/my-plans");
     } catch (error) {
       console.error("Error adding plan:", error);
     }

@@ -353,44 +353,63 @@ function MyPlans() {
         </div>
       )}
 
-      {!isLoading && (
-        <div className="grid grid-cols-[3fr_7fr] pt-10">
-          <div className="flex flex-col mr-3">
-            <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
-              My plans
-            </h1>
-            <div className="mt-14 flex flex-col">
-              {sortedPlans.map((plan) =>
-                viewingPlan && plan.id === viewingPlan.id ? (
-                  <PlanCard key={plan.id} plan={plan} onApply={handleApply} />
-                ) : (
-                  <CompactPlanCard
-                    key={plan.id}
-                    plan={plan}
-                    onApply={handleApply}
-                  />
-                )
+      {!isLoading &&
+        (sortedPlans.length === 0 ? (
+          <div className="flex flex-col items-center mt-12 h-screen">
+            <p className="text-2xl text-gray-600 font-montserrat mb-4">
+              No plans added yet
+            </p>
+            <button
+              className="bg-[#F05454] text-white px-6 py-2 rounded-xl hover:bg-opacity-80 transition-colors duration-300 font-montserrat"
+              onClick={() => navigate("/workout-plans")}
+            >
+              Choose plan to add
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-[3fr_7fr] pt-10">
+            <div className="flex flex-col mr-3">
+              <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
+                My plans
+              </h1>
+              <div className="mt-14 flex flex-col">
+                {sortedPlans.map((plan) =>
+                  viewingPlan && plan.id === viewingPlan.id ? (
+                    <PlanCard key={plan.id} plan={plan} onApply={handleApply} />
+                  ) : (
+                    <CompactPlanCard
+                      key={plan.id}
+                      plan={plan}
+                      onApply={handleApply}
+                    />
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col mt-6">
+              <div className="flex justify-end space-x-4">
+                <button
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2"
+                  onClick={() => navigate("/workout-plans")}
+                >
+                  Add plan
+                </button>
+                <button
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
+                  onClick={() =>
+                    viewingPlan && navigate(`/my-plans-edit/${viewingPlan.id}`)
+                  }
+                >
+                  Edit
+                </button>
+              </div>
+              {activePlan && viewingPlan && (
+                <WorkoutPlanSchedule planDetails={viewingPlan.myPlanDetails} />
               )}
             </div>
           </div>
-
-          <div className="flex flex-col mt-6">
-            <div className="flex justify-end">
-              <button
-                className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
-                onClick={() =>
-                  viewingPlan && navigate(`/my-plans-edit/${viewingPlan.id}`)
-                }
-              >
-                Edit
-              </button>
-            </div>
-            {activePlan && viewingPlan && (
-              <WorkoutPlanSchedule planDetails={viewingPlan.myPlanDetails} />
-            )}
-          </div>
-        </div>
-      )}
+        ))}
     </div>
   );
 }
