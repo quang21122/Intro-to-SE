@@ -321,7 +321,6 @@ const MyPlansEdit: React.FC = () => {
                   : "translate-x-0"
                 }`}
             >
-              {console.log("planDetails", planDetails)}
               {planDetails.length > 0 && (
                 <PlanTable
                   setPlan={setPlan}
