@@ -7,6 +7,32 @@ import { HiChartBar } from "react-icons/hi";
 type Level = "Beginner" | "Intermediate" | "Advanced";
 type Goal = "Maintaining" | "Bulking" | "Cutting" | "Sport Specific";
 
+interface Exercise {
+  id: string;
+  sets: number;
+  reps: string;
+  interval: string;
+  restTime: string;
+}
+
+interface ExerciseWithName extends Exercise {
+  name?: string;
+  muscleName?: string;
+  image?: string;
+}
+
+
+interface PlanDetail {
+  day: string;
+  exercises: ExerciseWithName[];
+  name: string;
+  startTime?: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
+}
+
 interface Plan {
   id: string;
   name: string;
@@ -18,14 +44,22 @@ interface Plan {
   days: number;
   description: string;
   createdAt: string;
+  myPlanDetails: PlanDetail[];
 }
 
-function PlanCard({ id }: { id: string }) {
-  const [plan, setPlan] = useState<Plan | null>(null);
+interface PlanCardProps {
+  id: string;
+  plan: Plan | null;
+  setPlanInfo: React.Dispatch<React.SetStateAction<Plan | null>>;
+};
+
+const PlanCard: React.FC<PlanCardProps> = ({
+  id,plan,setPlanInfo
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [appliedId, setAppliedId] = useState<string | null>(null);
   const { user, loading } = useAuth();
-  
+
   useEffect(() => {
     const fetchPlan = async () => {
       if (user) {
@@ -51,7 +85,7 @@ function PlanCard({ id }: { id: string }) {
           const plan = data.data.myPlan;
 
           if (plan) {
-            setPlan(plan);
+            setPlanInfo(plan);
           } else {
             console.error("Plan not found");
           }
@@ -66,17 +100,7 @@ function PlanCard({ id }: { id: string }) {
       return;
     }
     fetchPlan();
-  }, [id, user, loading]);
-
-  const [activeLevel, setActiveLevel] = useState<string | undefined>(undefined);
-  const [activeGoal, setActiveGoal] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (plan) {
-      setActiveLevel(plan.level);
-      setActiveGoal(plan.goal);
-    }
-  }, [plan]);
+  }, [id, user, loading, setPlanInfo]);
 
   const levelOption: Level[] = ["Beginner", "Intermediate", "Advanced"];
 
@@ -87,6 +111,34 @@ function PlanCard({ id }: { id: string }) {
     "Sport Specific",
   ];
   
+  const handleDifficultyChange = (level: Level) => {
+    if (plan) {
+      const updatedPlan = { ...plan, level };
+      setPlanInfo(updatedPlan);
+    }
+  };
+
+  const handleGoalChange = (goal: Goal) => {
+    if (plan) {
+      const updatedPlan = { ...plan, goal };
+      setPlanInfo(updatedPlan);
+    }
+  };
+
+  const handleTitleChange = (value: string) => {
+    if (plan) {
+      const updatedPlan = { ...plan, name: value };
+      setPlanInfo(updatedPlan);
+    }
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    if (plan) {
+      const updatedPlan = { ...plan, description: value };
+      setPlanInfo(updatedPlan);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -116,24 +168,6 @@ function PlanCard({ id }: { id: string }) {
       </div>
     );
   }
-
-  const handleDifficultyChange = (level: Level) => {
-    setActiveLevel(level);
-    setPlan((prev) => (prev ? { ...prev, level } : prev));
-  };
-
-  const handleGoalChange = (goal: Goal) => {
-    setActiveGoal(goal);
-    setPlan((prev) => (prev ? { ...prev, goal } : prev));
-  };
-
-  const handleTitleChange = (value: string) => {
-    setPlan((prev) => (prev ? { ...prev, name: value } : prev));
-  };
-
-  const handleDescriptionChange = (value: string) => {
-    setPlan((prev) => (prev ? { ...prev, description: value } : prev));
-  };
 
   return (
     <div className="flex flex-col mt-4 mx-4">
@@ -167,7 +201,7 @@ function PlanCard({ id }: { id: string }) {
                     key={goal}
                     onClick={() => handleGoalChange(goal)}
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
-                      activeGoal === goal
+                      plan?.goal === goal
                         ? "bg-[#C73659] text-white"
                         : "bg-[#D9D9D9]"
                     }`}
@@ -189,7 +223,7 @@ function PlanCard({ id }: { id: string }) {
                     key={difficulty}
                     onClick={() => handleDifficultyChange(difficulty)}
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
-                      activeLevel === difficulty
+                      plan?.level === difficulty
                         ? "bg-[#C73659] text-white"
                         : "bg-[#D9D9D9]"
                     }`}
@@ -210,7 +244,6 @@ function PlanCard({ id }: { id: string }) {
               onChange={(e) => handleDescriptionChange(e.target.value)}
               className="text-black text-xl mt-2 font-montserrat bg-[#D9D9D9] rounded-xl p-2 focus:outline-none"
               rows={6}
-              autoFocus
             />
           </div>
         </div>
@@ -219,8 +252,5 @@ function PlanCard({ id }: { id: string }) {
   );
 }
 
-PlanCard.propTypes = {
-  id: PropTypes.string,
-};
-
 export default PlanCard;
+

@@ -191,7 +191,7 @@ const MyPlansEdit: React.FC = () => {
       setIsPlanDetailsLoading(false);
     }
   }, [plan]); // This will only run when `plan` changes
-  
+
 
   const handleFinishEdit = async () => {
     if (!user || !plan) {
@@ -295,16 +295,19 @@ const MyPlansEdit: React.FC = () => {
               My Plans
             </h1>
           </div>
-          {!isAdding && <PlanCard id={id ?? ""} />}
+          {!isAdding && <PlanCard
+            id={id ?? ""}
+            plan={plan}
+            setPlanInfo={setPlan} // Truyền callback để cập nhật kế hoạch
+          />}
         </div>
 
         <div className="flex flex-col mt-10 relative">
           <div className="flex justify-end">
             <button
               onClick={handleFinishEdit}
-              className={`px-5 py-2 ${
-                isAdding ? "w-[18%]" : "w-[16%]"
-              } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
+              className={`px-5 py-2 ${isAdding ? "w-[18%]" : "w-[16%]"
+                } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
             >
               Finish edit
             </button>
@@ -313,11 +316,10 @@ const MyPlansEdit: React.FC = () => {
           <div className="relative">
             {/* PlanTable with slide transition */}
             <div
-              className={`transition-transform duration-300 transform ${
-                isAdding
+              className={`transition-transform duration-300 transform ${isAdding
                   ? "translate-x-[-52%] -mt-[3%] w-[100%] ml-[10%]"
                   : "translate-x-0"
-              }`}
+                }`}
             >
               {planDetails.length > 0 && (
                 <PlanTable
@@ -334,11 +336,10 @@ const MyPlansEdit: React.FC = () => {
 
             {/* AddExerciseCard with slide-in */}
             <div
-              className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 w-[40%] ${
-                isAdding
+              className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 w-[40%] ${isAdding
                   ? "translate-x-0 opacity-100"
                   : "translate-x-full opacity-0"
-              }`}
+                }`}
             >
               {isAdding && (
                 <AddExerciseCard
