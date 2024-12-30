@@ -390,13 +390,13 @@ function MyPlans() {
             <div className="flex flex-col mt-6">
               <div className="flex justify-end space-x-4">
                 <button
-                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2"
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 hover:bg-opacity-80 transition-colors duration-300"
                   onClick={() => navigate("/workout-plans")}
                 >
                   Add plan
                 </button>
                 <button
-                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%] hover:bg-opacity-80 transition-colors duration-300"
                   onClick={() =>
                     viewingPlan && navigate(`/my-plans-edit/${viewingPlan.id}`)
                   }

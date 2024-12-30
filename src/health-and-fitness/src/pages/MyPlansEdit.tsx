@@ -191,7 +191,6 @@ const MyPlansEdit: React.FC = () => {
       setIsPlanDetailsLoading(false);
     }
   }, [plan]); // This will only run when `plan` changes
-  
 
   const handleFinishEdit = async () => {
     if (!user || !plan) {
@@ -282,16 +281,16 @@ const MyPlansEdit: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col mx-24">
+    <div className="flex flex-col mx-24 h-full bg-[#232221] min-h-screen">
       <Navbar isHomepage={false} />
       <div className={`grid grid-cols-[3fr_7fr] pt-10`}>
-        <div className="flex flex-col">
+        <div className="flex flex-col -ml-4">
           <div
             className="flex flex-row hover:cursor-pointer"
             onClick={() => navigate("/my-plans")}
           >
             <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
-            <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
+            <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-2">
               My Plans
             </h1>
           </div>
@@ -302,9 +301,9 @@ const MyPlansEdit: React.FC = () => {
           <div className="flex justify-end">
             <button
               onClick={handleFinishEdit}
-              className={`px-5 py-2 ${
+              className={`px-5 py-2 -mt-10 ${
                 isAdding ? "w-[18%]" : "w-[16%]"
-              } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
+              } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl hover:opacity-80 duration-300`}
             >
               Finish edit
             </button>
@@ -315,7 +314,7 @@ const MyPlansEdit: React.FC = () => {
             <div
               className={`transition-transform duration-300 transform ${
                 isAdding
-                  ? "translate-x-[-52%] -mt-[3%] w-[100%] ml-[10%]"
+                  ? "translate-x-[-52%] -mt-[3%] w-[100%] ml-[9%]"
                   : "translate-x-0"
               }`}
             >
