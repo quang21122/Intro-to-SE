@@ -54,7 +54,9 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
     >
       {/* Logo */}
       <div
-        className="flex justify-center items-center cursor-pointer -ml-10"
+        className={`flex justify-center items-center cursor-pointer -ml-10 ${
+          location.pathname === "/profile" ? "hidden" : ""
+        }`}
         onClick={() => navigate("/")}
       >
         <img src={logo} alt="Logo" className="h-10" />
@@ -64,7 +66,11 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
       </div>
 
       {/* Menu */}
-      <nav className="hidden md:block">
+      <nav
+        className={`hidden md:block ${
+          location.pathname === "/profile" ? "ml-52" : ""
+        }`}
+      >
         <ul className="flex gap-20 relative mx-28">
           <li className="relative group pr-6">
             <a
@@ -177,11 +183,6 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
                     }`}
                   >
                     Profile
-                  </a>
-                </li>
-                <li className="px-4 py-1">
-                  <a href="#" className="tracking-widest hover:underline">
-                    Setting
                   </a>
                 </li>
                 <li className="px-4 py-1">

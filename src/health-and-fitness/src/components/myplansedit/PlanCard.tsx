@@ -25,7 +25,7 @@ function PlanCard({ id }: { id: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [appliedId, setAppliedId] = useState<string | null>(null);
   const { user, loading } = useAuth();
-  
+
   useEffect(() => {
     const fetchPlan = async () => {
       if (user) {
@@ -86,7 +86,7 @@ function PlanCard({ id }: { id: string }) {
     "Cutting",
     "Sport Specific",
   ];
-  
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -136,7 +136,7 @@ function PlanCard({ id }: { id: string }) {
   };
 
   return (
-    <div className="flex flex-col mt-4 mx-4">
+    <div className="flex flex-col mt-4 mr-4">
       <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
         {plan && <img src={plan.image} alt="" />}
         <div className="flex flex-col ml-2 mt-6">
@@ -169,7 +169,7 @@ function PlanCard({ id }: { id: string }) {
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                       activeGoal === goal
                         ? "bg-[#C73659] text-white"
-                        : "bg-[#D9D9D9]"
+                        : "bg-[#D9D9D9] hover:bg-[#C73659] hover:text-white duration-300"
                     }`}
                   >
                     {goal}
@@ -191,7 +191,7 @@ function PlanCard({ id }: { id: string }) {
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                       activeLevel === difficulty
                         ? "bg-[#C73659] text-white"
-                        : "bg-[#D9D9D9]"
+                        : "bg-[#D9D9D9] hover:bg-[#C73659] hover:text-white duration-300"
                     }`}
                   >
                     {difficulty}

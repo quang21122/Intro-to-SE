@@ -244,13 +244,13 @@ export default function Exercises() {
         <div className="flex gap-4 my-6">
           <button
             onClick={() => setShowMuscleFilter((prev) => !prev)}
-            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md"
+            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md hover:bg-[#d83c3c] duration-300"
           >
             {showMuscleFilter ? "Hide Muscle Filter" : "Show Muscle Filter"}
           </button>
           <button
             onClick={() => setShowEquipmentFilter((prev) => !prev)}
-            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md"
+            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md hover:bg-[#d83c3c] duration-300"
           >
             {showEquipmentFilter
               ? "Hide Equipment Filter"
@@ -417,11 +417,13 @@ export default function Exercises() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-bold mb-1">{exercise.name}</h3>
-                      <div className="text-[#FF4D4D] text-sm mb-2">
+                      <h3 className="font-bold mb-1 font-bebas text-2xl">
+                        {exercise.name}
+                      </h3>
+                      <div className="text-[#FF4D4D] text-xl mb-2 font-bebas">
                         {exercise.muscleName}
                       </div>
-                      <p className="text-gray-400 text-sm line-clamp-3">
+                      <p className="text-gray-400 text-md line-clamp-3 font-montserrat">
                         {exercise.instruction}
                       </p>
                     </div>

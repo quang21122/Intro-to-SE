@@ -291,7 +291,7 @@ export default function WorkoutPlans() {
 
         {/* Filter */}
         <button
-          className="py-[0.7rem] px-4 rounded-lg bg-white text-black text-2xl ml-28 flex items-center flex-row"
+          className="py-[0.7rem] px-4 rounded-lg bg-white text-black text-2xl ml-28 flex items-center flex-row hover:bg-gray-300 transition-colors"
           onClick={() => setIsFilterOpen(true)}
         >
           Filter
