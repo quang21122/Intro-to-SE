@@ -82,10 +82,15 @@ const PlanCard: React.FC<PlanCardProps> = ({
           setAppliedId(userData.user.appliedPlan);
 
           const data = await response.json();
-          const plan = data.data.myPlan;
-
-          if (plan) {
-            setPlanInfo(plan);
+          const newPlan = data.data.myPlan;
+          
+          if (newPlan) {
+            const updatedNewPlan = { ...newPlan };
+            delete updatedNewPlan.myPlanDetails;
+            setPlanInfo((prevPlan) => ({
+              ...prevPlan,   // Giữ thông tin cũ
+              ...updatedNewPlan,  // Cập nhật thông tin mới (trừ myPlanDetails)
+            }));
           } else {
             console.error("Plan not found");
           }

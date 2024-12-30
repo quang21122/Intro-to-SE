@@ -293,6 +293,7 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
         <h1 className="font-montserrat text-3xl text-black">Exercises</h1>
         {exercises.length > 0 ? (
           exercises.map((exercise) => (
+            console.log("Exercise info:", exercise),
             <div
               key={exercise.id}
               className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 cursor-pointer my-2"
