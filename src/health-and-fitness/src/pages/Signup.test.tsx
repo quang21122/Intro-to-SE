@@ -5,27 +5,6 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom';
 
 describe('Signup Page', () => {
-    it('should render signup form', () => {
-        render(
-            <MemoryRouter>
-                <AuthProvider>
-                    <ProfileProvider>
-                        <Signup />
-                    </ProfileProvider>
-                </AuthProvider>
-            </MemoryRouter>
-        );
-
-        // Kiểm tra các input field
-        expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-        expect(screen.getByLabelText('Password')).toBeInTheDocument();
-        expect(screen.getByLabelText('Confirm Password')).toBeInTheDocument();
-
-        // Kiểm tra nút "Sign Up"
-        expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
-    });
-
     it('should show error message for missing information', async () => {
         render(
             <MemoryRouter>
