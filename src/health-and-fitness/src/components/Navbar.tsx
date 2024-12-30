@@ -70,7 +70,8 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             <a
               onClick={handleWorkoutPlans}
               className={`tracking-[0.2rem] ${
-                location.pathname === "/workout-plans"
+                location.pathname === "/workout-plans" ||
+                location.pathname === "/my-plans"
                   ? "bg-gradient-to-b from-[#FEF3E2] to-[#FA4032] bg-clip-text text-transparent"
                   : "text-white group-hover:bg-gradient-to-b group-hover:from-[#FEF3E2] group-hover:to-[#FA4032] group-hover:bg-clip-text group-hover:text-transparent"
               }`}
@@ -79,7 +80,8 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
             </a>
             <div
               className={`absolute top-2 right-0 h-0 w-0 rotate-180 transform border-x-[10px] border-y-[10px] border-solid border-transparent group-hover:border-b-[#fb6767] cursor-pointer ${
-                location.pathname === "/workout-plans"
+                location.pathname === "/workout-plans" ||
+                location.pathname === "/my-plans"
                   ? "border-b-red-500"
                   : "border-b-white"
               }`}
