@@ -298,7 +298,7 @@ const MyPlansEdit: React.FC = () => {
           {!isAdding && <PlanCard
             id={id ?? ""}
             plan={plan}
-            setPlanInfo={setPlan} // Truyền callback để cập nhật kế hoạch
+            setPlanInfo={setPlan} 
           />}
         </div>
 
