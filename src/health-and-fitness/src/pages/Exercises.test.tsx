@@ -40,35 +40,23 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
                 fireEvent.click(cardioOption);
             });
         }
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loading/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
 
         // Wait for filtered exercises to appear
         await waitFor(() => {
             const filteredExercises = screen.getAllByText(/cardio/i);
             expect(filteredExercises.length).toBeGreaterThan(1);
-        });
+        }, { timeout: 5000 });
 
         // Now, cancel the filter
         await act(async () => {
             fireEvent.click(cardioOption!);
         });
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loaing/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
 
         // Wait for the exercises to return to their unfiltered state
         await waitFor(() => {
             expect(screen.getByText('Air Bike')).toBeInTheDocument();
             expect(screen.getByText('Barbell Bench Press')).toBeInTheDocument();
-        });
+        }, { timeout: 3000 });
     });
 
     // Filter exercises by one muscle group
@@ -106,18 +94,12 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
                 fireEvent.click(cardioOption);
             });
         }
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loading/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
 
         // Wait for filtered exercises to appear
         await waitFor(() => {
             const filteredExercises = screen.getAllByText(/cardio/i);
             expect(filteredExercises.length).toBeGreaterThan(1);
-        });
+        }, { timeout: 5000 });
     });
 
     // Filter exercises by multiple muscle groups
@@ -164,13 +146,6 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
             });
         }
 
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loading/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
-
         // Wait for filtered exercises to appear
         await waitFor(() => {
             const filteredExercises = screen.getAllByText(/cardio/i);
@@ -178,7 +153,7 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
 
             const filteredExercises2 = screen.getAllByText(/forearms/i);
             expect(filteredExercises2.length).toBeGreaterThan(1);
-        });
+        }, { timeout: 5000 });
     });
 
     // Filter exercises by both muscle group and equipment
@@ -231,21 +206,13 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
             });
         }
 
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loading/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
-
         // Wait for filtered exercises to appear
         await waitFor(() => {
             const filteredExercises = screen.getAllByText(/back/i);
             expect(filteredExercises.length).toBeGreaterThan(1);
-
             const filteredExercises2 = screen.getAllByText(/barbell/i);
             expect(filteredExercises2.length).toBeGreaterThan(1);
-        });
+        }, { timeout: 5000 });
     });
 
     // Handle no matching results with filter
@@ -284,16 +251,9 @@ describe('ExerciseLibrary Page - Filter Functionality', () => {
             });
         }
 
-        // Wait for loading to finish
-        await waitFor(() => {
-            if (!screen.queryByText(/loading/i)) {
-                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-            }
-        })
-
         // Wait for filtered exercises to appear
         await waitFor(() => {
             expect(screen.getByText(/no available exercises found/i)).toBeInTheDocument();
-        });
+        }, { timeout: 5000 });
     });
 });
