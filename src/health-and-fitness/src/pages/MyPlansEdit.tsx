@@ -51,9 +51,12 @@ const MyPlansEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPlanDetailsLoading, setIsPlanDetailsLoading] = useState(true);
   const navigate = useNavigate();
-
   const { user, loading } = useAuth();
+  const [selectedDay, setSelectedDay] = useState(0);
+
+  const [planDetails, setPlanDetails] = useState([] as PlanDetail[]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -173,8 +176,22 @@ const MyPlansEdit: React.FC = () => {
     if (!user || loading) {
       return;
     }
-    fetchPlan();
+    (async () => fetchPlan())();
   }, [id, user, loading]);
+
+  useEffect(() => {
+    const orderedDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    if (plan && plan.myPlanDetails) {
+      const sortedDetails = [...plan.myPlanDetails].sort((a, b) => {
+        const dayA = orderedDays.indexOf(a.day);
+        const dayB = orderedDays.indexOf(b.day);
+        return dayA - dayB;
+      });
+      setPlanDetails(sortedDetails);
+      setIsPlanDetailsLoading(false);
+    }
+  }, [plan]); // This will only run when `plan` changes
+
 
   const handleFinishEdit = async () => {
     if (!user || !plan) {
@@ -200,7 +217,41 @@ const MyPlansEdit: React.FC = () => {
     navigate("/my-plans"); // Adjust path based on your routing setup
   };
 
-  if (isLoading) {
+  const handleAddExercise = (exercise: Exercise, selectedDay: number) => {
+    if (!plan) {
+      return;
+    }
+
+    const updatedPlan = {
+      ...plan,
+      myPlanDetails: planDetails.map((detail) => {
+        if (detail.day === plan.myPlanDetails[selectedDay].day) {
+          return {
+            ...detail,
+            exercises: [...detail.exercises, exercise],
+          };
+        }
+        return detail;
+      }),
+    };
+
+    setPlan(updatedPlan);
+
+    fetch(`http://localhost:3000/api/myPlan?uid=${user?.uid}&id=${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedPlan),
+    }).then((response) => {
+      if (!response.ok) {
+        console.error(`Error updating plan: ${response.status}`);
+      }
+      console.log("Exercise added successfully");
+    });
+  };
+
+  if (isLoading || isPlanDetailsLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="flex flex-col items-center">
@@ -230,7 +281,6 @@ const MyPlansEdit: React.FC = () => {
     );
   }
 
-  console.log(plan);
   return (
     <div className="flex flex-col mx-24">
       <Navbar isHomepage={false} />
@@ -245,16 +295,19 @@ const MyPlansEdit: React.FC = () => {
               My Plans
             </h1>
           </div>
-          {!isAdding && <PlanCard id={id ?? ""} />}
+          {!isAdding && <PlanCard
+            id={id ?? ""}
+            plan={plan}
+            setPlanInfo={setPlan} 
+          />}
         </div>
 
         <div className="flex flex-col mt-10 relative">
           <div className="flex justify-end">
             <button
               onClick={handleFinishEdit}
-              className={`px-5 py-2 ${
-                isAdding ? "w-[18%]" : "w-[16%]"
-              } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
+              className={`px-5 py-2 ${isAdding ? "w-[18%]" : "w-[16%]"
+                } text-xl font-montserrat bg-[#A91D3A] text-white rounded-xl`}
             >
               Finish edit
             </button>
@@ -263,31 +316,38 @@ const MyPlansEdit: React.FC = () => {
           <div className="relative">
             {/* PlanTable with slide transition */}
             <div
-              className={`transition-transform duration-300 transform ${
-                isAdding
+              className={`transition-transform duration-300 transform ${isAdding
                   ? "translate-x-[-52%] -mt-[3%] w-[100%] ml-[10%]"
                   : "translate-x-0"
-              }`}
+                }`}
             >
-              {plan && (
+              {planDetails.length > 0 && (
                 <PlanTable
-                  plan={plan}
                   setPlan={setPlan}
                   isAdding={isAdding}
                   setIsAdding={setIsAdding}
+                  selectedDay={selectedDay}
+                  setSelectedDay={setSelectedDay}
+                  planDetails={planDetails}
+                  setPlanDetails={setPlanDetails}
                 />
               )}
             </div>
 
             {/* AddExerciseCard with slide-in */}
             <div
-              className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 w-[40%] ${
-                isAdding
+              className={`absolute top-0 right-0 transition-all duration-300 ease-in-out transform mt-3 w-[40%] ${isAdding
                   ? "translate-x-0 opacity-100"
                   : "translate-x-full opacity-0"
-              }`}
+                }`}
             >
-              {isAdding && <AddExerciseCard setIsAdding={setIsAdding} />}
+              {isAdding && (
+                <AddExerciseCard
+                  setIsAdding={setIsAdding}
+                  handleAddExercise={handleAddExercise}
+                  selectedDay={selectedDay}
+                />
+              )}
             </div>
           </div>
         </div>

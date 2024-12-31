@@ -2,7 +2,7 @@ import e from "express";
 import myPlanService from "../services/myPlanService.js";
 
 const createMyPlan = async (req, res) => {
-  const { uid, originalPlanId } = req.query;
+  const { uid, originalPlanId } = req.body;
   if (!uid) {
     return res.status(400).json({ error: "uid is required" });
   }

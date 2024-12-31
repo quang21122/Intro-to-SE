@@ -178,11 +178,6 @@ export default function Navbar({ isHomepage }: { isHomepage: boolean }) {
                   </a>
                 </li>
                 <li className="px-4 py-1">
-                  <a href="#" className="tracking-widest hover:underline">
-                    Setting
-                  </a>
-                </li>
-                <li className="px-4 py-1">
                   <a
                     href="#"
                     onClick={handleLogout}

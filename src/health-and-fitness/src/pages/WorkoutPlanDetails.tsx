@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { GrFormPrevious } from "react-icons/gr";
+import { useAuth } from "../hooks/useAuth";
 
 interface Exercise {
   id: string;
@@ -53,6 +54,7 @@ export default function WorkoutPlanDetails() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPlanDetails = async () => {
@@ -107,6 +109,36 @@ export default function WorkoutPlanDetails() {
   if (error) return <div>Error: {error}</div>;
   if (!plan) return <div>No plan found</div>;
 
+  const handleAddPlan = async () => {
+    try {
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+
+      const response = await fetch("http://localhost:3000/api/myPlan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          originalPlanId: plan.id,
+        }),
+      });
+
+      if (response.status === 400) {
+        throw new Error("Invalid plan ID provided");
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Plan added successfully");
+      navigate("/my-plans");
+    } catch (error) {
+      console.error("Error adding plan:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col mx-24 h-full">
       <Navbar isHomepage={false} />
@@ -155,7 +187,10 @@ export default function WorkoutPlanDetails() {
 
         <div className="flex flex-col mt-6">
           <div className="flex justify-end">
-            <button className="font-montserrat text-white text-xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]">
+            <button
+              className="font-montserrat text-white text-xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
+              onClick={handleAddPlan}
+            >
               Add Plan
             </button>
           </div>
