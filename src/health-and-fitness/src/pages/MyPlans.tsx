@@ -320,7 +320,7 @@ function MyPlans() {
   }
 
   return (
-    <div className="flex flex-col mx-24 py-2">
+    <div className="flex flex-col mx-24 py-2 min-h-screen">
       <div className="">
         <Navbar isHomepage={false} />
       </div>
