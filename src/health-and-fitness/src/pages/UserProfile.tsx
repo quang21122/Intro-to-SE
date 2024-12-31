@@ -173,7 +173,7 @@ export default function Profile() {
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-xl font-semibold">Password</label>
                 <button
-                  className="text-md underline"
+                  className="text-md rounded-md px-2 py-1 bg-gray-500 hover:bg-gray-600 transition-colors"
                   onClick={() => setIsChangePassword(!ischangePassword)}
                 >
                   Change
@@ -206,13 +206,13 @@ export default function Profile() {
                       goalBody: myProfile.goalBody || "",
                     });
                   }}
-                  className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
+                  className="px-4 py-1 transition-colors bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={saveChanges}
-                  className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                  className="px-4 py-1 transition-colors bg-green-600 text-white rounded hover:bg-green-700"
                 >
                   Save Changes
                 </button>
@@ -220,7 +220,7 @@ export default function Profile() {
             ) : (
               <button
                 onClick={toggleEditMode}
-                className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
+                className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857] transition-colors"
               >
                 Edit
               </button>
@@ -496,7 +496,7 @@ export default function Profile() {
               <button
                 type="submit"
                 onClick={handleChangePassword}
-                className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold hover:bg-[#605D5D]"
+                className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold transition-colors hover:bg-[#605D5D]"
               >
                 Confirm
               </button>
@@ -507,7 +507,7 @@ export default function Profile() {
                   setNewPassword("");
                   setVerifyPassword("");
                 }}
-                className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold hover:bg-gray-400"
+                className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold transition-colors hover:bg-gray-400"
               >
                 Cancel
               </button>

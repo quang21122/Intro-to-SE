@@ -140,7 +140,7 @@ export default function WorkoutPlanDetails() {
   };
 
   return (
-    <div className="flex flex-col mx-24 h-full">
+    <div className="flex flex-col mx-24 min-h-screen">
       <Navbar isHomepage={false} />
       <div className="grid grid-cols-[3fr_7fr] pt-10">
         <div className="flex flex-col mx-3">
