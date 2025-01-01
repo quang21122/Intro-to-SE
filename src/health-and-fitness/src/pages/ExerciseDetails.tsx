@@ -161,7 +161,7 @@ export default function ExerciseDetail() {
         <button className="text-[#FF4D4D] cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8 mt-1"
+            className="h-8 w-8 mb-1"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -174,7 +174,7 @@ export default function ExerciseDetail() {
             />
           </svg>
         </button>
-        <span className="text-[#FF4D4D] text-3xl font-bold cursor-pointer">
+        <span className="text-[#FF4D4D] text-3xl font-bold cursor-pointer font-bebas">
           EXERCISE
         </span>
       </div>
@@ -189,7 +189,7 @@ export default function ExerciseDetail() {
           {/* Alternative Exercises */}
           <div className="mt-10">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-lg font-bold text-[#F05454]">
+              <h2 className="text-xl font-bold text-[#F05454] font-montserrat">
                 Alternative {muscleName} Exercises
               </h2>
               <div className="flex gap-2 select-none">
@@ -245,7 +245,9 @@ export default function ExerciseDetail() {
 
         {/* Exercise Title and Categories */}
         <div className="mb-6 flex-col">
-          <h1 className="text-2xl font-bold text-[#FF4D4D] mb-4">{name}</h1>
+          <h1 className="text-3xl font-bold text-[#FF4D4D] mb-4 -mt-2 font-bebas">
+            {name}
+          </h1>
           <div className="grid grid-cols-2 mr-auto max-w-80">
             <div className="flex flex-col gap-2">
               <div className="w-28 h-28 bg-gray-700 rounded-lg overflow-hidden relative">
@@ -259,7 +261,7 @@ export default function ExerciseDetail() {
                 </span>
               </div>
               <div className="rounded-lg mt-4 mb-8">
-                <h2 className="text-white text-md font-medium mb-1">
+                <h2 className="text-white text-md font-medium mb-1 font-montserrat">
                   Difficulty
                 </h2>
                 <p className="text-gray-400">{difficulty}</p>
@@ -277,16 +279,18 @@ export default function ExerciseDetail() {
                 </span>
               </div>
               <div className="rounded-lg mt-4 mb-8">
-                <h2 className="text-white text-md font-medium mb-1">Type</h2>
+                <h2 className="text-white text-md font-medium mb-1 font-montserrat">
+                  Type
+                </h2>
                 <p className="text-gray-400">{type}</p>
               </div>
             </div>
           </div>
 
-          <h2 className="text-white text-lg font-semibold mb-4">
+          <h2 className="text-white text-lg font-semibold mb-4 font-montserrat">
             Instructions
           </h2>
-          <p className="text-gray-400 text-sm">{instruction}</p>
+          <p className="text-gray-400 text-sm font-montserrat">{instruction}</p>
         </div>
       </div>
     </div>
