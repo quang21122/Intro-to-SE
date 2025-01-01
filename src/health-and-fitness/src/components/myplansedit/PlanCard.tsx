@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import PropTypes from "prop-types";
 import { TfiCup } from "react-icons/tfi";
 import { HiChartBar } from "react-icons/hi";
 
@@ -175,7 +174,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
   }
 
   return (
-    <div className="flex flex-col mt-4 mx-4">
+    <div className="flex flex-col mt-4 mr-4">
       <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
         {plan && <img src={plan.image} alt="" />}
         <div className="flex flex-col ml-2 mt-6">
@@ -208,7 +207,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                       plan?.goal === goal
                         ? "bg-[#C73659] text-white"
-                        : "bg-[#D9D9D9]"
+                        : "bg-[#D9D9D9] hover:bg-[#C73659] hover:text-white duration-300"
                     }`}
                   >
                     {goal}
@@ -230,7 +229,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
                     className={`text-black text-[1.1rem] my-2 py-2 rounded-xl ${
                       plan?.level === difficulty
                         ? "bg-[#C73659] text-white"
-                        : "bg-[#D9D9D9]"
+                        : "bg-[#D9D9D9] hover:bg-[#C73659] hover:text-white duration-300"
                     }`}
                   >
                     {difficulty}

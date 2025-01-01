@@ -179,10 +179,13 @@ function MyPlans() {
           style={{ backgroundImage: `url(${plan.image})` }}
         >
           <div className="absolute top-2 right-2 flex space-x-2">
-            <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl">
+            <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl" 
+  aria-label="apply" 
+  data-apply="true">
               <LuFileCheck
                 className="text-white text-2xl"
                 onClick={() => onApply(plan.id)}
+                aria-label="apply"
               />
             </button>
             <button className="bg-black opacity-0 group-hover:opacity-70 transition-opacity duration-300 py-1 px-2 rounded-xl">
@@ -390,13 +393,13 @@ function MyPlans() {
             <div className="flex flex-col mt-6">
               <div className="flex justify-end space-x-4">
                 <button
-                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2"
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 hover:bg-opacity-80 transition-colors duration-300"
                   onClick={() => navigate("/workout-plans")}
                 >
                   Add plan
                 </button>
                 <button
-                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
+                  className="font-montserrat text-white text-2xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%] hover:bg-opacity-80 transition-colors duration-300"
                   onClick={() =>
                     viewingPlan && navigate(`/my-plans-edit/${viewingPlan.id}`)
                   }

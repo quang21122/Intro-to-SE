@@ -54,7 +54,7 @@ interface AddExerciseCardProps {
   selectedDay: number;
 }
 
-const AddExerciseCard: React.FC<AddExerciseCardProps> = ({ 
+const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
   setIsAdding,
   handleAddExercise,
   selectedDay,
@@ -154,14 +154,15 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
         }
 
         // Map exercises with muscle names
-        const exercisesWithMuscles = exerciseData.map((exercise: ExerciseDetail) => {
-          const muscle = muscles.find((m) => m.id === exercise.muscle);
-          return {
-            ...exercise,
-            muscleName: muscle ? muscle.name : "Unknown",
-          };
-        });
-
+        const exercisesWithMuscles = exerciseData.map(
+          (exercise: ExerciseDetail) => {
+            const muscle = muscles.find((m) => m.id === exercise.muscle);
+            return {
+              ...exercise,
+              muscleName: muscle ? muscle.name : "Unknown",
+            };
+          }
+        );
 
         setExercises(exercisesWithMuscles);
       } catch (err) {
@@ -258,7 +259,7 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
       <div className="flex flex-row items-center justify-between">
         <h1 className="font-bebas text-4xl text-black">Exercise Library</h1>
         <IoCloseCircleOutline
-          className="text-4xl text-black cursor-pointer"
+          className="text-4xl text-black cursor-pointer hover:text-[#C73659] duration-300"
           onClick={() => setIsAdding(false)}
         />
       </div>
@@ -290,47 +291,50 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
       </div>
 
       <div className="flex flex-col mt-6">
-        <h1 className="font-montserrat text-3xl text-black">Exercises</h1>
-        {exercises.length > 0 ? (
-          exercises.map((exercise) => (
-            console.log("Exercise info:", exercise),
-            <div
-              key={exercise.id}
-              className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 cursor-pointer my-2"
-            >
-              <img
-                src={exercise.image}
-                alt={exercise.name}
-                className="w-14 h-14 rounded-full"
-              />
-              <div className="flex flex-col">
-                <h2 className="text-lg text-black">{exercise.name}</h2>
-                <p className="text-lg text-[#686D76]">{exercise.muscleName}</p>
+        {/* <h1 className="font-montserrat text-3xl text-black">Exercises</h1> */}
+        <div className="h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+          {exercises.length > 0 ? (
+            exercises.map((exercise) => (
+              <div
+                key={exercise.id}
+                className="grid grid-cols-[2fr_7fr_1fr] items-center bg-[#D9D9D9] rounded-xl p-4 my-2"
+              >
+                <img
+                  src={exercise.image}
+                  alt={exercise.name}
+                  className="w-14 h-14 rounded-full"
+                />
+                <div className="flex flex-col">
+                  <h2 className="text-lg text-black">{exercise.name}</h2>
+                  <p className="text-lg text-[#686D76]">
+                    {exercise.muscleName}
+                  </p>
+                </div>
+                <CiCirclePlus
+                  className="text-4xl text-black cursor-pointer hover:text-[#C73659]"
+                  onClick={() => {
+                    handleAddExercise(
+                      {
+                        id: exercise.id,
+                        sets: 0,
+                        reps: "0",
+                        interval: "00:00",
+                        restTime: "00:00",
+                      },
+                      selectedDay
+                    );
+                  }}
+                />
               </div>
-              <CiCirclePlus
-                className="text-4xl text-black"
-                onClick={() => {
-                  handleAddExercise(
-                    {
-                      id: exercise.id,
-                      sets: 0,
-                      reps: "0",
-                      interval: "00:00",
-                      restTime: "00:00"
-                    }, 
-                    selectedDay
-                  );
-                }}
-              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center bg-[#D9D9D9] rounded-xl p-6 my-2">
+              <p className="text-xl text-[#686D76] font-montserrat">
+                No exercises found
+              </p>
             </div>
-          ))
-        ) : (
-          <div className="flex flex-col items-center justify-center bg-[#D9D9D9] rounded-xl p-6 my-2">
-            <p className="text-xl text-[#686D76] font-montserrat">
-              No exercises found
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -109,7 +109,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               onBlur={() => handleBlur("restTime")}
             />
             <IoTrashOutline
-              className="text-3xl ml-3 text-black cursor-pointer"
+              className="text-3xl ml-3 text-black cursor-pointer hover:text-red-500 duration-300"
               onClick={onDelete}
             />
           </div>
