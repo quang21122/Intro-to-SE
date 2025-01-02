@@ -13,6 +13,19 @@ interface FilterState {
   Levels: string;
 }
 
+interface Plan {
+  id: string;
+  name: string;
+  image: string;
+  muscle: string;
+  level: string;
+  goal: string;
+  equipment: string;
+  days: number;
+  description: string;
+  createdAt: string;
+}
+
 export default function WorkoutPlans() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [muscles, setMuscles] = useState<string[]>([]);
@@ -25,7 +38,14 @@ export default function WorkoutPlans() {
     Levels: "All",
   });
 
-  const days = [1, 2, 3, 4, 5, 6, 7].map((day) => `${day} days`);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Plan[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [isEmpty, setIsEmpty] = useState(false);
+
+  const days = [1, 2, 3, 4, 5, 6, 7, 28].map((day) => `${day} days`);
   const goals = ["Maintaining", "Bulking", "Cutting", "Sport Specific"];
   const levels = ["Beginner", "Intermediate", "Advanced"];
   const clearAllFilters = () => {
@@ -37,18 +57,148 @@ export default function WorkoutPlans() {
     });
   };
 
+  const [filteredPlans, setFilteredPlans] = useState<Plan[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>({
+    Days: "All",
+    Muscles: "All",
+    Goals: "All",
+    Levels: "All",
+  });
+
+  const fetchFilteredPlans = async (filters: FilterState) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setIsEmpty(false);
+
+      const queryParams = new URLSearchParams();
+
+      if (filters.Days !== "All") {
+        const match = filters.Days.match(/\d+/);
+        queryParams.append("daysList", match ? match[0] : "");
+      }
+      if (filters.Muscles !== "All") {
+        queryParams.append("muscles", filters.Muscles);
+      }
+      if (filters.Goals !== "All") {
+        queryParams.append("goals", filters.Goals);
+      }
+      if (filters.Levels !== "All") {
+        queryParams.append("levels", filters.Levels);
+      }
+
+      if (queryParams.toString() === "") {
+        setFilteredPlans([]);
+        return;
+      }
+
+      const url = `http://localhost:3000/api/plan?${queryParams.toString()}`;
+
+      const response = await fetch(url);
+
+      if (response.status === 404) {
+        setIsEmpty(true);
+        setFilteredPlans([]);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch filtered plans");
+      }
+
+      const data = await response.json();
+      if (!data.data || data.data.length === 0) {
+        setIsEmpty(true);
+        setFilteredPlans([]);
+      } else {
+        setIsEmpty(false);
+        setFilteredPlans(data.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch plans");
+      setFilteredPlans([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleApplyFilters = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setAppliedFilters(filterState);
+    setIsFilterOpen(false);
+    fetchFilteredPlans(filterState);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const searchWorkoutPlans = async () => {
+      if (!debouncedSearchTerm) {
+        setSearchResults([]);
+        setIsEmpty(false);
+        return;
+      }
+
+      setIsSearching(!isSearching);
+      setSearchError(null);
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/plan?search=${debouncedSearchTerm}`
+        );
+
+        if (response.status === 404) {
+          setIsEmpty(true);
+          setSearchResults([]);
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Search failed");
+        }
+
+        const data = await response.json();
+
+        if (!data.data.plans || data.data.plans.length === 0) {
+          setSearchResults([]);
+          setIsEmpty(true);
+        } else {
+          setSearchResults(data.data.plans);
+          setIsEmpty(false);
+        }
+      } catch (err) {
+        setSearchError(err instanceof Error ? err.message : "Search failed");
+        setSearchResults([]);
+        setIsEmpty(true);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    searchWorkoutPlans();
+  }, [debouncedSearchTerm]);
+
   useEffect(() => {
     const fetchMuscleNames = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch("http://localhost:3000/api/muscle?all=true", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/muscle?all=true",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -74,31 +224,74 @@ export default function WorkoutPlans() {
     fetchMuscleNames();
   }, []);
 
+  useEffect(() => {
+    console.log("isEmpty changed:", isEmpty);
+  }, [isEmpty]);
+
+  // update filtered plans when filters change
+  useEffect(() => {
+    console.log("appliedFilters changed:", appliedFilters);
+    fetchFilteredPlans(appliedFilters);
+  }, [appliedFilters]);
+
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="flex flex-col items-center">
+          <svg
+            className="animate-spin h-10 w-10 text-gray-500 mb-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="text-xl text-gray-700">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return <p>Error: {error}</p>;
   }
 
+  if (searchError) {
+    return <p>Error: {searchError}</p>;
+  }
+
   return (
-    <div className="py-6 flex flex-col mx-24">
+    <div className="py-2 flex flex-col mx-24 min-h-screen">
       <Navbar isHomepage={false} />
       <div className="flex justify-center items-center flex-row font-bebas mt-10">
         {/* Search input */}
-        <div className="flex items-center flex-row w-full">
+        <div className="flex items-center flex-row w-full relative">
           <input
             type="text"
-            placeholder="Search"
-            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-[120%]"
+            placeholder="Search workout plans..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 rounded-lg border-2 border-gray-300 bg-white text-black text-2xl w-full"
+            style={{ textTransform: "none" }}
           />
-          <FaSearch className="text-3xl text-black -mx-12" onClick={() => {}} />
+          <FaSearch className="absolute right-4 text-3xl text-black" />
         </div>
 
         {/* Filter */}
         <button
-          className="py-[0.7rem] px-4 rounded-lg bg-white text-black text-2xl ml-28 flex items-center flex-row"
+          className="py-[0.7rem] px-4 rounded-lg bg-white text-black text-2xl ml-28 flex items-center flex-row hover:bg-gray-300 transition-colors"
           onClick={() => setIsFilterOpen(true)}
         >
           Filter
@@ -165,8 +358,9 @@ export default function WorkoutPlans() {
                     Clear
                   </button>
                   <button
+                    type="button"
                     className="flex-1 bg-[#F05454] text-black text-xl px-6 py-2 rounded-xl hover:text-white transition-colors"
-                    onClick={() => setIsFilterOpen(false)}
+                    onClick={handleApplyFilters}
                   >
                     Apply
                   </button>
@@ -185,7 +379,13 @@ export default function WorkoutPlans() {
         <p className="uppercase font-bebas text-[#F05454] text-5xl mb-12">
           Workout Plans
         </p>
-        <WorkoutPlanList />
+        <WorkoutPlanList
+          searchResults={searchResults}
+          isSearching={searchResults.length !== 0}
+          filteredPlans={filteredPlans}
+          isFiltering={filteredPlans.length !== 0}
+          isEmpty={isEmpty}
+        />
       </div>
     </div>
   );
@@ -259,4 +459,3 @@ const DropdownWithCheckbox: React.FC<DropdownWithCheckboxProps> = ({
     </div>
   );
 };
-

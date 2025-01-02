@@ -12,6 +12,10 @@ const createPlan = async (req, res) => {
 
 const deletePlan = async (req, res) => {
   const { id } = req.query;
+  if (!id) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
   const deletedPlan = await planService.deletePlan(id);
 
   if (deletedPlan.error) {
@@ -22,11 +26,20 @@ const deletePlan = async (req, res) => {
 };
 
 const getPlan = async (req, res) => {
-  const {id, page} = req.query;
-  if (!id && !page) {
-    return res.status(400).json({ error: "Either 'id' or 'page' query parameter is required" });
+  const { id, page, search, muscles, daysList, levels, name, goals } = req.query;
+  if (!id && !page && !search && !muscles && !daysList && !levels && !name && !goals) {
+    return res.status(400).json({ error: "Either 'id', 'page', 'search' or filter elements query parameter is required" });
   }
   try {
+    if (search) {
+      // Handle query by search
+      const plans = await planService.searchPlans(search);
+      if (!plans || plans.length === 0) {
+        return res.status(404).json({ error: "No plans found from search" });
+      }
+      return res.status(200).json({ data: plans });
+    }
+
     if (id) {
       // Handle query by id
       const plan = await planService.getPlan(id);
@@ -35,6 +48,50 @@ const getPlan = async (req, res) => {
       }
       return res.status(200).json({ data: plan });
     }
+
+    if (muscles || daysList || levels || name || goals) {
+      //Handle filter
+      if (!muscles && !page && !name && !daysList && !levels && !goals) {
+        return res.status(400).json({
+          error:
+            "At least one query parameter (muscles, page, name, daysList, levels or goals) is required",
+        });
+      }
+    
+        const muscleNames = muscles ? muscles.split(",") : [];
+        const days = daysList ? daysList.split(",").map(Number) : [];
+        const multipleLevels = levels ? levels.split(",") : [];
+        const pageNum = page ? parseInt(page, 10) : null;
+        const multipleGoals = goals ? goals.split(",") : [];
+
+        // Validate page number if provided
+        if (page && (isNaN(pageNum) || pageNum < 1)) {
+          return res.status(400).json({ error: "Invalid page number" });
+        }
+
+        const filters = {
+          muscles: muscleNames,
+          daysList: days,
+          levels: multipleLevels,
+          page: pageNum,
+          name,
+          goals: multipleGoals
+        };
+
+        const plans = await planService.getFilteredPlans(filters);
+
+        if (!plans || plans.length === 0) {
+          return res
+            .status(404)
+            .json({ error: "No plans found for the specified filters" });
+        }
+
+        return res.status(200).json({
+          data: plans,
+          ...(pageNum && { page: pageNum }), // Include page if pagination is used
+        });
+    }
+
     if (page) {
       // Validate page number
       const pageNum = parseInt(page, 10);
@@ -47,9 +104,9 @@ const getPlan = async (req, res) => {
         return res.status(404).json({ error: "No plans found for the specified page" });
       }
       return res.status(200).json({ data: plans, page: pageNum });
-    }
+      }
   }
-  catch (error) {
+   catch (error) {
     console.log("Error in getPlan:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -57,6 +114,10 @@ const getPlan = async (req, res) => {
 
 const updatePlan = async (req, res) => {
   const { id } = req.query;
+  if (!id) {
+    return res.status(400).json({ error: "id is required" });
+  }
+
   const updatedPlan = await planService.updatePlan(id, req.body);
 
   if (updatedPlan.error) {

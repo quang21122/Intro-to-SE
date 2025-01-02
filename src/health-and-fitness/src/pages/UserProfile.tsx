@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useProfile } from "../hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import logo from "../assets/header/logo.png";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -138,8 +139,20 @@ export default function Profile() {
         <Navbar isHomepage={false} />
       </div>
       {/* Left Sidebar */}
-      <div className="w-64 bg-[#A91E3B] p-6 text-white">
+      <div className="w-80 bg-[#A91E3B] p-6 text-white">
         <div className="mb-8 mt-20">
+          {/* Logo */}
+          <div
+            className={`flex justify-center items-center cursor-pointer max-w-28 absolute top-6 left-8 ${
+              location.pathname === "/profile" ? "" : ""
+            }`}
+            onClick={() => navigate("/")}
+          >
+            <img src={logo} alt="Logo" className="h-10 cursor-pointer" />
+            <p className="bebas-font text-4xl ml-2 tracking-widest text-white cursor-pointer">
+              HAF
+            </p>
+          </div>
           <div className="flex items-center space-x-3 mb-6">
             <div>
               <img
@@ -148,25 +161,25 @@ export default function Profile() {
                 className="w-14 h-14 rounded-full"
               />
             </div>
-            <div className="text-lg">{profile.name}</div>
+            <div className="text-xl font-semibold">{profile.name}</div>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 ml-2">
             <div>
-              <label className="block text-sm mb-1">Email</label>
+              <label className="block text-xl font-semibold mb-1">Email</label>
 
-              <div className="text-sm">{profile.email}</div>
+              <div className="text-md">{profile.email}</div>
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm">Password</label>
+                <label className="block text-xl font-semibold">Password</label>
                 <button
-                  className="text-xs underline"
+                  className="text-md rounded-md px-2 py-1 bg-gray-500 hover:bg-gray-600 transition-colors"
                   onClick={() => setIsChangePassword(!ischangePassword)}
                 >
                   Change
                 </button>
               </div>
-              <div className="text-sm">••••••••••••••</div>
+              <div className="text-md">••••••••••••••</div>
             </div>
           </div>
         </div>
@@ -180,28 +193,26 @@ export default function Profile() {
             {isEditing ? (
               <div className="space-x-4">
                 <button
-                  onClick={
-                    () => {
-                      toggleEditMode();
-                      setProfile({
-                        name: user?.displayName || "",
-                        email: user?.email || "",
-                        height: myProfile.height || "",
-                        weight: myProfile.weight || "",
-                        gender: myProfile.gender || "",
-                        goalHeight: myProfile.goalHeight || "",
-                        goalWeight: myProfile.goalWeight || "",
-                        goalBody: myProfile.goalBody || "",
-                      });
-                    }
-                  }
-                  className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
+                  onClick={() => {
+                    toggleEditMode();
+                    setProfile({
+                      name: user?.displayName || "",
+                      email: user?.email || "",
+                      height: myProfile.height || "",
+                      weight: myProfile.weight || "",
+                      gender: myProfile.gender || "",
+                      goalHeight: myProfile.goalHeight || "",
+                      goalWeight: myProfile.goalWeight || "",
+                      goalBody: myProfile.goalBody || "",
+                    });
+                  }}
+                  className="px-4 py-1 transition-colors bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={saveChanges}
-                  className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                  className="px-4 py-1 transition-colors bg-green-600 text-white rounded hover:bg-green-700"
                 >
                   Save Changes
                 </button>
@@ -209,7 +220,7 @@ export default function Profile() {
             ) : (
               <button
                 onClick={toggleEditMode}
-                className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857]"
+                className="px-4 py-1 bg-[#A91E3B] text-white rounded hover:bg-[#c73857] transition-colors"
               >
                 Edit
               </button>
@@ -485,7 +496,7 @@ export default function Profile() {
               <button
                 type="submit"
                 onClick={handleChangePassword}
-                className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold hover:bg-[#605D5D]"
+                className="w-full py-2 mt-6 bg-black rounded-lg text-white text-xl font-bold transition-colors hover:bg-[#605D5D]"
               >
                 Confirm
               </button>
@@ -496,7 +507,7 @@ export default function Profile() {
                   setNewPassword("");
                   setVerifyPassword("");
                 }}
-                className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold hover:bg-gray-400"
+                className="w-full py-2 mt-4 bg-gray-300 rounded-lg text-black text-xl font-bold transition-colors hover:bg-gray-400"
               >
                 Cancel
               </button>

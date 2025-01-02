@@ -52,6 +52,10 @@ export default function Exercises() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
@@ -70,7 +74,6 @@ export default function Exercises() {
         const muscleData = await muscleRes.json();
         if (muscleData.status === 200) {
           setMuscles(muscleData.muscles);
-          console.log("Fetched Muscles:", muscleData.muscles);
         } else {
           console.error("Error: Unexpected status code", muscleData.status);
         }
@@ -106,15 +109,11 @@ export default function Exercises() {
 
         // Fetch exercises only if there are selected muscles
         const selectedMusclesParam = selectedMuscles.join(",");
-        console.log("Selected Muscles:", selectedMusclesParam);
         const selectedEquipmentParam = selectedEquipment.join(",");
-        console.log("Selected Equipment:", selectedEquipmentParam);
-
         const queryParam = new URLSearchParams();
 
         if (debouncedSearchTerm) {
           queryParam.append("search", debouncedSearchTerm);
-          console.log("Search Term:", debouncedSearchTerm);
         }
 
         if (selectedMuscles.length) {
@@ -141,16 +140,12 @@ export default function Exercises() {
         }
 
         const exerciseData = await exerciseRes.json();
-        console.log("Fetched Exercises:", exerciseData);
         const exercises = debouncedSearchTerm
           ? exerciseData.data.exercises
           : exerciseData.data || [];
-        console.log("Exercises:", exercises);
 
         const filteredExerciseCount = exercises.length;
-        console.log("Filtered Exercise Count:", filteredExerciseCount);
         const totalPages = Math.ceil(filteredExerciseCount / itemsPerPage);
-        console.log("Total Pages:", totalPages);
         setTotalPages(totalPages);
 
         // Fetch corresponding muscle and equipment data for each exercise
@@ -168,7 +163,6 @@ export default function Exercises() {
               `http://localhost:3000/api/equipment?id=${exercise.equipment}`
             );
             const equipmentData = await equipmentRes.json();
-            console.log("Equipment Data:", equipmentData);
 
             return {
               ...exercise,
@@ -187,6 +181,7 @@ export default function Exercises() {
         setExercises(updatedExercises);
       } catch (err) {
         if (err instanceof Error) {
+          setTotalPages(0);
           setError("No available exercises found");
         } else {
           setError("An unknown error occurred while fetching exercises");
@@ -202,12 +197,9 @@ export default function Exercises() {
   useEffect(() => {
     setCurrentFilteredPage(1);
     setCurrentPage(1);
-    console.log("Current Filtered Page:", currentFilteredPage);
-    console.log("Current Page:", currentPage);
   }, [selectedMuscles, selectedEquipment, debouncedSearchTerm]); // Reset currentPage when selectedMuscles changes
 
   const handleExerciseClick = (exercise: Exercise) => {
-    console.log("Exercise clicked:", exercise);
     const formattedName = exercise.name.replace(/\s+/g, "-").toLowerCase();
     navigate(`/exercises/${formattedName}`, { state: { exercise } });
   };
@@ -252,13 +244,13 @@ export default function Exercises() {
         <div className="flex gap-4 my-6">
           <button
             onClick={() => setShowMuscleFilter((prev) => !prev)}
-            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md"
+            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md hover:bg-[#d83c3c] duration-300"
           >
             {showMuscleFilter ? "Hide Muscle Filter" : "Show Muscle Filter"}
           </button>
           <button
             onClick={() => setShowEquipmentFilter((prev) => !prev)}
-            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md"
+            className="bg-[#FF4D4D] text-white px-4 py-2 rounded-md hover:bg-[#d83c3c] duration-300"
           >
             {showEquipmentFilter
               ? "Hide Equipment Filter"
@@ -269,7 +261,7 @@ export default function Exercises() {
         {/* Filter by Muscle */}
         {showMuscleFilter && (
           <section className="my-8 w-full">
-            <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">
+            <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4 font-bebas">
               FILTER BY MUSCLE
             </h2>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
@@ -305,7 +297,7 @@ export default function Exercises() {
         {/* Filter by Equipment */}
         {showEquipmentFilter && (
           <section className="mb-8 w-full">
-            <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">
+            <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4 font-bebas">
               FILTER BY EQUIPMENT
             </h2>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
@@ -340,11 +332,35 @@ export default function Exercises() {
 
         {/* Exercises List */}
         <section className="w-full">
-          <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4">EXERCISES</h2>
+          <h2 className="text-[#FF4D4D] text-3xl font-bold mb-4 font-bebas">
+            EXERCISES
+          </h2>
 
           {isLoading ? (
             <div className="min-h-screen">
-              <p>Loading...</p>
+              <div className="flex flex-col items-center">
+                <svg
+                  className="animate-spin h-10 w-10 text-gray-500 mb-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <p className="text-xl text-gray-700">Loading...</p>
+              </div>
             </div>
           ) : error ? (
             <p className="text-red-500">{error}</p>
@@ -372,11 +388,13 @@ export default function Exercises() {
                         />
                       </div>
                       <div>
-                        <h3 className="font-bold mb-1">{exercise.name}</h3>
-                        <div className="text-[#FF4D4D] text-sm mb-2">
+                        <h3 className="font-bold mb-1 font-bebas text-2xl">
+                          {exercise.name}
+                        </h3>
+                        <div className="text-[#FF4D4D] text-xl mb-2 font-bebas">
                           {exercise.muscleName}
                         </div>
-                        <p className="text-gray-400 text-sm line-clamp-3">
+                        <p className="text-gray-400 text-md line-clamp-3 font-montserrat">
                           {exercise.instruction}
                         </p>
                       </div>
@@ -399,11 +417,13 @@ export default function Exercises() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-bold mb-1">{exercise.name}</h3>
-                      <div className="text-[#FF4D4D] text-sm mb-2">
+                      <h3 className="font-bold mb-1 font-bebas text-2xl">
+                        {exercise.name}
+                      </h3>
+                      <div className="text-[#FF4D4D] text-xl mb-2 font-bebas">
                         {exercise.muscleName}
                       </div>
-                      <p className="text-gray-400 text-sm line-clamp-3">
+                      <p className="text-gray-400 text-md line-clamp-3 font-montserrat">
                         {exercise.instruction}
                       </p>
                     </div>

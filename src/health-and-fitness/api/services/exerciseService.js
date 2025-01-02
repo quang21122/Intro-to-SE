@@ -73,16 +73,11 @@ const createExercise = async (data) => {
 
 const getExercise = async (name) => {
   try {
-    // Convert hyphenated name back to original format
-    const formattedName = name.replace(/-/g, " ");
-    console.log("Formatted Name:", formattedName);
-
     // Query Firestore to find the document by name
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(
-      query(exercisesCollection, where("name", "==", formattedName))
+      query(exercisesCollection, where("name", "==", name))
     );
-    console.log("Query Snapshot Docs:", querySnapshot.docs);
 
     if (querySnapshot.empty) {
       return { error: "Exercise not found", status: 404 };
@@ -177,8 +172,6 @@ const getExercisesByPage = async (page, pageSize = 10) => {
 
 const updateExercise = async (name, data) => {
   try {
-    // Query Firestore to find the document by name
-    console.log(name);
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(
       query(exercisesCollection, where("name", "==", name))
@@ -279,7 +272,6 @@ const getFilteredExercises = async ({ muscles, equipments, page, name }) => {
 const searchExercises = async (searchTerm) => {
   try {
     const formattedTerm = searchTerm.toLowerCase().trim();
-    console.log("Formatted Search Term:", formattedTerm);
 
     const exercisesCollection = collection(firestoreDb, "exercises");
     const querySnapshot = await getDocs(exercisesCollection);

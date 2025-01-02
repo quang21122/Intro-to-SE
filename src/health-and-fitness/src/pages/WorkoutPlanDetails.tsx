@@ -4,7 +4,9 @@ import { GiBiceps } from "react-icons/gi";
 import WorkoutPlanSchedule from "../components/workout/WorkoutPlanSchedule";
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { GrFormPrevious } from "react-icons/gr";
+import { useAuth } from "../hooks/useAuth";
 
 interface Exercise {
   id: string;
@@ -18,6 +20,11 @@ interface PlanDetail {
   day: string;
   exercises: Exercise[];
   name: string;
+  startTime: {
+    hour: number;
+    minute: number;
+    flag: boolean;
+  };
 }
 
 interface Plan {
@@ -46,6 +53,8 @@ export default function WorkoutPlanDetails() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPlanDetails = async () => {
@@ -100,14 +109,50 @@ export default function WorkoutPlanDetails() {
   if (error) return <div>Error: {error}</div>;
   if (!plan) return <div>No plan found</div>;
 
+  const handleAddPlan = async () => {
+    try {
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+
+      const response = await fetch("http://localhost:3000/api/myPlan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          originalPlanId: plan.id,
+        }),
+      });
+
+      if (response.status === 400) {
+        throw new Error("Invalid plan ID provided");
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Plan added successfully");
+      navigate("/my-plans");
+    } catch (error) {
+      console.error("Error adding plan:", error);
+    }
+  };
+
   return (
-    <div className="flex flex-col mx-24">
+    <div className="flex flex-col mx-24 min-h-screen">
       <Navbar isHomepage={false} />
       <div className="grid grid-cols-[3fr_7fr] pt-10">
         <div className="flex flex-col mx-3">
-          <h1 className="font-bebas uppercase text-4xl text-[#F05454]">
-            Plan details
-          </h1>
+          <div
+            className="flex flex-row hover:cursor-pointer"
+            onClick={() => navigate("/workout-plans")}
+          >
+            <GrFormPrevious className="text-5xl text-[#F05454] cursor-pointer" />
+            <h1 className="font-bebas uppercase text-5xl text-[#F05454] ml-4">
+              Plan Details
+            </h1>
+          </div>
           <div className="w-full bg-[#B2B2B2] rounded-xl p-3 mt-14 flex flex-col">
             <img src={plan.image} alt="" className="rounded-xl" />
             <div className="flex flex-col ml-2 mt-6">
@@ -142,7 +187,10 @@ export default function WorkoutPlanDetails() {
 
         <div className="flex flex-col mt-6">
           <div className="flex justify-end">
-            <button className="font-montserrat text-white text-xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]">
+            <button
+              className="font-montserrat text-white text-xl bg-[#A91D3A] rounded-xl px-5 py-2 w-[14%]"
+              onClick={handleAddPlan}
+            >
               Add Plan
             </button>
           </div>
