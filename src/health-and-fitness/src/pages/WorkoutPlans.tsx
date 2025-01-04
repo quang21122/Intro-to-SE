@@ -45,7 +45,7 @@ export default function WorkoutPlans() {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [isEmpty, setIsEmpty] = useState(false);
 
-  const days = [1, 2, 3, 4, 5, 6, 7, 28].map((day) => `${day} days`);
+  const days = [1, 2, 3, 4, 5, 6, 7].map((day) => `${day} days`);
   const goals = ["Maintaining", "Bulking", "Cutting", "Sport Specific"];
   const levels = ["Beginner", "Intermediate", "Advanced"];
   const clearAllFilters = () => {
