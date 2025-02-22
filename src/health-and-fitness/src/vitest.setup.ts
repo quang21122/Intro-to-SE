@@ -6,10 +6,16 @@ afterEach(() => {
     cleanup();
 });
 
+declare global {
+    interface Window {
+        matchMedia: (query: string) => MediaQueryList;
+    }
+}
+
 global.matchMedia = global.matchMedia || function() {
     return {
-      matches: false,
-      addListener: function() {},
-      removeListener: function() {},
+        matches: false,
+        addListener: function() {},
+        removeListener: function() {},
     };
 };
