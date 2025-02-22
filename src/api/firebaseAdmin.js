@@ -6,7 +6,7 @@ const { credential } = pkg;
 
 // Import the service account key
 import fs from 'fs';
-const serviceAccount = JSON.parse(fs.readFileSync("./api/intro2se-383d8-firebase-adminsdk-5j1hl-122947a7ea.json", 'utf8'));
+const serviceAccount = JSON.parse(fs.readFileSync("./intro2se-383d8-firebase-adminsdk-5j1hl-122947a7ea.json", 'utf8'));
 
 // Initialize the Firebase Admin SDK
 const adminApp = initializeApp({

@@ -2,12 +2,12 @@
 
 import express from 'express';
 import cors from 'cors';
-import userRoutes from '../api/routes/user.js'; // Adjust path if needed
-import exerciseRoutes from '../api/routes/exercise.js'; // Adjust path if needed
-import planRoutes from '../api/routes/plan.js'; // Adjust path if needed
-import equipmentRoutes from '../api/routes/equipment.js'; // Adjust path if needed
-import muscleRoutes from '../api/routes/muscle.js'; // Adjust path if needed
-import myPlanRoutes from '../api/routes/myPlan.js'; // Adjust path if needed
+import userRoutes from './routes/user.js'; // Adjust path if needed
+import exerciseRoutes from './routes/exercise.js'; // Adjust path if needed
+import planRoutes from './routes/plan.js'; // Adjust path if needed
+import equipmentRoutes from './routes/equipment.js'; // Adjust path if needed
+import muscleRoutes from './routes/muscle.js'; // Adjust path if needed
+import myPlanRoutes from './routes/myPlan.js'; // Adjust path if needed
 
 // Initialize Express app
 const app = express();
