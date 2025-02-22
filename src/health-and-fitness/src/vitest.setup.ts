@@ -3,19 +3,18 @@ import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
 afterEach(() => {
-    cleanup();
+  cleanup();
 });
 
-declare global {
-    interface Window {
-        matchMedia: (query: string) => MediaQueryList;
-    }
-}
-
-global.matchMedia = global.matchMedia || function() {
-    return {
-        matches: false,
-        addListener: function() {},
-        removeListener: function() {},
-    };
-};
+(global as any).matchMedia =
+  (global as any).matchMedia ||
+  ((query: string): any => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => { },
+    removeEventListener: () => { },
+    addListener: () => { },
+    removeListener: () => { },
+    dispatchEvent: () => false,
+  }));
