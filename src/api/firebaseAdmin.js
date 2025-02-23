@@ -2,11 +2,17 @@ import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import pkg from 'firebase-admin';
+import path from 'path';
+import { fileURLToPath } from 'url';
 const { credential } = pkg;
 
-// Import the service account key
-import fs from 'fs';
-const serviceAccount = JSON.parse(fs.readFileSync("./intro2se-383d8-firebase-adminsdk-5j1hl-122947a7ea.json", 'utf8'));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const serviceAccount = JSON.parse(
+  fs.readFileSync(
+    path.join(__dirname, 'intro2se-383d8-firebase-adminsdk-122947a7ea.json'),
+    'utf8'
+  )
+);
 
 // Initialize the Firebase Admin SDK
 const adminApp = initializeApp({
