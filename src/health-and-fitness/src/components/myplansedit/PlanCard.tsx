@@ -65,7 +65,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
         setIsLoading(true);
         try {
           const response = await fetch(
-            `https://intro-to-se-pi.vercel.app/api/myPlan?uid=${user.uid}&id=${id}`
+            `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${id}`
           );
 
           if (!response.ok) {
@@ -74,7 +74,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
           }
 
           const userResponse = await fetch(
-            `https://intro-to-se-pi.vercel.app/api/user?userId=${user.uid}`
+            `intro-to-se-server.vercel.app/api/user?userId=${user.uid}`
           );
 
           const userData = await userResponse.json();

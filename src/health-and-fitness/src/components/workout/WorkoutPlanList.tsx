@@ -50,7 +50,7 @@ function WorkoutPlanList({
       const fetchPage = async (pageNum: number): Promise<Plan[]> => {
         try {
           const response = await fetch(
-            `https://intro-to-se-pi.vercel.app/api/plan?page=${pageNum}&limit=6`,
+            `intro-to-se-server.vercel.app/api/plan?page=${pageNum}&limit=6`,
             {
               headers: { "Content-Type": "application/json" },
               // Add timeout

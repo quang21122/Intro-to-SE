@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = async (email: string, password: string, username: string) => {
     try {
       const res = await axios.post(
-        "https://intro-to-se-pi.vercel.app/api/user",
+        "intro-to-se-server.vercel.app/api/user",
         {
             email: email,
             password: password,

@@ -47,7 +47,7 @@ export default function ExerciseDetail() {
       try {
         // Fetch alternative exercises based on the muscle group
         const response = await fetch(
-          `https://intro-to-se-pi.vercel.app/api/exercise?muscles=${exerciseDetails?.muscle}`
+          `intro-to-se-server.vercel.app/api/exercise?muscles=${exerciseDetails?.muscle}`
         );
         const res = await response.json();
 
@@ -61,13 +61,13 @@ export default function ExerciseDetail() {
           exercises.map(async (exercise: ExerciseDetails) => {
             // Fetch muscle data for the exercise
             const muscleRes = await fetch(
-              `https://intro-to-se-pi.vercel.app/api/muscle?id=${exercise.muscle}`
+              `intro-to-se-server.vercel.app/api/muscle?id=${exercise.muscle}`
             );
             const muscleData = await muscleRes.json();
 
             // Fetch equipment data for the exercise
             const equipmentRes = await fetch(
-              `https://intro-to-se-pi.vercel.app/api/equipment?id=${exercise.equipment}`
+              `intro-to-se-server.vercel.app/api/equipment?id=${exercise.equipment}`
             );
             const equipmentData = await equipmentRes.json();
 

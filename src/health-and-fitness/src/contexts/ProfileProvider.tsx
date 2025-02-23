@@ -77,7 +77,7 @@ export const ProfileProvider: React.FC<ProfileProviderProps> = ({ children }) =>
     }
   ) => {
     try {
-      const url = 'https://intro-to-se-pi.vercel.app/api/user';
+      const url = 'intro-to-se-server.vercel.app/api/user';
       const response = await axios.put(
         `${url}?userId=${userId}`,
         updatedProfile

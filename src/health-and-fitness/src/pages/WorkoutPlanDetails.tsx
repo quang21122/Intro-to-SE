@@ -68,7 +68,7 @@ export default function WorkoutPlanDetails() {
 
       try {
         const response = await fetch(
-          `https://intro-to-se-pi.vercel.app/api/plan?id=${id}`,
+          `intro-to-se-server.vercel.app/api/plan?id=${id}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -115,7 +115,7 @@ export default function WorkoutPlanDetails() {
         throw new Error("User is not authenticated");
       }
 
-      const response = await fetch("https://intro-to-se-pi.vercel.app/api/myPlan", {
+      const response = await fetch("intro-to-se-server.vercel.app/api/myPlan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

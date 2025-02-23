@@ -69,7 +69,7 @@ function WorkoutPlanSchedule({ planDetails }: WorkoutPlanScheduleProps) {
           sortedPlanDetails[selectedDay].exercises.map(async (exercise) => {
             try {
               const response = await fetch(
-                `https://intro-to-se-pi.vercel.app/api/exercise?id=${exercise.id}`,
+                `intro-to-se-server.vercel.app/api/exercise?id=${exercise.id}`,
                 {
                   method: "GET",
                   headers: {
@@ -89,7 +89,7 @@ function WorkoutPlanSchedule({ planDetails }: WorkoutPlanScheduleProps) {
               }
 
               const muscleResponse = await fetch(
-                `https://intro-to-se-pi.vercel.app/api/muscle?id=${data.data.data.muscle}`,
+                `intro-to-se-server.vercel.app/api/muscle?id=${data.data.data.muscle}`,
                 {
                   method: "GET",
                   headers: {

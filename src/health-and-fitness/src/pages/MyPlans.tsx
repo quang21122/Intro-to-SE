@@ -67,7 +67,7 @@ function MyPlans() {
         }
 
         const response = await fetch(
-          `https://intro-to-se-pi.vercel.app/api/myPlan?uid=${user.uid}`
+          `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}`
         );
 
         if (!response.ok) {
@@ -77,7 +77,7 @@ function MyPlans() {
         }
 
         const userResponse = await fetch(
-          `https://intro-to-se-pi.vercel.app/api/user?userId=${user.uid}`
+          `intro-to-se-server.vercel.app/api/user?userId=${user.uid}`
         );
 
         const userData = await userResponse.json();
@@ -97,7 +97,7 @@ function MyPlans() {
         const plansWithDetails: Plan[] = await Promise.all(
           plans.map(async (plan: Plan) => {
             const detailsResponse: Response = await fetch(
-              `https://intro-to-se-pi.vercel.app/api/myPlan?uid=${user.uid}&id=${plan.id}`
+              `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${plan.id}`
             );
 
             if (!detailsResponse.ok) {
@@ -150,7 +150,7 @@ function MyPlans() {
     const handleRemoveMyPlan = async (id: string) => {
       try {
         const response = await fetch(
-          `https://intro-to-se-pi.vercel.app/api/myPlan?uid=${user?.uid}&id=${id}`,
+          `intro-to-se-server.vercel.app/api/myPlan?uid=${user?.uid}&id=${id}`,
           {
             method: "DELETE",
           }
