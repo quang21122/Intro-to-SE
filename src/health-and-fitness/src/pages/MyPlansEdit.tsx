@@ -70,7 +70,7 @@ const MyPlansEdit: React.FC = () => {
     const fetchExerciseDetails = async (exerciseId: string) => {
       try {
         const response = await fetch(
-          `intro-to-se-server.vercel.app/api/exercise?id=${exerciseId}`
+          `https://intro-to-se-server.vercel.app/api/exercise?id=${exerciseId}`
         );
         if (!response.ok) {
           throw new Error(`Error fetching exercise: ${response.status}`);
@@ -79,7 +79,7 @@ const MyPlansEdit: React.FC = () => {
         const data = await response.json();
 
         const muscleResponse = await fetch(
-          `intro-to-se-server.vercel.app/api/muscle?id=${data.data.data.muscle}`
+          `https://intro-to-se-server.vercel.app/api/muscle?id=${data.data.data.muscle}`
         );
         const muscleData = await muscleResponse.json();
         return {
@@ -98,7 +98,7 @@ const MyPlansEdit: React.FC = () => {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}`
+            `https://intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}`
           );
 
           if (!response.ok) {
@@ -120,7 +120,7 @@ const MyPlansEdit: React.FC = () => {
           const plansWithDetails: Plan[] = await Promise.all(
             plans.map(async (plan: Plan) => {
               const detailsResponse: Response = await fetch(
-                `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${plan.id}`
+                `https://intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${plan.id}`
               );
 
               if (!detailsResponse.ok) {
@@ -198,7 +198,7 @@ const MyPlansEdit: React.FC = () => {
     }
 
     const response = await fetch(
-      `intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${id}`,
+      `https://intro-to-se-server.vercel.app/api/myPlan?uid=${user.uid}&id=${id}`,
       {
         method: "PUT",
         headers: {
@@ -236,7 +236,7 @@ const MyPlansEdit: React.FC = () => {
 
     setPlan(updatedPlan);
 
-    fetch(`intro-to-se-server.vercel.app/api/myPlan?uid=${user?.uid}&id=${id}`, {
+    fetch(`https://intro-to-se-server.vercel.app/api/myPlan?uid=${user?.uid}&id=${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

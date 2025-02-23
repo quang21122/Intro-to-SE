@@ -92,7 +92,7 @@ export default function WorkoutPlans() {
         return;
       }
 
-      const url = `intro-to-se-server.vercel.app/api/plan?${queryParams.toString()}`;
+      const url = `https://intro-to-se-server.vercel.app/api/plan?${queryParams.toString()}`;
 
       const response = await fetch(url);
 
@@ -150,7 +150,7 @@ export default function WorkoutPlans() {
 
       try {
         const response = await fetch(
-          `intro-to-se-server.vercel.app/api/plan?search=${debouncedSearchTerm}`
+          `https://intro-to-se-server.vercel.app/api/plan?search=${debouncedSearchTerm}`
         );
 
         if (response.status === 404) {
@@ -191,7 +191,7 @@ export default function WorkoutPlans() {
 
       try {
         const response = await fetch(
-          "intro-to-se-server.vercel.app/api/muscle?all=true",
+          "https://intro-to-se-server.vercel.app/api/muscle?all=true",
           {
             method: "GET",
             headers: {
