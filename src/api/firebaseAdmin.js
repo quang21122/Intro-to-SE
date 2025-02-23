@@ -3,6 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import pkg from 'firebase-admin';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 const { credential } = pkg;
 
