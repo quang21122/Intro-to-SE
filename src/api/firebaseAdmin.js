@@ -10,7 +10,7 @@ const { credential } = pkg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serviceAccount = JSON.parse(
   fs.readFileSync(
-    path.join(__dirname, 'intro2se-383d8-firebase-adminsdk-122947a7ea.json'),
+    path.join(__dirname, 'intro2se-cert.json'),
     'utf8'
   )
 );
