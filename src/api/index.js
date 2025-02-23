@@ -14,7 +14,7 @@ const app = express();
 
 // Define CORS options
 const corsOptions = {
-  origin: 'http://localhost:9000', // Change to your frontend URL
+  origin: ['http://localhost:9000', 'https://intro-to-se-pi.vercel.app'], // Change to your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

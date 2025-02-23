@@ -69,7 +69,7 @@ export default function Exercises() {
     const fetchMuscles = async () => {
       try {
         const muscleRes = await fetch(
-          "http://localhost:3000/api/muscle?all=true"
+          "https://intro-to-se-pi.vercel.app/api/muscle?all=true"
         );
         const muscleData = await muscleRes.json();
         if (muscleData.status === 200) {
@@ -89,7 +89,7 @@ export default function Exercises() {
     const fetchEquipment = async () => {
       try {
         const equipmentRes = await fetch(
-          "http://localhost:3000/api/equipment?all=true"
+          "https://intro-to-se-pi.vercel.app/api/equipment?all=true"
         );
         const equipmentData = await equipmentRes.json();
         setEquipment(equipmentData);
@@ -126,10 +126,10 @@ export default function Exercises() {
 
         const exerciseRes = await fetch(
           debouncedSearchTerm
-            ? `http://localhost:3000/api/exercise?search=${debouncedSearchTerm}` // Fetch exercises with search term
+            ? `https://intro-to-se-pi.vercel.app/api/exercise?search=${debouncedSearchTerm}` // Fetch exercises with search term
             : selectedMuscles.length || selectedEquipment.length
-            ? `http://localhost:3000/api/exercise?${queryParam.toString()}` // Fetch exercises with selected muscles
-            : `http://localhost:3000/api/exercise?page=${currentPage}`
+            ? `https://intro-to-se-pi.vercel.app/api/exercise?${queryParam.toString()}` // Fetch exercises with selected muscles
+            : `https://intro-to-se-pi.vercel.app/api/exercise?page=${currentPage}`
         );
 
         if (!exerciseRes.ok) {
@@ -152,7 +152,7 @@ export default function Exercises() {
         const updatedExercises = await Promise.all(
           exercises.map(async (exercise: Exercise) => {
             const muscleRes = await fetch(
-              `http://localhost:3000/api/muscle?id=${exercise.muscle}`
+              `https://intro-to-se-pi.vercel.app/api/muscle?id=${exercise.muscle}`
             );
             const muscleData = await muscleRes.json();
 
@@ -160,7 +160,7 @@ export default function Exercises() {
               exercise.equipment = "0XlZ1Tz8zO6DaanQVvkX";
             }
             const equipmentRes = await fetch(
-              `http://localhost:3000/api/equipment?id=${exercise.equipment}`
+              `https://intro-to-se-pi.vercel.app/api/equipment?id=${exercise.equipment}`
             );
             const equipmentData = await equipmentRes.json();
 

@@ -78,7 +78,7 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
     const fetchMuscles = async () => {
       try {
         const muscleRes = await fetch(
-          "http://localhost:3000/api/muscle?all=true"
+          "https://intro-to-se-pi.vercel.app/api/muscle?all=true"
         );
         const muscleData = await muscleRes.json();
         if (muscleData.status === 200) {
@@ -98,7 +98,7 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
     const fetchEquipment = async () => {
       try {
         const equipmentRes = await fetch(
-          "http://localhost:3000/api/equipment?all=true"
+          "https://intro-to-se-pi.vercel.app/api/equipment?all=true"
         );
         const equipmentData = await equipmentRes.json();
         setEquipment(equipmentData);
@@ -113,14 +113,14 @@ const AddExerciseCard: React.FC<AddExerciseCardProps> = ({
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        let url = "http://localhost:3000/api/exercise";
+        let url = "https://intro-to-se-pi.vercel.app/api/exercise";
 
         if (debouncedSearchTerm) {
-          url = `http://localhost:3000/api/exercise?search=${debouncedSearchTerm}`;
+          url = `https://intro-to-se-pi.vercel.app/api/exercise?search=${debouncedSearchTerm}`;
         } else {
           const queryParam = new URLSearchParams();
           if (selectedMuscle === "All" && selectedEquipment === "All") {
-            url = "http://localhost:3000/api/exercise?page=1";
+            url = "https://intro-to-se-pi.vercel.app/api/exercise?page=1";
           } else {
             if (selectedMuscle !== "All") {
               queryParam.append("muscles", selectedMuscle);

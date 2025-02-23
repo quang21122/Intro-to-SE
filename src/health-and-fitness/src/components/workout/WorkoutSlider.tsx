@@ -68,7 +68,7 @@ function WorkoutSlider() {
   useEffect(() => {
     const fetchPagePlans = async (page: number) => {
       const response = await fetch(
-        `http://localhost:3000/api/plan?page=${page}&limit=6`,
+        `https://intro-to-se-pi.vercel.app/api/plan?page=${page}&limit=6`,
         {
           method: "GET",
           headers: {
